@@ -13,8 +13,8 @@ try:
 except ImportError:
     HF_AVAILABLE = False
 
-from .base import PIIExtractorBase, PIIExtractionResult, PIIEntity
-from ..core.logging_config import get_logger
+from extractors.base import PIIExtractorBase, PIIExtractionResult, PIIEntity
+from core.logging_config import get_logger
 
 logger = get_logger(__name__)
 

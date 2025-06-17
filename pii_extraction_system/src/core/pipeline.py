@@ -4,11 +4,11 @@ import uuid
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-from .config import settings
-from .logging_config import get_logger, audit_log
-from ..utils.data_storage import storage_manager
-from ..utils.document_processor import DocumentProcessor
-from ..extractors.base import PIIExtractionResult, PIIEntity
+from core.config import settings
+from core.logging_config import get_logger, audit_log
+from utils.data_storage import storage_manager
+from utils.document_processor import DocumentProcessor
+from extractors.base import PIIExtractionResult, PIIEntity
 
 logger = get_logger(__name__)
 
@@ -59,7 +59,7 @@ class PIIExtractionPipeline:
         
         try:
             if "rule_based" in settings.ml_models.enabled_models:
-                from ..extractors.rule_based import RuleBasedExtractor
+                from extractors.rule_based import RuleBasedExtractor
                 extractors["rule_based"] = RuleBasedExtractor()
                 logger.info("Rule-based extractor initialized")
         except ImportError as e:
@@ -67,7 +67,7 @@ class PIIExtractionPipeline:
         
         try:
             if "ner" in settings.ml_models.enabled_models:
-                from ..extractors.ner_extractor import NERExtractor
+                from extractors.ner_extractor import NERExtractor
                 extractors["ner"] = NERExtractor()
                 logger.info("NER extractor initialized")
         except ImportError as e:
@@ -75,7 +75,7 @@ class PIIExtractionPipeline:
         
         try:
             if "layout_aware" in settings.ml_models.enabled_models:
-                from ..extractors.layout_aware import LayoutAwareExtractor
+                from extractors.layout_aware import LayoutAwareExtractor
                 extractors["layout_aware"] = LayoutAwareExtractor()
                 logger.info("Layout-aware extractor initialized")
         except ImportError as e:
@@ -83,7 +83,7 @@ class PIIExtractionPipeline:
         
         if not extractors:
             logger.warning("No extractors initialized - falling back to rule-based")
-            from ..extractors.rule_based import RuleBasedExtractor
+            from extractors.rule_based import RuleBasedExtractor
             extractors["rule_based"] = RuleBasedExtractor()
         
         return extractors

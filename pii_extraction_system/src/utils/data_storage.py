@@ -9,8 +9,8 @@ from typing import Dict, List, Optional, Union
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
 
-from core.config import settings
-from core.logging_config import get_logger, audit_log
+from ..core.config import settings
+from ..core.logging_config import get_logger, audit_log
 
 logger = get_logger(__name__)
 

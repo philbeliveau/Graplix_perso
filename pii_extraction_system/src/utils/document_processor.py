@@ -13,8 +13,8 @@ from docx import Document
 from PyPDF2 import PdfReader
 from pdfminer.high_level import extract_text as pdf_extract_text
 
-from core.config import settings
-from core.logging_config import get_logger
+from ..core.config import settings
+from ..core.logging_config import get_logger
 
 logger = get_logger(__name__)
 

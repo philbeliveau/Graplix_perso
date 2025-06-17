@@ -10,7 +10,7 @@ from transformers import (
     LayoutLMTokenizer, LayoutLMForTokenClassification,
     AutoProcessor, VisionEncoderDecoderModel
 )
-from extractors.base import PIIExtractorBase, PIIEntity, PIIExtractionResult
+from .base import PIIExtractorBase, PIIEntity, PIIExtractionResult
 import logging
 
 logger = logging.getLogger(__name__)

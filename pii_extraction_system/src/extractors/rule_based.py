@@ -3,8 +3,8 @@
 import re
 from typing import Dict, List, Any
 
-from extractors.base import PIIExtractorBase, PIIExtractionResult, PIIEntity
-from core.logging_config import get_logger
+from .base import PIIExtractorBase, PIIExtractionResult, PIIEntity
+from ..core.logging_config import get_logger
 
 logger = get_logger(__name__)
 

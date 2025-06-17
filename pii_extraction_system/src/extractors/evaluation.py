@@ -7,8 +7,8 @@ from dataclasses import dataclass, field
 from collections import defaultdict
 import statistics
 
-from extractors.base import PIIEntity, PIIExtractionResult
-from core.logging_config import get_logger
+from .base import PIIEntity, PIIExtractionResult
+from ..core.logging_config import get_logger
 
 logger = get_logger(__name__)
 

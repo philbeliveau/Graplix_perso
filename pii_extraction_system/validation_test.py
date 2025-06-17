@@ -1,11 +1,13 @@
 """Final system validation test script."""
 
 import sys
+import os
 sys.path.append('.')
+sys.path.append('./src')
 
-from core.pipeline import PIIExtractionPipeline
-from extractors.rule_based import RuleBasedExtractor
-from utils.document_processor import DocumentProcessor
+from src.core.pipeline import PIIExtractionPipeline
+from src.extractors.rule_based import RuleBasedExtractor
+from src.utils.document_processor import DocumentProcessor
 
 def main():
     print('=== FINAL SYSTEM VALIDATION ===')
@@ -62,17 +64,17 @@ def main():
         
         # Process the test file
         result = pipeline.extract_from_file('test_document.txt')
-        print(f'   - File processing: SUCCESS - Found {len(result.entities)} entities')
-        print(f'   - Confidence: {result.confidence_score:.2f}')
+        print(f'   - File processing: SUCCESS - Found {len(result.pii_entities)} entities')
+        print(f'   - Average confidence: {sum(result.confidence_scores)/len(result.confidence_scores) if result.confidence_scores else 0:.2f}')
         print(f'   - Processing time: {result.processing_time:.3f}s')
         
         # Show some sample entities
         print('   - Sample entities found:')
         entity_types = {}
-        for entity in result.entities:
-            if entity.type not in entity_types:
-                entity_types[entity.type] = []
-            entity_types[entity.type].append(entity.value)
+        for entity in result.pii_entities:
+            if entity.pii_type not in entity_types:
+                entity_types[entity.pii_type] = []
+            entity_types[entity.pii_type].append(entity.text)
         
         for pii_type, values in entity_types.items():
             print(f'     • {pii_type}: {len(values)} found ({", ".join(values[:2])}{"..." if len(values) > 2 else ""})')

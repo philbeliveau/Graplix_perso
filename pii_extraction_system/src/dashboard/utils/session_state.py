@@ -40,7 +40,7 @@ def initialize_session_state():
     if 'error_annotations' not in st.session_state:
         st.session_state.error_annotations = {}
     if 'performance_metrics' not in st.session_state:
-        st.session_state.performance_metrics = {}
+        st.session_state.performance_metrics = []
     if 'feedback_data' not in st.session_state:
         st.session_state.feedback_data = []
     

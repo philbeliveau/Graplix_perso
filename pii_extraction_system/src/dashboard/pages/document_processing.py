@@ -66,7 +66,13 @@ def show_upload_section():
     if uploaded_files:
         for uploaded_file in uploaded_files:
             if uploaded_file is not None:
-                process_uploaded_file(uploaded_file)
+                # Check if file is already processed to avoid duplication
+                file_key = f"{uploaded_file.name}_{uploaded_file.size}"
+                if file_key not in st.session_state.get('processed_files', set()):
+                    if 'processed_files' not in st.session_state:
+                        st.session_state.processed_files = set()
+                    st.session_state.processed_files.add(file_key)
+                    process_uploaded_file(uploaded_file)
 
 def process_uploaded_file(uploaded_file):
     """Process and store uploaded file"""
@@ -93,11 +99,7 @@ def process_uploaded_file(uploaded_file):
     st.session_state.file_data[file_id] = file_data
     
     st.success(f"✅ Uploaded: {uploaded_file.name}")
-    
-    # Auto-process if user has write permissions
-    if auth.has_permission('write'):
-        if st.button(f"Process {uploaded_file.name}", key=f"process_{file_id}"):
-            process_document(file_id)
+    st.info("📝 Document uploaded successfully. Use the 'View' button to select it, then click 'Process' to analyze for PII.")
 
 def show_document_list():
     """Display uploaded documents"""
@@ -154,18 +156,50 @@ def process_document(file_id: str):
         if not file_data:
             raise ValueError("File data not found")
         
-        # Extract text based on file type
-        text_content = extract_text_content(file_data, doc_info['type'])
+        # Save file temporarily for processing
+        import tempfile
+        import os
         
-        # Mock PII extraction (integrate with actual pipeline)
-        pii_results = mock_pii_extraction(text_content)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{doc_info['name']}") as tmp_file:
+            tmp_file.write(file_data)
+            tmp_file_path = tmp_file.name
+        
+        try:
+            # Use actual PII pipeline
+            pipeline = PIIExtractionPipeline()
+            extraction_result = pipeline.extract_from_file(tmp_file_path)
+            
+            # Convert PII entities to expected format
+            pii_results = []
+            for entity in extraction_result.pii_entities:
+                pii_results.append({
+                    'type': entity.pii_type.upper(),
+                    'text': entity.text,
+                    'start': entity.start_pos,
+                    'end': entity.end_pos,
+                    'confidence': entity.confidence,
+                    'context': entity.context,
+                    'extractor': entity.extractor
+                })
+            
+            # Extract text content for display
+            doc_processor = DocumentProcessor()
+            text_content = doc_processor.process_document(tmp_file_path)['content']
+            
+        finally:
+            # Clean up temporary file
+            if os.path.exists(tmp_file_path):
+                os.unlink(tmp_file_path)
         
         # Store results
         results = {
             'text_content': text_content,
             'pii_entities': pii_results,
-            'processing_method': 'mock_extraction',
-            'confidence_threshold': st.session_state.get('confidence_threshold', 0.5)
+            'processing_method': 'real_pipeline',
+            'processing_time': extraction_result.processing_time,
+            'confidence_scores': extraction_result.confidence_scores,
+            'confidence_threshold': st.session_state.get('confidence_threshold', 0.5),
+            'total_entities': len(pii_results)
         }
         
         session_state.store_processing_results(file_id, results)
@@ -178,79 +212,7 @@ def process_document(file_id: str):
         session_state.update_document_status(file_id, 'error', error_message=str(e))
         st.error(f"❌ Processing failed: {str(e)}")
 
-def extract_text_content(file_data: bytes, file_type: str) -> str:
-    """Extract text content from file data"""
-    try:
-        if 'pdf' in file_type.lower():
-            # PDF extraction
-            pdf_file = io.BytesIO(file_data)
-            pdf_reader = PyPDF2.PdfReader(pdf_file)
-            text = ""
-            for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
-            return text
-        
-        elif 'docx' in file_type.lower() or 'word' in file_type.lower():
-            # DOCX extraction
-            docx_file = io.BytesIO(file_data)
-            doc = Document(docx_file)
-            text = ""
-            for paragraph in doc.paragraphs:
-                text += paragraph.text + "\n"
-            return text
-        
-        elif any(img_type in file_type.lower() for img_type in ['jpg', 'jpeg', 'png']):
-            # Image OCR (simplified - would use actual OCR in production)
-            return "OCR extraction would be implemented here for image files"
-        
-        else:
-            return "Unsupported file type for text extraction"
-    
-    except Exception as e:
-        raise ValueError(f"Text extraction failed: {str(e)}")
-
-def mock_pii_extraction(text: str) -> List[Dict[str, Any]]:
-    """Mock PII extraction for demonstration"""
-    import re
-    
-    pii_entities = []
-    
-    # Email pattern
-    email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-    for match in re.finditer(email_pattern, text):
-        pii_entities.append({
-            'type': 'EMAIL',
-            'text': match.group(),
-            'start': match.start(),
-            'end': match.end(),
-            'confidence': 0.95
-        })
-    
-    # Phone pattern
-    phone_pattern = r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b'
-    for match in re.finditer(phone_pattern, text):
-        pii_entities.append({
-            'type': 'PHONE',
-            'text': match.group(),
-            'start': match.start(),
-            'end': match.end(),
-            'confidence': 0.85
-        })
-    
-    # Simple name pattern (capitalized words)
-    name_pattern = r'\b[A-Z][a-z]+ [A-Z][a-z]+\b'
-    for match in re.finditer(name_pattern, text):
-        # Skip common false positives
-        if match.group() not in ['Dear Sir', 'John Doe', 'Jane Doe']:
-            pii_entities.append({
-                'type': 'PERSON',
-                'text': match.group(),
-                'start': match.start(),
-                'end': match.end(),
-                'confidence': 0.70
-            })
-    
-    return pii_entities
+# Removed mock functions - now using real PII pipeline
 
 def show_processing_results():
     """Display processing results for current document"""
@@ -327,6 +289,18 @@ def show_pii_entities(results: Dict[str, Any]):
     st.markdown("### Detected PII Entities")
     
     pii_entities = results.get('pii_entities', [])
+    total_entities = results.get('total_entities', 0)
+    processing_method = results.get('processing_method', 'unknown')
+    processing_time = results.get('processing_time', 0)
+    
+    # Show processing summary
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Entities", total_entities)
+    with col2:
+        st.metric("Processing Time", f"{processing_time:.2f}s")
+    with col3:
+        st.metric("Method", processing_method)
     
     if not pii_entities:
         st.info("No PII entities detected")

@@ -8,7 +8,12 @@ dashboard, featuring 7 main sections for complete system interaction and monitor
 import streamlit as st
 from streamlit_option_menu import option_menu
 import sys
+import warnings
 from pathlib import Path
+
+# Suppress torch warnings for Streamlit compatibility
+warnings.filterwarnings("ignore", message=".*torch.classes.*")
+warnings.filterwarnings("ignore", message=".*no running event loop.*")
 
 # Add the src directory to Python path for imports
 src_path = Path(__file__).parent.parent

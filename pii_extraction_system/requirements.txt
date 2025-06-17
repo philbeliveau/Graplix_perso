@@ -14,6 +14,8 @@ pdfplumber>=0.7.0
 python-docx>=0.8.11
 pytesseract>=0.3.10
 Pillow>=9.2.0
+openpyxl>=3.1.0
+msoffcrypto-tool>=5.0.0
 
 # ML and NLP
 scikit-learn>=1.1.0
@@ -39,3 +41,7 @@ mypy>=0.991
 
 # Monitoring
 prometheus-client>=0.14.0
+
+# Additional dependencies for full functionality
+sentencepiece>=0.2.0
+pycryptodome>=3.20.0

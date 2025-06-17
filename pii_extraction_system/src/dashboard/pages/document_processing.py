@@ -52,8 +52,18 @@ def show_upload_section():
     
     # Get configuration
     config = st.session_state.get('app_config', {})
-    supported_formats = config.get('supported_formats', ['pdf', 'docx', 'jpg', 'png'])
+    supported_formats = config.get('supported_formats', ['pdf', 'docx', 'xlsx', 'xls', 'jpg', 'png'])
     max_size_mb = config.get('max_file_size_mb', 50)
+    
+    # Password input for protected documents
+    st.markdown("#### Document Password (if required)")
+    st.text_input(
+        "Enter password for protected documents",
+        type="password",
+        value="Hubert",
+        help="Leave blank for unprotected documents. Default password 'Hubert' is pre-filled.",
+        key="document_password"
+    )
     
     # File uploader
     uploaded_files = ui_components.show_file_uploader(
@@ -184,7 +194,9 @@ def process_document(file_id: str):
             
             # Extract text content for display
             doc_processor = DocumentProcessor()
-            text_content = doc_processor.process_document(tmp_file_path)['content']
+            password = st.session_state.get('document_password', '')
+            processed_doc = doc_processor.process_document(tmp_file_path, password if password else None)
+            text_content = processed_doc.get('raw_text', '')
             
         finally:
             # Clean up temporary file

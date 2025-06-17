@@ -54,10 +54,20 @@ def show_batch_upload():
         st.warning("Batch processing requires write permissions.")
         return
     
+    # Password input for protected documents
+    st.markdown("#### Document Password (if required)")
+    st.text_input(
+        "Enter password for protected documents",
+        type="password",
+        value="Hubert",
+        help="Leave blank for unprotected documents. Default password 'Hubert' is pre-filled.",
+        key="batch_password"
+    )
+    
     # Batch upload interface
     uploaded_files = st.file_uploader(
         "Upload multiple documents for batch processing",
-        type=['pdf', 'docx', 'jpg', 'png'],
+        type=['pdf', 'docx', 'xlsx', 'xls', 'jpg', 'png'],
         accept_multiple_files=True,
         help="Select multiple files to process in batch"
     )

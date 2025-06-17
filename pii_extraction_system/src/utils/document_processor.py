@@ -2,6 +2,7 @@
 
 import io
 import json
+import tempfile
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -16,6 +17,23 @@ from pdfminer.high_level import extract_text as pdf_extract_text
 from core.config import settings
 from core.logging_config import get_logger
 
+# For password-protected documents
+try:
+    import msoffcrypto
+    MSOFFCRYPTO_AVAILABLE = True
+except ImportError:
+    MSOFFCRYPTO_AVAILABLE = False
+
+# For Excel files
+try:
+    import openpyxl
+    OPENPYXL_AVAILABLE = True
+except ImportError:
+    OPENPYXL_AVAILABLE = False
+
+# Configure tesseract path for macOS Homebrew installation
+pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'
+
 logger = get_logger(__name__)
 
 
@@ -28,6 +46,8 @@ class DocumentProcessor:
             '.pdf': self._process_pdf,
             '.docx': self._process_docx,
             '.doc': self._process_docx,  # Limited support
+            '.xlsx': self._process_excel,
+            '.xls': self._process_excel,
             '.txt': self._process_text,
             '.jpg': self._process_image,
             '.jpeg': self._process_image,
@@ -39,12 +59,13 @@ class DocumentProcessor:
         # Configure Tesseract
         pytesseract.pytesseract.tesseract_cmd = settings.processing.tesseract_cmd
     
-    def process_document(self, file_path: Union[str, Path]) -> Dict:
+    def process_document(self, file_path: Union[str, Path], password: Optional[str] = None) -> Dict:
         """
         Process a document and extract text and metadata.
         
         Args:
             file_path: Path to the document file
+            password: Optional password for protected documents
             
         Returns:
             Dictionary containing extracted text, metadata, and processing info
@@ -67,7 +88,12 @@ class DocumentProcessor:
         logger.info(f"Processing document: {file_path}")
         
         try:
-            result = self.supported_formats[file_extension](file_path)
+            # Pass password to processing methods that support it
+            if file_extension in ['.docx', '.doc', '.pdf', '.xlsx', '.xls']:
+                result = self.supported_formats[file_extension](file_path, password)
+            else:
+                result = self.supported_formats[file_extension](file_path)
+            
             result.update({
                 'file_path': str(file_path),
                 'file_name': file_path.name,
@@ -83,7 +109,7 @@ class DocumentProcessor:
             logger.error(f"Error processing {file_path}: {str(e)}")
             raise
     
-    def _process_pdf(self, file_path: Path) -> Dict:
+    def _process_pdf(self, file_path: Path, password: Optional[str] = None) -> Dict:
         """Process PDF files."""
         result = {
             'raw_text': '',
@@ -97,11 +123,25 @@ class DocumentProcessor:
             # Try extracting text with PyPDF2 first
             with open(file_path, 'rb') as file:
                 pdf_reader = PdfReader(file)
+                
+                # Handle password-protected PDFs
+                if pdf_reader.is_encrypted:
+                    if password:
+                        try:
+                            pdf_reader.decrypt(password)
+                            logger.info(f"Successfully decrypted PDF with provided password")
+                        except Exception as e:
+                            logger.error(f"Failed to decrypt PDF with password: {e}")
+                            raise ValueError(f"Invalid password for encrypted PDF: {file_path}")
+                    else:
+                        raise ValueError(f"PDF is encrypted but no password provided: {file_path}")
+                
                 result['metadata'] = {
                     'num_pages': len(pdf_reader.pages),
                     'title': pdf_reader.metadata.get('/Title', '') if pdf_reader.metadata else '',
                     'author': pdf_reader.metadata.get('/Author', '') if pdf_reader.metadata else '',
-                    'creation_date': str(pdf_reader.metadata.get('/CreationDate', '')) if pdf_reader.metadata else ''
+                    'creation_date': str(pdf_reader.metadata.get('/CreationDate', '')) if pdf_reader.metadata else '',
+                    'is_encrypted': pdf_reader.is_encrypted
                 }
                 
                 for page_num, page in enumerate(pdf_reader.pages):
@@ -132,7 +172,7 @@ class DocumentProcessor:
         
         return result
     
-    def _process_docx(self, file_path: Path) -> Dict:
+    def _process_docx(self, file_path: Path, password: Optional[str] = None) -> Dict:
         """Process DOCX files."""
         result = {
             'raw_text': '',
@@ -143,7 +183,31 @@ class DocumentProcessor:
         }
         
         try:
-            doc = Document(file_path)
+            # Handle password-protected DOCX files
+            doc_to_process = file_path
+            temp_file = None
+            
+            if password and MSOFFCRYPTO_AVAILABLE:
+                try:
+                    # Check if the file is encrypted
+                    with open(file_path, 'rb') as f:
+                        office_file = msoffcrypto.OfficeFile(f)
+                        if office_file.is_encrypted():
+                            # Create temporary decrypted file
+                            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.docx')
+                            office_file.load_key(password=password)
+                            office_file.decrypt(temp_file)
+                            temp_file.close()
+                            doc_to_process = temp_file.name
+                            logger.info(f"Successfully decrypted DOCX with provided password")
+                except Exception as e:
+                    logger.error(f"Failed to decrypt DOCX with password: {e}")
+                    if temp_file:
+                        temp_file.close()
+                    raise ValueError(f"Invalid password for encrypted DOCX: {file_path}")
+            
+            # Process the document (either original or decrypted)
+            doc = Document(doc_to_process)
             
             # Extract metadata
             core_props = doc.core_properties
@@ -152,7 +216,8 @@ class DocumentProcessor:
                 'author': core_props.author or '',
                 'created': str(core_props.created) if core_props.created else '',
                 'modified': str(core_props.modified) if core_props.modified else '',
-                'num_paragraphs': len(doc.paragraphs)
+                'num_paragraphs': len(doc.paragraphs),
+                'is_encrypted': doc_to_process != str(file_path)
             }
             
             # Extract text from paragraphs
@@ -171,9 +236,126 @@ class DocumentProcessor:
                     for cell in row.cells:
                         result['raw_text'] += cell.text + ' '
                 result['raw_text'] += '\n'
+            
+            # Clean up temporary file if created
+            if temp_file and doc_to_process != str(file_path):
+                try:
+                    import os
+                    os.unlink(temp_file.name)
+                except Exception as cleanup_e:
+                    logger.warning(f"Failed to cleanup temporary file: {cleanup_e}")
         
         except Exception as e:
+            # Clean up temporary file on error
+            if temp_file and doc_to_process != str(file_path):
+                try:
+                    import os
+                    os.unlink(temp_file.name)
+                except Exception as cleanup_e:
+                    logger.warning(f"Failed to cleanup temporary file on error: {cleanup_e}")
+            
             logger.error(f"DOCX processing failed: {e}")
+            raise
+        
+        return result
+    
+    def _process_excel(self, file_path: Path, password: Optional[str] = None) -> Dict:
+        """Process Excel files (.xlsx, .xls)."""
+        result = {
+            'raw_text': '',
+            'sheets': [],
+            'metadata': {},
+            'bounding_boxes': []
+        }
+        
+        if not OPENPYXL_AVAILABLE:
+            raise ValueError("openpyxl not available. Cannot process Excel files.")
+        
+        try:
+            # Handle password-protected Excel files
+            workbook_to_process = file_path
+            temp_file = None
+            
+            if password and MSOFFCRYPTO_AVAILABLE:
+                try:
+                    # Check if the file is encrypted
+                    with open(file_path, 'rb') as f:
+                        office_file = msoffcrypto.OfficeFile(f)
+                        if office_file.is_encrypted():
+                            # Create temporary decrypted file
+                            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx')
+                            office_file.load_key(password=password)
+                            office_file.decrypt(temp_file)
+                            temp_file.close()
+                            workbook_to_process = temp_file.name
+                            logger.info(f"Successfully decrypted Excel with provided password")
+                except Exception as e:
+                    logger.error(f"Failed to decrypt Excel with password: {e}")
+                    if temp_file:
+                        temp_file.close()
+                    raise ValueError(f"Invalid password for encrypted Excel: {file_path}")
+            
+            # Process the Excel file (either original or decrypted)
+            workbook = openpyxl.load_workbook(workbook_to_process, data_only=True)
+            
+            # Extract metadata
+            result['metadata'] = {
+                'sheet_names': workbook.sheetnames,
+                'num_sheets': len(workbook.sheetnames),
+                'is_encrypted': workbook_to_process != str(file_path)
+            }
+            
+            # Process each sheet
+            for sheet_name in workbook.sheetnames:
+                sheet = workbook[sheet_name]
+                sheet_text = ''
+                rows_data = []
+                
+                # Extract data from cells
+                for row_num, row in enumerate(sheet.iter_rows(values_only=True), 1):
+                    row_text_parts = []
+                    for cell_value in row:
+                        if cell_value is not None:
+                            cell_text = str(cell_value)
+                            row_text_parts.append(cell_text)
+                            sheet_text += cell_text + ' '
+                    
+                    if row_text_parts:  # Only add non-empty rows
+                        rows_data.append({
+                            'row_number': row_num,
+                            'cells': row_text_parts,
+                            'text': ' '.join(row_text_parts)
+                        })
+                    
+                    sheet_text += '\n'
+                
+                result['sheets'].append({
+                    'sheet_name': sheet_name,
+                    'text': sheet_text,
+                    'rows': rows_data,
+                    'num_rows': len(rows_data)
+                })
+                
+                result['raw_text'] += f"Sheet: {sheet_name}\n{sheet_text}\n"
+            
+            # Clean up temporary file if created
+            if temp_file and workbook_to_process != str(file_path):
+                try:
+                    import os
+                    os.unlink(temp_file.name)
+                except Exception as cleanup_e:
+                    logger.warning(f"Failed to cleanup temporary file: {cleanup_e}")
+        
+        except Exception as e:
+            # Clean up temporary file on error
+            if temp_file and workbook_to_process != str(file_path):
+                try:
+                    import os
+                    os.unlink(temp_file.name)
+                except Exception as cleanup_e:
+                    logger.warning(f"Failed to cleanup temporary file on error: {cleanup_e}")
+            
+            logger.error(f"Excel processing failed: {e}")
             raise
         
         return result

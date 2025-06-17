@@ -1,0 +1,557 @@
+{
+  "document_id": "56b78dd4-ee7c-4711-a739-79e755a0147d",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "Hopital Cte",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 15,
+        "end_pos": 26,
+        "context": "\u201cQu\u00e9bec Laval (Hopital Cte deta Sante} 175, bid. Rend Laganee (Bloc Fl, Lava...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "Rend Laganee",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 49,
+        "end_pos": 61,
+        "context": "\u201cQu\u00e9bec Laval (Hopital Cte deta Sante} 175, bid. Rend Laganee (Bloc Fl, Laval 7M 975-5497 fom, Se de naissance ...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "Adiesses Bates",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 125,
+        "end_pos": 139,
+        "context": "...al 7M 975-5497 fom, Se de naissance esses jo ates Adiesses Bates prio sion il nai Testes RX dro, do pout raisod me...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "Bloc Fl",
+        "type": "organization",
+        "confidence": 0.9890934824943542,
+        "start_pos": 63,
+        "end_pos": 70,
+        "context": " (Hopital Cte deta Sante} 175, bid. Rend Laganee (Bloc Fl, Laval 7M 975-5497 fom, Se de naissance esses jo ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Laval",
+        "type": "organization",
+        "confidence": 0.948494553565979,
+        "start_pos": 72,
+        "end_pos": 77,
+        "context": " Cte deta Sante} 175, bid. Rend Laganee (Bloc Fl, Laval 7M 975-5497 fom, Se de naissance esses jo ates Ad",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Testes",
+        "type": "organization",
+        "confidence": 0.9277553558349609,
+        "start_pos": 157,
+        "end_pos": 163,
+        "context": "nce esses jo ates Adiesses Bates prio sion il nai Testes RX dro, do pout raisod merci tiom dem\u00e9dedin : on ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "\u201c Qu\u00e9bec Laval",
+        "type": "organization",
+        "confidence": 0.9130784273147583,
+        "start_pos": 0,
+        "end_pos": 13,
+        "context": "\u201cQu\u00e9bec Laval (Hopital Cte deta Sante} 175, bid. Rend Laganee (",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Hopital Cte deta Sante",
+        "type": "organization",
+        "confidence": 0.8958784341812134,
+        "start_pos": 15,
+        "end_pos": 37,
+        "context": "\u201cQu\u00e9bec Laval (Hopital Cte deta Sante} 175, bid. Rend Laganee (Bloc Fl, Laval 7M 975-54",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Rend Laganee",
+        "type": "organization",
+        "confidence": 0.8466982841491699,
+        "start_pos": 49,
+        "end_pos": 61,
+        "context": "\u201cQu\u00e9bec Laval (Hopital Cte deta Sante} 175, bid. Rend Laganee (Bloc Fl, Laval 7M 975-5497 fom, Se de naissance ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Adiesses",
+        "type": "organization",
+        "confidence": 0.7977626919746399,
+        "start_pos": 125,
+        "end_pos": 133,
+        "context": "al 7M 975-5497 fom, Se de naissance esses jo ates Adiesses Bates prio sion il nai Testes RX dro, do pout rai",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.5,
+      0.5,
+      0.5,
+      0.9130784273147583,
+      0.8958784341812134,
+      0.8466982841491699,
+      0.9890934824943542,
+      0.948494553565979,
+      0.7977626919746399,
+      0.9277553558349609
+    ],
+    "processing_time": 3.388974905014038,
+    "error": null,
+    "metadata": {
+      "document_id": "56b78dd4-ee7c-4711-a739-79e755a0147d",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 3,
+          "processing_time": 0.0003440380096435547,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 7,
+          "processing_time": 3.3886308670043945,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 10,
+      "total_entities_after_dedup": 10
+    },
+    "timestamp": "2025-06-17T10:42:34.830175"
+  },
+  "processed_document": {
+    "raw_text": "\u201cQu\u00e9bec Laval (Hopital Cte deta Sante} 175, bid. Rend Laganee (Bloc Fl, Laval 7M 975-5497 fom, Se de naissance esses jo ates Adiesses Bates prio sion il nai Testes RX dro, do pout raisod merci tiom dem\u00e9dedin : on retin: Ri TERE GHADI RG",
+    "ocr_text": "\u201cQu\u00e9bec Laval (Hopital Cte deta Sante} 175, bid. Rend Laganee (Bloc Fl, Laval 7M 975-5497 fom, Se de naissance esses jo ates Adiesses Bates prio sion il nai Testes RX dro, do pout raisod merci tiom dem\u00e9dedin : on retin: Ri TERE GHADI RG",
+    "metadata": {
+      "width": 548,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 34.8
+    },
+    "bounding_boxes": [
+      {
+        "text": "\u201cQu\u00e9bec",
+        "confidence": 41,
+        "x": 55,
+        "y": 78,
+        "width": 94,
+        "height": 20
+      },
+      {
+        "text": "Laval",
+        "confidence": 54,
+        "x": 267,
+        "y": 124,
+        "width": 22,
+        "height": 31
+      },
+      {
+        "text": "(Hopital",
+        "confidence": 49,
+        "x": 293,
+        "y": 124,
+        "width": 37,
+        "height": 31
+      },
+      {
+        "text": "Cte",
+        "confidence": 45,
+        "x": 334,
+        "y": 124,
+        "width": 14,
+        "height": 31
+      },
+      {
+        "text": "deta",
+        "confidence": 45,
+        "x": 352,
+        "y": 124,
+        "width": 23,
+        "height": 31
+      },
+      {
+        "text": "Sante}",
+        "confidence": 46,
+        "x": 378,
+        "y": 134,
+        "width": 30,
+        "height": 11
+      },
+      {
+        "text": "175,",
+        "confidence": 57,
+        "x": 161,
+        "y": 148,
+        "width": 22,
+        "height": 9
+      },
+      {
+        "text": "bid.",
+        "confidence": 54,
+        "x": 189,
+        "y": 137,
+        "width": 23,
+        "height": 30
+      },
+      {
+        "text": "Rend",
+        "confidence": 54,
+        "x": 217,
+        "y": 137,
+        "width": 18,
+        "height": 30
+      },
+      {
+        "text": "Laganee",
+        "confidence": 38,
+        "x": 239,
+        "y": 137,
+        "width": 36,
+        "height": 30
+      },
+      {
+        "text": "(Bloc",
+        "confidence": 58,
+        "x": 279,
+        "y": 137,
+        "width": 21,
+        "height": 30
+      },
+      {
+        "text": "Fl,",
+        "confidence": 32,
+        "x": 304,
+        "y": 137,
+        "width": 10,
+        "height": 30
+      },
+      {
+        "text": "Laval",
+        "confidence": 71,
+        "x": 317,
+        "y": 137,
+        "width": 23,
+        "height": 30
+      },
+      {
+        "text": "7M",
+        "confidence": 67,
+        "x": 389,
+        "y": 137,
+        "width": 13,
+        "height": 30
+      },
+      {
+        "text": "975-5497",
+        "confidence": 64,
+        "x": 377,
+        "y": 160,
+        "width": 44,
+        "height": 12
+      },
+      {
+        "text": "fom,",
+        "confidence": 53,
+        "x": 73,
+        "y": 188,
+        "width": 28,
+        "height": 30
+      },
+      {
+        "text": "Se",
+        "confidence": 50,
+        "x": 208,
+        "y": 188,
+        "width": 19,
+        "height": 30
+      },
+      {
+        "text": "de",
+        "confidence": 66,
+        "x": 363,
+        "y": 188,
+        "width": 10,
+        "height": 29
+      },
+      {
+        "text": "naissance",
+        "confidence": 66,
+        "x": 377,
+        "y": 198,
+        "width": 47,
+        "height": 10
+      },
+      {
+        "text": "esses",
+        "confidence": 41,
+        "x": 90,
+        "y": 224,
+        "width": 30,
+        "height": 6
+      },
+      {
+        "text": "jo",
+        "confidence": 47,
+        "x": 227,
+        "y": 210,
+        "width": 11,
+        "height": 29
+      },
+      {
+        "text": "ates",
+        "confidence": 76,
+        "x": 345,
+        "y": 224,
+        "width": 5,
+        "height": 6
+      },
+      {
+        "text": "Adiesses",
+        "confidence": 52,
+        "x": 76,
+        "y": 221,
+        "width": 44,
+        "height": 11
+      },
+      {
+        "text": "Bates",
+        "confidence": 56,
+        "x": 338,
+        "y": 222,
+        "width": 28,
+        "height": 9
+      },
+      {
+        "text": "prio",
+        "confidence": 31,
+        "x": 76,
+        "y": 238,
+        "width": 36,
+        "height": 30
+      },
+      {
+        "text": "sion",
+        "confidence": 49,
+        "x": 117,
+        "y": 238,
+        "width": 35,
+        "height": 30
+      },
+      {
+        "text": "il",
+        "confidence": 42,
+        "x": 163,
+        "y": 252,
+        "width": 19,
+        "height": 10
+      },
+      {
+        "text": "nai",
+        "confidence": 33,
+        "x": 187,
+        "y": 238,
+        "width": 33,
+        "height": 30
+      },
+      {
+        "text": "Testes",
+        "confidence": 39,
+        "x": 367,
+        "y": 248,
+        "width": 63,
+        "height": 8
+      },
+      {
+        "text": "RX",
+        "confidence": 65,
+        "x": 77,
+        "y": 263,
+        "width": 14,
+        "height": 16
+      },
+      {
+        "text": "dro,",
+        "confidence": 40,
+        "x": 122,
+        "y": 287,
+        "width": 26,
+        "height": 27
+      },
+      {
+        "text": "do",
+        "confidence": 84,
+        "x": 105,
+        "y": 321,
+        "width": 11,
+        "height": 10
+      },
+      {
+        "text": "pout",
+        "confidence": 45,
+        "x": 325,
+        "y": 311,
+        "width": 20,
+        "height": 29
+      },
+      {
+        "text": "raisod",
+        "confidence": 41,
+        "x": 349,
+        "y": 311,
+        "width": 30,
+        "height": 29
+      },
+      {
+        "text": "merci",
+        "confidence": 51,
+        "x": 78,
+        "y": 346,
+        "width": 26,
+        "height": 13
+      },
+      {
+        "text": "tiom",
+        "confidence": 79,
+        "x": 77,
+        "y": 539,
+        "width": 25,
+        "height": 30
+      },
+      {
+        "text": "dem\u00e9dedin",
+        "confidence": 44,
+        "x": 106,
+        "y": 550,
+        "width": 60,
+        "height": 9
+      },
+      {
+        "text": ":",
+        "confidence": 44,
+        "x": 164,
+        "y": 539,
+        "width": 6,
+        "height": 30
+      },
+      {
+        "text": "on",
+        "confidence": 56,
+        "x": 339,
+        "y": 539,
+        "width": 24,
+        "height": 30
+      },
+      {
+        "text": "retin:",
+        "confidence": 54,
+        "x": 129,
+        "y": 561,
+        "width": 47,
+        "height": 30
+      },
+      {
+        "text": "Ri",
+        "confidence": 37,
+        "x": 81,
+        "y": 598,
+        "width": 19,
+        "height": 10
+      },
+      {
+        "text": "TERE",
+        "confidence": 43,
+        "x": 343,
+        "y": 621,
+        "width": 21,
+        "height": 7
+      },
+      {
+        "text": "GHADI",
+        "confidence": 49,
+        "x": 418,
+        "y": 611,
+        "width": 24,
+        "height": 28
+      },
+      {
+        "text": "RG",
+        "confidence": 34,
+        "x": 504,
+        "y": 611,
+        "width": 20,
+        "height": 28
+      }
+    ],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpsscr98qf_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_name": "tmpsscr98qf_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_size_mb": 0.03,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

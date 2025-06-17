@@ -43,6 +43,10 @@ def initialize_session_state():
         st.session_state.performance_metrics = []
     if 'feedback_data' not in st.session_state:
         st.session_state.feedback_data = []
+    if 'correction_log' not in st.session_state:
+        st.session_state.correction_log = {}
+    if 'batch_jobs' not in st.session_state:
+        st.session_state.batch_jobs = []
     
     # System monitoring state
     if 'system_status' not in st.session_state:

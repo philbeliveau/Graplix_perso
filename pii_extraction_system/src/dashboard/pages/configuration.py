@@ -6,6 +6,7 @@ enabling customization for different deployment scenarios and requirements.
 """
 
 import streamlit as st
+import pandas as pd
 import json
 from typing import Dict, List, Any, Optional
 import sys

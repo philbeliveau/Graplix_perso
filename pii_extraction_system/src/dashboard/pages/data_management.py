@@ -8,6 +8,7 @@ and model training data throughout the system lifecycle.
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.express as px
 from typing import Dict, List, Any, Optional
 import sys
 from pathlib import Path

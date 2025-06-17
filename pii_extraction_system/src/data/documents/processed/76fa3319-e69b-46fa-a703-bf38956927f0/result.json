@@ -1,0 +1,61 @@
+{
+  "document_id": "76fa3319-e69b-46fa-a703-bf38956927f0",
+  "extraction_result": {
+    "pii_entities": [],
+    "confidence_scores": [],
+    "processing_time": 5.7220458984375e-05,
+    "error": null,
+    "metadata": {
+      "document_id": "76fa3319-e69b-46fa-a703-bf38956927f0",
+      "document_type": ".pdf",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 0,
+          "processing_time": 2.9087066650390625e-05,
+          "error": "No text content available"
+        },
+        "ner": {
+          "entity_count": 0,
+          "processing_time": 2.8133392333984375e-05,
+          "error": "No text content available"
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 0,
+      "total_entities_after_dedup": 0
+    },
+    "timestamp": "2025-06-17T10:13:10.008122"
+  },
+  "processed_document": {
+    "raw_text": "",
+    "ocr_text": "",
+    "pages": [],
+    "metadata": {},
+    "bounding_boxes": [],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpmagjfll6_Souad Touati - Curriculum Vitae.pdf",
+    "file_name": "tmpmagjfll6_Souad Touati - Curriculum Vitae.pdf",
+    "file_size_mb": 0.88,
+    "file_type": ".pdf",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

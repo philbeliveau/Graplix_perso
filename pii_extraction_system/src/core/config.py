@@ -36,7 +36,7 @@ class ProcessingConfig(BaseModel):
     concurrent_jobs: int = Field(default=4, description="Number of concurrent processing jobs")
     timeout_seconds: int = Field(default=300, description="Processing timeout in seconds")
     ocr_languages: str = Field(default="eng+fra", description="OCR languages")
-    tesseract_cmd: str = Field(default="/usr/bin/tesseract", description="Tesseract command path")
+    tesseract_cmd: str = Field(default="/opt/homebrew/bin/tesseract", description="Tesseract command path")
 
 
 class PrivacyConfig(BaseModel):

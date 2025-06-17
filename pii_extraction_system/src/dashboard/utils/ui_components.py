@@ -114,7 +114,7 @@ def create_confidence_histogram(confidences: List[float], title: str = "Confiden
     """Create confidence score histogram"""
     fig = px.histogram(
         x=confidences,
-        bins=20,
+        nbins=20,
         title=title,
         labels={'x': 'Confidence Score', 'y': 'Count'},
         color_discrete_sequence=['#1f77b4']

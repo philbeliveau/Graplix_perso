@@ -1,0 +1,643 @@
+{
+  "document_id": "77056263-2b2e-463d-8a8f-8b06cda63938",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "819 776-202",
+        "type": "social_security_number",
+        "confidence": 1.0,
+        "start_pos": 26,
+        "end_pos": 37,
+        "context": "776-2425 re\u2019 Telbcoplaurs 819 776-202 dni 7762436, coo Roger. \u201cNom de . 10 \u2018Seng \u2018Die \u2018...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b\\d{3}[-.\\s]?\\d{3}[-.\\s]?\\d{3}\\b"
+        }
+      },
+      {
+        "text": "Canada",
+        "type": "location",
+        "confidence": 0.9991224408149719,
+        "start_pos": 227,
+        "end_pos": 233,
+        "context": " ROTC \u2018AOS 175333: om dl pire; \"om iver Onitatio: Canada: 9. (sv \u2018ate ge \u2014 ie a Date, ab ant paris ~ aon d",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "ROTC",
+        "type": "organization",
+        "confidence": 0.9199288487434387,
+        "start_pos": 178,
+        "end_pos": 182,
+        "context": "tions: ompl\u00e9mentaires. ,. bal che de la personine ROTC \u2018AOS 175333: om dl pire; \"om iver Onitatio: Canad",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Telbcoplaurs",
+        "type": "organization",
+        "confidence": 0.7651669979095459,
+        "start_pos": 13,
+        "end_pos": 25,
+        "context": "776-2425 re\u2019 Telbcoplaurs 819 776-202 dni 7762436, coo Roger. \u201cNom de. 10 \u2018",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      1.0,
+      0.7651669979095459,
+      0.9199288487434387,
+      0.9991224408149719
+    ],
+    "processing_time": 3.6078832149505615,
+    "error": null,
+    "metadata": {
+      "document_id": "77056263-2b2e-463d-8a8f-8b06cda63938",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 1,
+          "processing_time": 0.0004360675811767578,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 3,
+          "processing_time": 3.6074471473693848,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 4,
+      "total_entities_after_dedup": 4
+    },
+    "timestamp": "2025-06-17T10:36:25.833181"
+  },
+  "processed_document": {
+    "raw_text": "776-2425 re\u2019 Telbcoplaurs 819 776-202 dni 7762436, coo Roger. \u201cNom de . 10 \u2018Seng \u2018Die \u2018Num\u00e9ro ot da au Colinas (soins Nom informations: ompl\u00e9mentaires., .. bal che de la personine ROTC \u2018AOS 175333: om dl pire; \"om iver Onitatio: Canada: 9 . (sv \u2018ate ge \u2014 ie a Date, ab ant paris ~ aon de. 3 om . gum ou mandats; lo 8 i Bate",
+    "ocr_text": "776-2425 re\u2019 Telbcoplaurs 819 776-202 dni 7762436, coo Roger. \u201cNom de . 10 \u2018Seng \u2018Die \u2018Num\u00e9ro ot da au Colinas (soins Nom informations: ompl\u00e9mentaires., .. bal che de la personine ROTC \u2018AOS 175333: om dl pire; \"om iver Onitatio: Canada: 9 . (sv \u2018ate ge \u2014 ie a Date, ab ant paris ~ aon de. 3 om . gum ou mandats; lo 8 i Bate",
+    "metadata": {
+      "width": 581,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 67.47
+    },
+    "bounding_boxes": [
+      {
+        "text": "776-2425",
+        "confidence": 63,
+        "x": 166,
+        "y": 61,
+        "width": 42,
+        "height": 14
+      },
+      {
+        "text": "re\u2019",
+        "confidence": 40,
+        "x": 79,
+        "y": 66,
+        "width": 12,
+        "height": 28
+      },
+      {
+        "text": "Telbcoplaurs",
+        "confidence": 55,
+        "x": 93,
+        "y": 74,
+        "width": 75,
+        "height": 13
+      },
+      {
+        "text": "819",
+        "confidence": 55,
+        "x": 154,
+        "y": 66,
+        "width": 12,
+        "height": 28
+      },
+      {
+        "text": "776-202",
+        "confidence": 39,
+        "x": 171,
+        "y": 77,
+        "width": 34,
+        "height": 9
+      },
+      {
+        "text": "dni",
+        "confidence": 37,
+        "x": 434,
+        "y": 50,
+        "width": 19,
+        "height": 13
+      },
+      {
+        "text": "7762436,",
+        "confidence": 67,
+        "x": 467,
+        "y": 85,
+        "width": 38,
+        "height": 13
+      },
+      {
+        "text": "coo",
+        "confidence": 32,
+        "x": 474,
+        "y": 98,
+        "width": 22,
+        "height": 13
+      },
+      {
+        "text": "Roger.",
+        "confidence": 55,
+        "x": 414,
+        "y": 167,
+        "width": 35,
+        "height": 15
+      },
+      {
+        "text": "\u201cNom",
+        "confidence": 58,
+        "x": 122,
+        "y": 182,
+        "width": 40,
+        "height": 10
+      },
+      {
+        "text": "de",
+        "confidence": 89,
+        "x": 151,
+        "y": 173,
+        "width": 10,
+        "height": 27
+      },
+      {
+        "text": ".",
+        "confidence": 68,
+        "x": 40,
+        "y": 221,
+        "width": 3,
+        "height": 1
+      },
+      {
+        "text": "10",
+        "confidence": 79,
+        "x": 392,
+        "y": 216,
+        "width": 12,
+        "height": 10
+      },
+      {
+        "text": "\u2018Seng",
+        "confidence": 49,
+        "x": 147,
+        "y": 218,
+        "width": 27,
+        "height": 30
+      },
+      {
+        "text": "\u2018Die",
+        "confidence": 49,
+        "x": 346,
+        "y": 252,
+        "width": 22,
+        "height": 29
+      },
+      {
+        "text": "\u2018Num\u00e9ro",
+        "confidence": 37,
+        "x": 67,
+        "y": 274,
+        "width": 40,
+        "height": 15
+      },
+      {
+        "text": "ot",
+        "confidence": 56,
+        "x": 153,
+        "y": 270,
+        "width": 8,
+        "height": 24
+      },
+      {
+        "text": "da",
+        "confidence": 86,
+        "x": 167,
+        "y": 275,
+        "width": 8,
+        "height": 13
+      },
+      {
+        "text": "au",
+        "confidence": 93,
+        "x": 205,
+        "y": 270,
+        "width": 8,
+        "height": 24
+      },
+      {
+        "text": "Colinas",
+        "confidence": 44,
+        "x": 265,
+        "y": 304,
+        "width": 124,
+        "height": 13
+      },
+      {
+        "text": "(soins",
+        "confidence": 53,
+        "x": 309,
+        "y": 296,
+        "width": 29,
+        "height": 28
+      },
+      {
+        "text": "Nom",
+        "confidence": 89,
+        "x": 383,
+        "y": 269,
+        "width": 21,
+        "height": 28
+      },
+      {
+        "text": "informations:",
+        "confidence": 48,
+        "x": 40,
+        "y": 356,
+        "width": 97,
+        "height": 31
+      },
+      {
+        "text": "ompl\u00e9mentaires.,",
+        "confidence": 33,
+        "x": 148,
+        "y": 359,
+        "width": 118,
+        "height": 27
+      },
+      {
+        "text": "..",
+        "confidence": 46,
+        "x": 267,
+        "y": 359,
+        "width": 9,
+        "height": 27
+      },
+      {
+        "text": "bal",
+        "confidence": 32,
+        "x": 84,
+        "y": 370,
+        "width": 20,
+        "height": 28
+      },
+      {
+        "text": "che",
+        "confidence": 67,
+        "x": 142,
+        "y": 380,
+        "width": 18,
+        "height": 12
+      },
+      {
+        "text": "de",
+        "confidence": 63,
+        "x": 161,
+        "y": 381,
+        "width": 17,
+        "height": 11
+      },
+      {
+        "text": "la",
+        "confidence": 63,
+        "x": 179,
+        "y": 380,
+        "width": 9,
+        "height": 10
+      },
+      {
+        "text": "personine",
+        "confidence": 67,
+        "x": 191,
+        "y": 383,
+        "width": 47,
+        "height": 9
+      },
+      {
+        "text": "ROTC",
+        "confidence": 41,
+        "x": 145,
+        "y": 403,
+        "width": 47,
+        "height": 26
+      },
+      {
+        "text": "\u2018AOS",
+        "confidence": 34,
+        "x": 385,
+        "y": 408,
+        "width": 19,
+        "height": 13
+      },
+      {
+        "text": "175333:",
+        "confidence": 34,
+        "x": 408,
+        "y": 409,
+        "width": 40,
+        "height": 12
+      },
+      {
+        "text": "om",
+        "confidence": 64,
+        "x": 121,
+        "y": 469,
+        "width": 20,
+        "height": 8
+      },
+      {
+        "text": "dl",
+        "confidence": 44,
+        "x": 182,
+        "y": 457,
+        "width": 8,
+        "height": 29
+      },
+      {
+        "text": "pire;",
+        "confidence": 53,
+        "x": 192,
+        "y": 469,
+        "width": 24,
+        "height": 11
+      },
+      {
+        "text": "\"om",
+        "confidence": 55,
+        "x": 362,
+        "y": 470,
+        "width": 21,
+        "height": 10
+      },
+      {
+        "text": "iver",
+        "confidence": 34,
+        "x": 446,
+        "y": 470,
+        "width": 26,
+        "height": 9
+      },
+      {
+        "text": "Onitatio:",
+        "confidence": 38,
+        "x": 148,
+        "y": 487,
+        "width": 38,
+        "height": 27
+      },
+      {
+        "text": "Canada:",
+        "confidence": 79,
+        "x": 189,
+        "y": 491,
+        "width": 39,
+        "height": 13
+      },
+      {
+        "text": "9",
+        "confidence": 35,
+        "x": 376,
+        "y": 496,
+        "width": 13,
+        "height": 8
+      },
+      {
+        "text": ".",
+        "confidence": 51,
+        "x": 51,
+        "y": 509,
+        "width": 4,
+        "height": 2
+      },
+      {
+        "text": "(sv",
+        "confidence": 39,
+        "x": 127,
+        "y": 512,
+        "width": 18,
+        "height": 8
+      },
+      {
+        "text": "\u2018ate",
+        "confidence": 42,
+        "x": 374,
+        "y": 500,
+        "width": 23,
+        "height": 30
+      },
+      {
+        "text": "ge",
+        "confidence": 65,
+        "x": 401,
+        "y": 513,
+        "width": 8,
+        "height": 7
+      },
+      {
+        "text": "\u2014",
+        "confidence": 70,
+        "x": 444,
+        "y": 546,
+        "width": 10,
+        "height": 1
+      },
+      {
+        "text": "ie",
+        "confidence": 51,
+        "x": 158,
+        "y": 600,
+        "width": 15,
+        "height": 8
+      },
+      {
+        "text": "a",
+        "confidence": 53,
+        "x": 187,
+        "y": 600,
+        "width": 12,
+        "height": 8
+      },
+      {
+        "text": "Date,",
+        "confidence": 62,
+        "x": 449,
+        "y": 600,
+        "width": 23,
+        "height": 8
+      },
+      {
+        "text": "ab",
+        "confidence": 60,
+        "x": 104,
+        "y": 628,
+        "width": 11,
+        "height": 37
+      },
+      {
+        "text": "ant",
+        "confidence": 48,
+        "x": 216,
+        "y": 645,
+        "width": 5,
+        "height": 9
+      },
+      {
+        "text": "paris",
+        "confidence": 45,
+        "x": 231,
+        "y": 632,
+        "width": 44,
+        "height": 27
+      },
+      {
+        "text": "~",
+        "confidence": 81,
+        "x": 452,
+        "y": 646,
+        "width": 15,
+        "height": 2
+      },
+      {
+        "text": "aon",
+        "confidence": 54,
+        "x": 72,
+        "y": 647,
+        "width": 22,
+        "height": 7
+      },
+      {
+        "text": "de.",
+        "confidence": 58,
+        "x": 110,
+        "y": 647,
+        "width": 5,
+        "height": 7
+      },
+      {
+        "text": "3",
+        "confidence": 36,
+        "x": 208,
+        "y": 647,
+        "width": 4,
+        "height": 7
+      },
+      {
+        "text": "om",
+        "confidence": 41,
+        "x": 221,
+        "y": 647,
+        "width": 9,
+        "height": 9
+      },
+      {
+        "text": ".",
+        "confidence": 41,
+        "x": 494,
+        "y": 656,
+        "width": 2,
+        "height": 2
+      },
+      {
+        "text": "gum",
+        "confidence": 42,
+        "x": 135,
+        "y": 640,
+        "width": 15,
+        "height": 35
+      },
+      {
+        "text": "ou",
+        "confidence": 66,
+        "x": 269,
+        "y": 640,
+        "width": 12,
+        "height": 35
+      },
+      {
+        "text": "mandats;",
+        "confidence": 45,
+        "x": 81,
+        "y": 667,
+        "width": 42,
+        "height": 15
+      },
+      {
+        "text": "lo",
+        "confidence": 33,
+        "x": 171,
+        "y": 657,
+        "width": 8,
+        "height": 30
+      },
+      {
+        "text": "8",
+        "confidence": 47,
+        "x": 122,
+        "y": 696,
+        "width": 15,
+        "height": 16
+      },
+      {
+        "text": "i",
+        "confidence": 38,
+        "x": 433,
+        "y": 697,
+        "width": 5,
+        "height": 4
+      },
+      {
+        "text": "Bate",
+        "confidence": 50,
+        "x": 150,
+        "y": 720,
+        "width": 20,
+        "height": 9
+      }
+    ],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpxboksr2e_e1c64004-1dd8-43a2-b2fc-6d3e7ca37b76.jpg",
+    "file_name": "tmpxboksr2e_e1c64004-1dd8-43a2-b2fc-6d3e7ca37b76.jpg",
+    "file_size_mb": 0.07,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

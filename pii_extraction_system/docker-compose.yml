@@ -1,0 +1,185 @@
+# Docker Compose for PII Extraction System
+# Agent 5: DevOps & CI/CD Specialist
+
+version: '3.8'
+
+services:
+  # Main application
+  pii-extraction-app:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8501:8501"
+    environment:
+      - ENV=production
+      - LOG_LEVEL=INFO
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    depends_on:
+      - redis
+      - prometheus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - pii-network
+
+  # Development environment
+  pii-extraction-dev:
+    build:
+      context: .
+      target: development
+    ports:
+      - "8502:8501"
+    environment:
+      - ENV=development
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./logs:/app/logs
+    command: ["poetry", "run", "streamlit", "run", "src/dashboard/main.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.runOnSave=true"]
+    networks:
+      - pii-network
+    profiles:
+      - dev
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - pii-network
+
+  # Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - pii-network
+    profiles:
+      - monitoring
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    networks:
+      - pii-network
+    profiles:
+      - monitoring
+
+  # MLflow for experiment tracking
+  mlflow:
+    image: python:3.9-slim
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow.db
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
+    volumes:
+      - mlflow-data:/mlflow
+    command: >
+      bash -c "pip install mlflow==2.4.0 && 
+               mlflow server --host 0.0.0.0 --port 5000 
+               --backend-store-uri sqlite:///mlflow/mlflow.db 
+               --default-artifact-root /mlflow/artifacts"
+    networks:
+      - pii-network
+    profiles:
+      - ml
+
+  # Testing environment
+  pii-extraction-test:
+    build:
+      context: .
+      target: testing
+    environment:
+      - ENV=testing
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - ./test-results:/app/test-results
+    command: ["poetry", "run", "pytest", "tests/", "-v", "--cov=src", "--cov-report=html:/app/test-results/coverage"]
+    networks:
+      - pii-network
+    profiles:
+      - test
+
+  # Security scanning
+  security-scanner:
+    build:
+      context: .
+      target: security
+    volumes:
+      - ./security-reports:/app/security-reports
+    command: >
+      bash -c "poetry run bandit -r src/ -f json -o security-reports/bandit.json &&
+               poetry run safety check --json --output security-reports/safety.json"
+    networks:
+      - pii-network
+    profiles:
+      - security
+
+  # Load testing
+  load-tester:
+    image: locustio/locust:latest
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./tests/load:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --host=http://pii-extraction-app:8501
+    networks:
+      - pii-network
+    profiles:
+      - load-test
+
+# Networks
+networks:
+  pii-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  mlflow-data:
+    driver: local

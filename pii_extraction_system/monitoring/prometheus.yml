@@ -1,0 +1,57 @@
+# Prometheus configuration for PII Extraction System
+# Agent 5: DevOps & CI/CD Specialist
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # PII Extraction System metrics
+  - job_name: 'pii-extraction-app'
+    static_configs:
+      - targets: ['pii-extraction-app:8501']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  # Node exporter for system metrics
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Application performance metrics
+  - job_name: 'pii-app-performance'
+    static_configs:
+      - targets: ['pii-extraction-app:8501']
+    metrics_path: '/performance-metrics'
+    scrape_interval: 60s
+
+  # ML model metrics
+  - job_name: 'ml-models'
+    static_configs:
+      - targets: ['pii-extraction-app:8501']
+    metrics_path: '/model-metrics'
+    scrape_interval: 120s

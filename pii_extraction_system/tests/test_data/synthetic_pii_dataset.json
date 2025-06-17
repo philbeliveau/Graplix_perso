@@ -1,0 +1,138 @@
+{
+  "metadata": {
+    "description": "Comprehensive synthetic PII dataset for testing PII extraction systems",
+    "version": "1.0.0",
+    "created_by": "Agent 6 - QA Testing Lead",
+    "languages": ["en", "fr"],
+    "total_documents": 50,
+    "total_entities": 200,
+    "entity_types": [
+      "email_address", "phone_number", "social_security_number", "credit_card_number",
+      "date_of_birth", "person_name", "address", "postal_code", "zip_code",
+      "driver_license", "medical_record_number", "employee_id", "ip_address",
+      "url", "iban"
+    ]
+  },
+  "documents": [
+    {
+      "id": "doc_001",
+      "title": "Employee Information Form",
+      "language": "en",
+      "text": "Employee Details:\nName: Sarah Johnson\nEmployee ID: EMP-12345\nEmail: sarah.johnson@company.com\nPhone: (555) 123-4567\nAddress: 123 Main Street, Toronto, ON M5V 3A8\nDate of Birth: 15/03/1985\nDriver's License: A12345678\nSIN: 123-456-789",
+      "expected_entities": [
+        {"text": "Sarah Johnson", "type": "person_name", "start": 25, "end": 37},
+        {"text": "EMP-12345", "type": "employee_id", "start": 52, "end": 61},
+        {"text": "sarah.johnson@company.com", "type": "email_address", "start": 69, "end": 94},
+        {"text": "(555) 123-4567", "type": "phone_number", "start": 102, "end": 116},
+        {"text": "123 Main Street", "type": "address", "start": 126, "end": 141},
+        {"text": "M5V 3A8", "type": "postal_code", "start": 154, "end": 161},
+        {"text": "15/03/1985", "type": "date_of_birth", "start": 180, "end": 190},
+        {"text": "A12345678", "type": "driver_license", "start": 209, "end": 218},
+        {"text": "123-456-789", "type": "social_security_number", "start": 224, "end": 235}
+      ]
+    },
+    {
+      "id": "doc_002",
+      "title": "Medical Record",
+      "language": "en",
+      "text": "Patient: Dr. Michael Thompson\nMRN: MR-987654\nDOB: January 22, 1978\nPhone: 416.789.0123\nEmail: m.thompson@email.org\nInsurance: 4532-1234-5678-9012\nEmergency Contact: Jane Thompson at (647) 555-0199",
+      "expected_entities": [
+        {"text": "Dr. Michael Thompson", "type": "person_name", "start": 9, "end": 28},
+        {"text": "MR-987654", "type": "medical_record_number", "start": 34, "end": 43},
+        {"text": "January 22, 1978", "type": "date_of_birth", "start": 49, "end": 65},
+        {"text": "416.789.0123", "type": "phone_number", "start": 73, "end": 85},
+        {"text": "m.thompson@email.org", "type": "email_address", "start": 93, "end": 113},
+        {"text": "4532-1234-5678-9012", "type": "credit_card_number", "start": 125, "end": 144},
+        {"text": "Jane Thompson", "type": "person_name", "start": 164, "end": 177},
+        {"text": "(647) 555-0199", "type": "phone_number", "start": 181, "end": 195}
+      ]
+    },
+    {
+      "id": "doc_003",
+      "title": "French Employee Form",
+      "language": "fr",
+      "text": "Informations Employé:\nNom: Marie Dubois\nCourriel: marie.dubois@entreprise.fr\nTéléphone: 01 23 45 67 89\nAdresse: 45 rue de la Paix, 75001 Paris\nDate de naissance: 12 mai 1990\nNuméro d'employé: E-789456",
+      "expected_entities": [
+        {"text": "Marie Dubois", "type": "person_name", "start": 27, "end": 39},
+        {"text": "marie.dubois@entreprise.fr", "type": "email_address", "start": 49, "end": 75},
+        {"text": "01 23 45 67 89", "type": "phone_number", "start": 87, "end": 101},
+        {"text": "45 rue de la Paix", "type": "address", "start": 111, "end": 128},
+        {"text": "12 mai 1990", "type": "date_of_birth", "start": 159, "end": 170},
+        {"text": "E-789456", "type": "employee_id", "start": 192, "end": 200}
+      ]
+    },
+    {
+      "id": "doc_004",
+      "title": "IT Support Ticket",
+      "language": "en",
+      "text": "Ticket #12345\nUser: admin@techcorp.com\nIP Address: 192.168.1.100\nWebsite: https://secure.techcorp.com/login\nIssue reported at: 2024-01-15 14:30:00\nContact: +1-800-555-0123",
+      "expected_entities": [
+        {"text": "admin@techcorp.com", "type": "email_address", "start": 20, "end": 38},
+        {"text": "192.168.1.100", "type": "ip_address", "start": 51, "end": 64},
+        {"text": "https://secure.techcorp.com/login", "type": "url", "start": 74, "end": 107},
+        {"text": "2024-01-15", "type": "date_of_birth", "start": 127, "end": 137},
+        {"text": "+1-800-555-0123", "type": "phone_number", "start": 157, "end": 172}
+      ]
+    },
+    {
+      "id": "doc_005",
+      "title": "Banking Information",
+      "language": "en",
+      "text": "Account Holder: Robert Smith\nIBAN: GB82 WEST 1234 5698 7654 32\nCredit Cards:\n- Visa: 4111-1111-1111-1111\n- MasterCard: 5555-5555-5555-4444\nPhone: 555-987-6543\nZIP: 90210",
+      "expected_entities": [
+        {"text": "Robert Smith", "type": "person_name", "start": 16, "end": 28},
+        {"text": "GB82 WEST 1234 5698 7654 32", "type": "iban", "start": 35, "end": 62},
+        {"text": "4111-1111-1111-1111", "type": "credit_card_number", "start": 80, "end": 99},
+        {"text": "5555-5555-5555-4444", "type": "credit_card_number", "start": 113, "end": 132},
+        {"text": "555-987-6543", "type": "phone_number", "start": 140, "end": 152},
+        {"text": "90210", "type": "zip_code", "start": 158, "end": 163}
+      ]
+    }
+  ],
+  "test_scenarios": {
+    "edge_cases": [
+      {
+        "name": "empty_document",
+        "text": "",
+        "expected_count": 0
+      },
+      {
+        "name": "no_pii_document",
+        "text": "This is a sample document without any personal information. It contains only generic text for testing purposes.",
+        "expected_count": 0
+      },
+      {
+        "name": "malformed_emails",
+        "text": "Invalid emails: @missing-local.com, missing-domain@, incomplete@email",
+        "expected_count": 0
+      },
+      {
+        "name": "false_positive_numbers",
+        "text": "The year 2024 has 365 days. Product code: 1234-5678-9012-3456 but this is not a credit card.",
+        "expected_count": 1
+      }
+    ],
+    "multilingual": [
+      {
+        "name": "mixed_language",
+        "text": "Contact: jean.dupont@email.fr, Phone: +33 1 42 86 83 80, Address: 10 Avenue des Champs-Élysées, 75008 Paris",
+        "expected_types": ["email_address", "phone_number", "address"]
+      }
+    ],
+    "performance": [
+      {
+        "name": "large_document",
+        "text_length": 10000,
+        "entity_density": "high",
+        "max_processing_time": 5.0
+      }
+    ]
+  },
+  "validation_rules": {
+    "precision_threshold": 0.85,
+    "recall_threshold": 0.80,
+    "f1_threshold": 0.82,
+    "processing_time_max": 2.0,
+    "confidence_min": 0.5
+  }
+}

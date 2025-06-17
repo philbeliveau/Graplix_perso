@@ -65,6 +65,31 @@ def show_upload_section():
         key="document_password"
     )
     
+    # Processing options
+    st.markdown("#### Processing Options")
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        processing_model = st.selectbox(
+            "Select Processing Model",
+            ['Ensemble Method (All Models)', 'Rule-Based Extractor', 'spaCy NER', 'Transformers NER', 'Layout-Aware NER'],
+            help="Choose which PII extraction model(s) to use"
+        )
+    
+    with col2:
+        confidence_threshold = st.slider(
+            "Confidence Threshold",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.5,
+            step=0.05,
+            help="Only show PII entities with confidence above this threshold"
+        )
+    
+    # Store processing options in session state
+    st.session_state.processing_model = processing_model
+    st.session_state.confidence_threshold = confidence_threshold
+    
     # File uploader
     uploaded_files = ui_components.show_file_uploader(
         key="document_uploader",
@@ -175,22 +200,40 @@ def process_document(file_id: str):
             tmp_file_path = tmp_file.name
         
         try:
-            # Use actual PII pipeline
-            pipeline = PIIExtractionPipeline()
+            # Get processing options from session state
+            processing_model = st.session_state.get('processing_model', 'Ensemble Method (All Models)')
+            
+            # Map UI model names to internal model names
+            model_mapping = {
+                'Ensemble Method (All Models)': ["rule_based", "ner", "layout_aware"],
+                'Rule-Based Extractor': ["rule_based"],
+                'spaCy NER': ["ner"],
+                'Transformers NER': ["ner"],
+                'Layout-Aware NER': ["layout_aware"]
+            }
+            
+            enabled_models = model_mapping.get(processing_model, ["rule_based", "ner", "layout_aware"])
+            
+            # Use actual PII pipeline with selected models
+            pipeline = PIIExtractionPipeline(models=enabled_models)
             extraction_result = pipeline.extract_from_file(tmp_file_path)
             
-            # Convert PII entities to expected format
+            # Get confidence threshold from session state
+            confidence_threshold = st.session_state.get('confidence_threshold', 0.5)
+            
+            # Convert PII entities to expected format and filter by confidence
             pii_results = []
             for entity in extraction_result.pii_entities:
-                pii_results.append({
-                    'type': entity.pii_type.upper(),
-                    'text': entity.text,
-                    'start': entity.start_pos,
-                    'end': entity.end_pos,
-                    'confidence': entity.confidence,
-                    'context': entity.context,
-                    'extractor': entity.extractor
-                })
+                if entity.confidence >= confidence_threshold:
+                    pii_results.append({
+                        'type': entity.pii_type.upper(),
+                        'text': entity.text,
+                        'start': entity.start_pos,
+                        'end': entity.end_pos,
+                        'confidence': entity.confidence,
+                        'context': entity.context,
+                        'extractor': entity.extractor
+                    })
             
             # Extract text content for display
             doc_processor = DocumentProcessor()
@@ -210,8 +253,11 @@ def process_document(file_id: str):
             'processing_method': 'real_pipeline',
             'processing_time': extraction_result.processing_time,
             'confidence_scores': extraction_result.confidence_scores,
-            'confidence_threshold': st.session_state.get('confidence_threshold', 0.5),
-            'total_entities': len(pii_results)
+            'confidence_threshold': confidence_threshold,
+            'total_entities': len(pii_results),
+            'selected_model': processing_model,
+            'enabled_models': enabled_models,
+            'total_entities_before_filter': len(extraction_result.pii_entities)
         }
         
         session_state.store_processing_results(file_id, results)
@@ -306,13 +352,16 @@ def show_pii_entities(results: Dict[str, Any]):
     processing_time = results.get('processing_time', 0)
     
     # Show processing summary
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Total Entities", total_entities)
     with col2:
         st.metric("Processing Time", f"{processing_time:.2f}s")
     with col3:
         st.metric("Method", processing_method)
+    with col4:
+        selected_model = results.get('selected_model', 'Unknown')
+        st.metric("Model", selected_model.split(' (')[0])
     
     if not pii_entities:
         st.info("No PII entities detected")
@@ -353,7 +402,7 @@ def show_statistics(results: Dict[str, Any]):
         confidence_scores.append(entity.get('confidence', 0))
     
     # Display metrics
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         st.metric("Total PII Entities", len(pii_entities))
@@ -364,6 +413,18 @@ def show_statistics(results: Dict[str, Any]):
     
     with col3:
         st.metric("PII Categories", len(category_counts))
+    
+    with col4:
+        selected_model = results.get('selected_model', 'Unknown')
+        st.metric("Model Used", selected_model.split(' (')[0])  # Remove the "(All Models)" part
+    
+    # Show filtering information if applicable
+    total_before_filter = results.get('total_entities_before_filter', len(pii_entities))
+    confidence_threshold = results.get('confidence_threshold', 0.5)
+    
+    if total_before_filter > len(pii_entities):
+        filtered_count = total_before_filter - len(pii_entities)
+        st.info(f"📊 Showing {len(pii_entities)} entities (filtered out {filtered_count} below {confidence_threshold:.0%} confidence)")
     
     # Charts
     col1, col2 = st.columns(2)

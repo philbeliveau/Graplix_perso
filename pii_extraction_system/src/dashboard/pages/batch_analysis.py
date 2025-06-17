@@ -18,6 +18,8 @@ src_path = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(src_path))
 
 from dashboard.utils import session_state, ui_components, auth
+from core.pipeline import PIIExtractionPipeline
+from utils.document_processor import DocumentProcessor
 
 def show_page():
     """Main batch analysis page"""
@@ -82,7 +84,8 @@ def show_batch_upload():
             
             processing_model = st.selectbox(
                 "Select Processing Model",
-                ['Rule-Based Extractor', 'spaCy NER', 'Transformers NER', 'Ensemble Method']
+                ['Ensemble Method', 'Rule-Based Extractor', 'spaCy NER', 'Transformers NER', 'Layout-Aware NER'],
+                help="Choose which PII extraction model(s) to use"
             )
             
             confidence_threshold = st.slider(
@@ -145,47 +148,318 @@ def start_batch_processing(files: List, model: str, threshold: float):
     st.session_state.batch_jobs.append(batch_job)
     st.session_state.batch_processing_status = {'is_processing': True, 'current_batch': batch_id}
     
-    # Mock processing (would integrate with actual processing pipeline)
+    # Real PII processing pipeline
     with st.spinner(f"Processing {len(files)} files..."):
-        process_batch_mock(batch_job, files)
+        process_batch_real(batch_job, files, model, threshold)
     
     st.success(f"Batch processing completed! Processed {len(files)} files.")
     st.session_state.batch_processing_status = {'is_processing': False}
 
-def process_batch_mock(batch_job: Dict, files: List):
-    """Mock batch processing for demonstration"""
-    import time
+def process_batch_real(batch_job: Dict, files: List, model: str, threshold: float):
+    """Real batch processing using PII extraction pipeline"""
+    import tempfile
+    import os
+    
+    # Map UI model names to internal model names
+    model_mapping = {
+        'Ensemble Method': ["rule_based", "ner", "layout_aware"],
+        'Rule-Based Extractor': ["rule_based"],
+        'spaCy NER': ["ner"],
+        'Transformers NER': ["ner"],
+        'Layout-Aware NER': ["layout_aware"]
+    }
+    
+    enabled_models = model_mapping.get(model, ["rule_based", "ner", "layout_aware"])
+    
+    # Get password for batch processing
+    batch_password = st.session_state.get('batch_password', '')
     
     for i, file in enumerate(files):
-        # Mock processing delay
-        time.sleep(0.1)  # Simulate processing time
-        
-        # Mock results
-        mock_result = {
-            'file_name': file.name,
-            'file_size': file.size,
-            'entities_found': np.random.randint(2, 15),
-            'processing_time': np.random.uniform(1.0, 5.0),
-            'confidence_avg': np.random.uniform(0.6, 0.95),
-            'categories': {
-                'PERSON': np.random.randint(0, 5),
-                'EMAIL': np.random.randint(0, 3),
-                'PHONE': np.random.randint(0, 2),
-                'ADDRESS': np.random.randint(0, 2)
+        try:
+            # Save file temporarily for processing
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{file.name}") as tmp_file:
+                tmp_file.write(file.read())
+                tmp_file_path = tmp_file.name
+            
+            try:
+                # Process with PII pipeline
+                pipeline = PIIExtractionPipeline(models=enabled_models)
+                extraction_result = pipeline.extract_from_file(tmp_file_path)
+                
+                # Extract text content for analysis
+                doc_processor = DocumentProcessor()
+                processed_doc = doc_processor.process_document(tmp_file_path, batch_password if batch_password else None)
+                text_content = processed_doc.get('raw_text', '')
+                
+                # Filter entities by confidence threshold
+                filtered_entities = []
+                category_counts = {}
+                confidence_scores = []
+                
+                for entity in extraction_result.pii_entities:
+                    if entity.confidence >= threshold:
+                        filtered_entities.append({
+                            'type': entity.pii_type.upper(),
+                            'text': entity.text,
+                            'start': entity.start_pos,
+                            'end': entity.end_pos,
+                            'confidence': entity.confidence,
+                            'context': entity.context,
+                            'extractor': entity.extractor
+                        })
+                        
+                        # Count by category
+                        entity_type = entity.pii_type.upper()
+                        category_counts[entity_type] = category_counts.get(entity_type, 0) + 1
+                        confidence_scores.append(entity.confidence)
+                
+                # Create detailed result
+                file_result = {
+                    'file_name': file.name,
+                    'file_size': file.size,
+                    'entities_found': len(filtered_entities),
+                    'processing_time': extraction_result.processing_time,
+                    'confidence_avg': sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0,
+                    'categories': category_counts,
+                    'pii_entities': filtered_entities,  # Store actual extracted entities
+                    'text_content': text_content,
+                    'total_entities_before_filter': len(extraction_result.pii_entities),
+                    'confidence_threshold': threshold,
+                    'selected_model': model,
+                    'enabled_models': enabled_models,
+                    'status': 'completed'
+                }
+                
+            finally:
+                # Clean up temporary file
+                if os.path.exists(tmp_file_path):
+                    os.unlink(tmp_file_path)
+                    
+        except Exception as e:
+            # Handle processing errors
+            file_result = {
+                'file_name': file.name,
+                'file_size': file.size,
+                'entities_found': 0,
+                'processing_time': 0,
+                'confidence_avg': 0,
+                'categories': {},
+                'pii_entities': [],
+                'text_content': '',
+                'total_entities_before_filter': 0,
+                'confidence_threshold': threshold,
+                'selected_model': model,
+                'enabled_models': enabled_models,
+                'status': 'error',
+                'error_message': str(e)
             }
-        }
         
-        batch_job['results'].append(mock_result)
+        batch_job['results'].append(file_result)
         batch_job['processed_files'] = i + 1
         
         # Update progress
-        if i % 5 == 0:  # Update every 5 files
-            st.progress((i + 1) / len(files))
+        if i % 2 == 0 or i == len(files) - 1:  # Update every 2 files or on last file
+            progress = (i + 1) / len(files)
+            st.progress(progress)
+            st.text(f"Processing: {file.name} ({i + 1}/{len(files)})")
 
 def cancel_batch_processing():
     """Cancel ongoing batch processing"""
     st.session_state.batch_processing_status = {'is_processing': False}
     st.warning("Batch processing cancelled.")
+
+def show_detailed_file_analysis(file_result: Dict):
+    """Show detailed analysis for a single file (similar to document processing)"""
+    st.markdown(f"### 📄 Analysis: {file_result['file_name']}")
+    
+    # File overview metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Entities", file_result.get('entities_found', 0))
+    
+    with col2:
+        st.metric("Processing Time", f"{file_result.get('processing_time', 0):.2f}s")
+    
+    with col3:
+        avg_confidence = file_result.get('confidence_avg', 0)
+        st.metric("Avg Confidence", f"{avg_confidence:.2%}")
+    
+    with col4:
+        selected_model = file_result.get('selected_model', 'Unknown')
+        st.metric("Model", selected_model.split(' (')[0] if selected_model else 'Unknown')
+    
+    # Show filtering information if applicable
+    total_before_filter = file_result.get('total_entities_before_filter', file_result.get('entities_found', 0))
+    confidence_threshold = file_result.get('confidence_threshold', 0.5)
+    
+    if total_before_filter > file_result.get('entities_found', 0):
+        filtered_count = total_before_filter - file_result.get('entities_found', 0)
+        st.info(f"📊 Showing {file_result.get('entities_found', 0)} entities (filtered out {filtered_count} below {confidence_threshold:.0%} confidence)")
+    
+    # Show error if processing failed
+    if file_result.get('status') == 'error':
+        st.error(f"❌ Processing failed: {file_result.get('error_message', 'Unknown error')}")
+        return
+    
+    pii_entities = file_result.get('pii_entities', [])
+    
+    if not pii_entities:
+        st.info("No PII entities detected in this file")
+        return
+    
+    # Create tabs for different views
+    tab1, tab2, tab3, tab4 = st.tabs(["📄 Document View", "📋 PII Entities", "📊 Statistics", "⚙️ Export"])
+    
+    with tab1:
+        show_file_document_view(file_result)
+    
+    with tab2:
+        show_file_pii_entities(file_result)
+    
+    with tab3:
+        show_file_statistics(file_result)
+    
+    with tab4:
+        show_file_export_options(file_result)
+
+def show_file_document_view(file_result: Dict):
+    """Show document with PII highlighting for batch file"""
+    st.markdown("### Document with PII Highlighting")
+    
+    text_content = file_result.get('text_content', '')
+    pii_entities = file_result.get('pii_entities', [])
+    
+    if not text_content:
+        st.warning("No text content available")
+        return
+    
+    # Show highlighted text or plain text if no entities
+    if pii_entities:
+        highlighted_html = ui_components.display_pii_highlights(text_content, pii_entities)
+        st.markdown(highlighted_html, unsafe_allow_html=True)
+    else:
+        st.text_area("Document Text", text_content, height=400)
+
+def show_file_pii_entities(file_result: Dict):
+    """Show PII entities table for batch file"""
+    st.markdown("### Detected PII Entities")
+    
+    pii_entities = file_result.get('pii_entities', [])
+    
+    if not pii_entities:
+        st.info("No PII entities detected")
+        return
+    
+    # Convert to DataFrame for display
+    entities_data = []
+    for entity in pii_entities:
+        entities_data.append({
+            'Type': entity.get('type', ''),
+            'Text': entity.get('text', ''),
+            'Confidence': f"{entity.get('confidence', 0):.2%}",
+            'Extractor': entity.get('extractor', ''),
+            'Position': f"{entity.get('start', 0)}-{entity.get('end', 0)}"
+        })
+    
+    df = pd.DataFrame(entities_data)
+    st.dataframe(df, use_container_width=True)
+    
+    # Show entities by type
+    st.markdown("#### Entities by Type")
+    entity_types = {}
+    for entity in pii_entities:
+        entity_type = entity.get('type', 'UNKNOWN')
+        if entity_type not in entity_types:
+            entity_types[entity_type] = []
+        entity_types[entity_type].append(entity.get('text', ''))
+    
+    for entity_type, texts in entity_types.items():
+        with st.expander(f"{entity_type} ({len(texts)} found)"):
+            for i, text in enumerate(texts, 1):
+                st.write(f"{i}. {text}")
+
+def show_file_statistics(file_result: Dict):
+    """Show statistics for batch file"""
+    st.markdown("### File Statistics")
+    
+    pii_entities = file_result.get('pii_entities', [])
+    
+    if not pii_entities:
+        st.info("No statistics available")
+        return
+    
+    # Count by category
+    category_counts = {}
+    confidence_scores = []
+    extractor_counts = {}
+    
+    for entity in pii_entities:
+        entity_type = entity.get('type', 'UNKNOWN')
+        category_counts[entity_type] = category_counts.get(entity_type, 0) + 1
+        confidence_scores.append(entity.get('confidence', 0))
+        
+        extractor = entity.get('extractor', 'unknown')
+        extractor_counts[extractor] = extractor_counts.get(extractor, 0) + 1
+    
+    # Display metrics
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.metric("Total PII Entities", len(pii_entities))
+    
+    with col2:
+        avg_confidence = sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0
+        st.metric("Average Confidence", f"{avg_confidence:.2%}")
+    
+    with col3:
+        st.metric("PII Categories", len(category_counts))
+    
+    # Charts
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Category distribution
+        if category_counts:
+            fig = ui_components.create_pii_category_chart(category_counts)
+            st.plotly_chart(fig, use_container_width=True)
+    
+    with col2:
+        # Confidence distribution
+        if confidence_scores:
+            fig = ui_components.create_confidence_histogram(confidence_scores)
+            st.plotly_chart(fig, use_container_width=True)
+    
+    # Extractor performance
+    if len(extractor_counts) > 1:
+        st.markdown("#### Extractor Performance")
+        for extractor, count in extractor_counts.items():
+            st.write(f"• {extractor}: {count} entities")
+
+def show_file_export_options(file_result: Dict):
+    """Show export options for single file"""
+    st.markdown("### Export File Results")
+    
+    filename_base = f"pii_results_{file_result['file_name'].split('.')[0]}"
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        # JSON export
+        ui_components.export_data(file_result, filename_base, 'json')
+    
+    with col2:
+        # CSV export (entities only)
+        pii_entities = file_result.get('pii_entities', [])
+        if pii_entities:
+            df = pd.DataFrame(pii_entities)
+            ui_components.export_data(df, f"{filename_base}_entities", 'csv')
+    
+    with col3:
+        # Text export
+        text_content = file_result.get('text_content', '')
+        if text_content:
+            ui_components.export_data(text_content, f"{filename_base}_text", 'txt')
 
 def show_batch_results():
     """Display batch processing results"""
@@ -237,9 +511,27 @@ def show_batch_results():
     with col4:
         st.metric("Status", selected_job['status'].title())
     
-    # Results table
+    # Results analysis
     if selected_job['results']:
-        st.markdown("#### Processing Results")
+        st.markdown("#### Detailed File Analysis")
+        
+        # File selection for detailed view
+        file_results = selected_job['results']
+        file_options = {i: f"{result['file_name']} ({result['entities_found']} entities)" 
+                       for i, result in enumerate(file_results)}
+        
+        selected_file_idx = st.selectbox(
+            "Select file for detailed analysis:",
+            options=list(file_options.keys()),
+            format_func=lambda x: file_options[x]
+        )
+        
+        if selected_file_idx is not None:
+            selected_file_result = file_results[selected_file_idx]
+            show_detailed_file_analysis(selected_file_result)
+        
+        st.markdown("---")
+        st.markdown("#### Batch Summary Table")
         
         df_results = pd.DataFrame(selected_job['results'])
         
@@ -250,7 +542,7 @@ def show_batch_results():
             )
         
         # Display table
-        display_columns = ['file_name', 'entities_found', 'processing_time', 'confidence_avg']
+        display_columns = ['file_name', 'entities_found', 'processing_time', 'confidence_avg', 'status']
         if all(col in df_results.columns for col in display_columns):
             df_display = df_results[display_columns].copy()
             df_display['processing_time'] = df_display['processing_time'].round(2)

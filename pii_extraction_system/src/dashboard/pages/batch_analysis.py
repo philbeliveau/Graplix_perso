@@ -1,8 +1,8 @@
 """
-Batch Analysis Page - Bulk document processing and analysis
+Batch Analysis Page with Multimodal LLM Processing
 
-This page provides capabilities for bulk document processing and results overview,
-essential for handling large-scale document processing scenarios.
+This page provides capabilities for bulk document processing using multiple
+multimodal LLMs for PII extraction, with cost tracking and performance analytics.
 """
 
 import streamlit as st
@@ -28,15 +28,15 @@ if env_loader_path.exists():
     except ImportError:
         pass
 
-from dashboard.utils import session_state, ui_components, auth
-from core.pipeline import PIIExtractionPipeline
+from dashboard.utils import session_state, ui_components, auth, run_history
+from llm.multimodal_llm_service import llm_service
 from utils.document_processor import DocumentProcessor
 
 def show_page():
-    """Main batch analysis page"""
-    st.markdown('<div class="section-header">📊 Batch Analysis</div>', 
+    """Main batch analysis page with LLM processing"""
+    st.markdown('<div class="section-header">🤖 AI Batch Processing</div>', 
                 unsafe_allow_html=True)
-    st.markdown("Process and analyze multiple documents in bulk operations.")
+    st.markdown("Process multiple documents using advanced multimodal LLMs with cost tracking and performance analytics.")
     
     # Check permissions
     if not auth.has_permission('read'):
@@ -60,12 +60,50 @@ def show_page():
         show_analytics_dashboard()
 
 def show_batch_upload():
-    """Batch document upload and processing interface"""
-    st.markdown("### Batch Document Upload")
+    """Batch document upload and LLM processing interface"""
+    st.markdown("### 🤖 AI-Powered Batch Processing")
     
     if not auth.has_permission('write'):
         st.warning("Batch processing requires write permissions.")
         return
+    
+    # LLM Model Selection
+    st.markdown("#### 🧠 Select AI Model")
+    
+    # Get available models
+    available_models = llm_service.get_available_models()
+    
+    if not available_models:
+        st.error("❌ No multimodal LLM models available!")
+        st.info("Please configure API keys for OpenAI, Anthropic, or Google in your environment variables.")
+        return
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        selected_model = st.selectbox(
+            "Choose AI Model",
+            available_models,
+            format_func=lambda x: format_model_display(x),
+            help="Select which AI model to use for batch processing"
+        )
+        
+        if selected_model:
+            model_info = llm_service.get_model_info(selected_model)
+            show_model_info_card(model_info, selected_model)
+    
+    with col2:
+        document_type = st.selectbox(
+            "Document Type",
+            ["document", "form", "resume", "check", "medical_record", "legal_document", "invoice"],
+            help="Document type helps optimize the AI prompt for better extraction"
+        )
+        
+        # Store model selection
+        st.session_state.batch_llm_model = selected_model
+        st.session_state.batch_document_type = document_type
+    
+    st.markdown("---")
     
     # Password input for protected documents
     st.markdown("#### Document Password (if required)")
@@ -91,94 +129,60 @@ def show_batch_upload():
         col1, col2 = st.columns([1, 1])
         
         with col1:
-            st.markdown("#### Processing Options")
-            
-            processing_model = st.selectbox(
-                "Select Processing Model",
-                ['Ensemble Method', 'Rule-Based Extractor', 'spaCy NER', 'Transformers NER', 'Layout-Aware NER'],
-                help="Choose which PII extraction model(s) to use"
-            )
+            st.markdown("#### ⚙️ Processing Settings")
             
             confidence_threshold = st.slider(
                 "Confidence Threshold",
                 min_value=0.0,
                 max_value=1.0,
-                value=0.5,
-                step=0.05
+                value=0.85,
+                step=0.05,
+                help="Minimum confidence for PII entities"
             )
             
-            # OCR Engine Selection
-            st.markdown("**OCR Settings (for Images & PDFs):**")
-            
-            # Check LLM availability
-            import os
-            llm_available = bool(os.getenv("OPENAI_API_KEY") or os.getenv("DEEPSEEK_API") or os.getenv("ANTHROPIC_API_KEY"))
-            
-            ocr_engine_options = ['tesseract', 'easyocr', 'both']
-            if llm_available:
-                ocr_engine_options.extend(['llm', 'llm+traditional'])
-            
-            ocr_engine = st.selectbox(
-                "OCR Engine",
-                ocr_engine_options,
-                index=0,
-                help="Choose OCR method: Traditional or AI-powered LLM OCR"
+            # Batch-specific cost controls
+            max_total_cost = st.slider(
+                "Max Total Batch Cost ($)",
+                0.10, 20.0, 5.0, 0.10,
+                help="Maximum total cost for entire batch"
             )
             
-            if ocr_engine in ['easyocr', 'both']:
-                use_gpu = st.checkbox("Use GPU for EasyOCR", value=False)
-            else:
-                use_gpu = False
+            max_cost_per_doc = st.slider(
+                "Max Cost per Document ($)",
+                0.01, 1.00, 0.20, 0.01,
+                help="Maximum cost per single document"
+            )
             
-            # LLM OCR options for batch processing
-            if ocr_engine in ['llm', 'llm+traditional'] and llm_available:
-                st.markdown("**🤖 LLM OCR Batch Settings:**")
-                
-                # Model selection
-                available_models = []
-                if os.getenv("OPENAI_API_KEY"):
-                    available_models.extend(["gpt-4o-mini", "gpt-3.5-turbo"])
-                if os.getenv("DEEPSEEK_API"):
-                    available_models.append("deepseek-chat")
-                if os.getenv("ANTHROPIC_API_KEY"):
-                    available_models.extend(["claude-3-haiku"])
-                
-                llm_model = st.selectbox(
-                    "LLM Model",
-                    available_models,
-                    index=0 if available_models else None,
-                    help="AI model for batch OCR processing"
-                )
-                
-                # Batch-specific cost controls
-                max_total_cost = st.slider(
-                    "Max Total Batch Cost ($)",
-                    0.10, 10.0, 1.0, 0.10,
-                    help="Maximum total cost for entire batch"
-                )
-                
-                max_cost_per_doc = st.slider(
-                    "Max Cost per Document ($)",
-                    0.01, 0.50, 0.10, 0.01,
-                    help="Maximum cost per single document"
-                )
-                
-                # Show cost estimation for batch
-                if llm_model and uploaded_files:
-                    cost_per_page = {
-                        "gpt-4o-mini": 0.00015,
-                        "gpt-3.5-turbo": 0.0005,
-                        "deepseek-chat": 0.0001,
-                        "claude-3-haiku": 0.00025
-                    }.get(llm_model, 0.0002)
-                    
-                    estimated_batch_cost = len(uploaded_files) * cost_per_page
-                    st.info(f"💰 Est. batch cost: ~${estimated_batch_cost:.4f} ({len(uploaded_files)} files)")
-                    
-                    if estimated_batch_cost > max_total_cost:
-                        st.warning(f"⚠️ Estimated cost exceeds batch limit!")
+            enable_cost_tracking = st.checkbox(
+                "Enable Detailed Cost Tracking",
+                value=True,
+                help="Track costs and usage for analysis"
+            )
             
-            parallel_processing = st.checkbox("Enable Parallel Processing", value=True)
+            parallel_processing = st.checkbox(
+                "Enable Progress Tracking", 
+                value=True,
+                help="Show real-time progress during batch processing"
+            )
+            
+            # Show cost estimation for batch
+            if selected_model and uploaded_files:
+                model_info = llm_service.get_model_info(selected_model)
+                cost_per_1k_input = model_info.get('cost_per_1k_input_tokens', 0.002)
+                
+                # Rough estimation (1000 tokens ≈ 1 page)
+                estimated_batch_cost = len(uploaded_files) * cost_per_1k_input * 2  # 2k tokens per doc estimate
+                st.info(f"💰 Est. batch cost: ~${estimated_batch_cost:.4f} ({len(uploaded_files)} files)")
+                
+                if estimated_batch_cost > max_total_cost:
+                    st.warning(f"⚠️ Estimated cost exceeds batch limit!")
+            
+            # Store processing settings
+            st.session_state.batch_confidence_threshold = confidence_threshold
+            st.session_state.batch_max_total_cost = max_total_cost
+            st.session_state.batch_max_cost_per_doc = max_cost_per_doc
+            st.session_state.batch_enable_cost_tracking = enable_cost_tracking
+            st.session_state.batch_parallel_processing = parallel_processing
             
         with col2:
             st.markdown("#### File Preview")
@@ -193,8 +197,11 @@ def show_batch_upload():
         col1, col2, col3 = st.columns([1, 1, 1])
         
         with col1:
-            if st.button("Start Batch Processing", type="primary"):
-                start_batch_processing(uploaded_files, processing_model, confidence_threshold, ocr_engine, use_gpu)
+            if st.button("🤖 Start AI Batch Processing", type="primary"):
+                if selected_model:
+                    start_llm_batch_processing(uploaded_files)
+                else:
+                    st.error("Please select an AI model first")
         
         with col2:
             if st.button("Clear Selection"):

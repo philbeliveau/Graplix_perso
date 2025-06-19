@@ -32,8 +32,10 @@ if env_loader_path.exists():
 
 from dashboard.pages import (
     document_processing,
+    document_processing_llm,
     batch_analysis,
     model_comparison,
+    model_analytics,
     error_analysis,
     performance_metrics,
     data_management,
@@ -114,9 +116,11 @@ def main():
         selected_page = option_menu(
             menu_title="Navigation",
             options=[
-                "Document Processing",
-                "Batch Analysis", 
+                "AI Document Processing",
+                "Document Processing (Classic)",
+                "AI Batch Analysis", 
                 "Model Comparison",
+                "Model Analytics",
                 "Error Analysis",
                 "Performance Metrics",
                 "Data Management",
@@ -124,13 +128,15 @@ def main():
                 "Configuration"
             ],
             icons=[
+                "robot",
                 "file-earmark-text",
                 "files", 
                 "diagram-3",
+                "bar-chart",
                 "bug",
                 "graph-up",
                 "database",
-                "robot",
+                "cpu",
                 "gear"
             ],
             menu_icon="list",
@@ -161,12 +167,16 @@ def main():
             st.rerun()
     
     # Route to selected page
-    if selected_page == "Document Processing":
+    if selected_page == "AI Document Processing":
+        document_processing_llm.show_page()
+    elif selected_page == "Document Processing (Classic)":
         document_processing.show_page()
-    elif selected_page == "Batch Analysis":
+    elif selected_page == "AI Batch Analysis":
         batch_analysis.show_page()
     elif selected_page == "Model Comparison":
         model_comparison.show_page()
+    elif selected_page == "Model Analytics":
+        model_analytics.show_page()
     elif selected_page == "Error Analysis":
         error_analysis.show_page()
     elif selected_page == "Performance Metrics":

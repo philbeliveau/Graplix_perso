@@ -39,7 +39,9 @@ from dashboard.pages import (
     error_analysis,
     performance_metrics,
     data_management,
-    configuration
+    configuration,
+    dataset_creation_phase0,
+    phase1_performance_validation
 )
 
 # Import LLM OCR config with error handling
@@ -47,6 +49,12 @@ try:
     from dashboard.pages import llm_ocr_simple as llm_ocr_config
 except ImportError:
     llm_ocr_config = None
+
+# Import LLM API Status page
+try:
+    from dashboard.pages import llm_api_status
+except ImportError:
+    llm_api_status = None
 from dashboard.utils import session_state, auth, ui_components
 
 def main():
@@ -116,6 +124,9 @@ def main():
         selected_page = option_menu(
             menu_title="Navigation",
             options=[
+                "LLM API Status",
+                "Phase 0 Dataset Creation",
+                "Phase 1 Performance Validation",
                 "AI Document Processing",
                 "Document Processing (Classic)",
                 "AI Batch Analysis", 
@@ -128,6 +139,9 @@ def main():
                 "Configuration"
             ],
             icons=[
+                "cloud-check",
+                "bullseye",
+                "target",
                 "robot",
                 "file-earmark-text",
                 "files", 
@@ -167,7 +181,17 @@ def main():
             st.rerun()
     
     # Route to selected page
-    if selected_page == "AI Document Processing":
+    if selected_page == "LLM API Status":
+        if llm_api_status:
+            llm_api_status.show_page()
+        else:
+            st.error("LLM API Status page not available")
+            st.info("Please check the installation and imports.")
+    elif selected_page == "Phase 0 Dataset Creation":
+        dataset_creation_phase0.show_page()
+    elif selected_page == "Phase 1 Performance Validation":
+        phase1_performance_validation.show_page()
+    elif selected_page == "AI Document Processing":
         document_processing_llm.show_page()
     elif selected_page == "Document Processing (Classic)":
         document_processing.show_page()

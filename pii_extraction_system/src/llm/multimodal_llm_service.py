@@ -267,6 +267,99 @@ class GoogleProvider(LLMProvider):
     def is_available(self) -> bool:
         return bool(self.api_key and self.client)
 
+class MistralProvider(LLMProvider):
+    """Mistral AI provider"""
+    
+    def __init__(self, model: str = "mistral-large"):
+        self.model = model
+        self.api_key = os.getenv('MISTRAL_API_KEY')
+        self.client = None
+        
+        if self.api_key:
+            try:
+                from mistralai.client import MistralClient
+                self.client = MistralClient(api_key=self.api_key)
+            except ImportError:
+                logger.warning("Mistral AI library not installed")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Mistral client: {e}")
+    
+    def extract_pii(self, image_data: str, prompt: str, **kwargs) -> Dict[str, Any]:
+        """
+        Note: Mistral doesn't currently support vision models for images,
+        so this method will return an error for image processing.
+        This is included for text-based PII extraction compatibility.
+        """
+        if not self.is_available():
+            raise ValueError("Mistral API key not configured or library not installed")
+        
+        # Mistral doesn't support vision yet, so we return an informative error
+        return {
+            "success": False,
+            "error": "Mistral models do not currently support image processing. Use for text-based PII extraction only.",
+            "model": self.model,
+            "provider": "mistral",
+            "supports_vision": False
+        }
+    
+    def extract_text_pii(self, text: str, prompt: str, **kwargs) -> Dict[str, Any]:
+        """Extract PII from text using Mistral"""
+        if not self.is_available():
+            raise ValueError("Mistral API key not configured or library not installed")
+        
+        try:
+            from mistralai.models.chat_completion import ChatMessage
+            
+            response = self.client.chat(
+                model=self.model,
+                messages=[
+                    ChatMessage(role="user", content=f"{prompt}\n\nText to analyze:\n{text}")
+                ],
+                max_tokens=kwargs.get('max_tokens', 4000),
+                temperature=kwargs.get('temperature', 0.0)
+            )
+            
+            content = response.choices[0].message.content
+            usage = response.usage
+            
+            # Calculate cost
+            cost_per_token = self.get_cost_per_token()
+            total_cost = (usage.prompt_tokens * cost_per_token['input'] + 
+                         usage.completion_tokens * cost_per_token['output'])
+            
+            return {
+                "success": True,
+                "content": content,
+                "usage": {
+                    "prompt_tokens": usage.prompt_tokens,
+                    "completion_tokens": usage.completion_tokens,
+                    "total_tokens": usage.total_tokens,
+                    "estimated_cost": total_cost
+                },
+                "model": self.model,
+                "provider": "mistral"
+            }
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "model": self.model,
+                "provider": "mistral"
+            }
+    
+    def get_cost_per_token(self) -> Dict[str, float]:
+        costs = {
+            "mistral-large": {"input": 0.002 / 1000, "output": 0.006 / 1000},
+            "mistral-medium": {"input": 0.0015 / 1000, "output": 0.0045 / 1000},
+            "mistral-small": {"input": 0.0006 / 1000, "output": 0.0018 / 1000},
+            "mistral-tiny": {"input": 0.00025 / 1000, "output": 0.00025 / 1000}
+        }
+        return costs.get(self.model, costs["mistral-large"])
+    
+    def is_available(self) -> bool:
+        return bool(self.api_key and self.client)
+
 class MultimodalLLMService:
     """Main service for multimodal LLM operations"""
     
@@ -314,6 +407,17 @@ class MultimodalLLMService:
                     logger.info(f"Initialized Google provider: {model}")
             except Exception as e:
                 logger.warning(f"Failed to initialize Google provider {model}: {e}")
+        
+        # Mistral models (text-only for now)
+        mistral_models = ["mistral-large", "mistral-medium", "mistral-small", "mistral-tiny"]
+        for model in mistral_models:
+            try:
+                provider = MistralProvider(model)
+                if provider.is_available():
+                    self.providers[f"mistral/{model}"] = provider
+                    logger.info(f"Initialized Mistral provider: {model} (text-only)")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Mistral provider {model}: {e}")
         
         logger.info(f"LLM service initialized with {len(self.providers)} available models: {list(self.providers.keys())}")
     

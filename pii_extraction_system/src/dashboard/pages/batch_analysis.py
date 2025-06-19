@@ -32,6 +32,34 @@ from dashboard.utils import session_state, ui_components, auth, run_history
 from llm.multimodal_llm_service import llm_service
 from utils.document_processor import DocumentProcessor
 
+def format_model_display(model_key: str) -> str:
+    """Format model display name"""
+    provider, model = model_key.split('/', 1)
+    provider_names = {
+        "openai": "🔵 OpenAI",
+        "anthropic": "🟡 Anthropic", 
+        "google": "🔴 Google"
+    }
+    
+    return f"{provider_names.get(provider, provider)} - {model}"
+
+def show_model_info_card(model_info: Dict[str, Any], model_key: str):
+    """Display model information card"""
+    if not model_info.get("available"):
+        st.error(f"Model {model_key} is not available")
+        return
+    
+    with st.container():
+        st.markdown(f"""
+        <div style="background-color: #f0f2f6; padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <h4>📊 Model Information</h4>
+            <p><strong>Provider:</strong> {model_info['provider'].title()}</p>
+            <p><strong>Model:</strong> {model_info['model']}</p>
+            <p><strong>Cost per 1K tokens:</strong> Input: ${model_info['cost_per_1k_input_tokens']:.4f} | Output: ${model_info['cost_per_1k_output_tokens']:.4f}</p>
+            <p><strong>Capabilities:</strong> 🖼️ Images, 📄 OCR, 🔍 PII Extraction</p>
+        </div>
+        """, unsafe_allow_html=True)
+
 def show_page():
     """Main batch analysis page with LLM processing"""
     st.markdown('<div class="section-header">🤖 AI Batch Processing</div>', 

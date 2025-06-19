@@ -365,7 +365,38 @@ def show_performance_settings():
         )
         
         # OCR settings
-        st.markdown("**OCR Performance:**")
+        st.markdown("**OCR Configuration:**")
+        ocr_engine = st.selectbox(
+            "OCR Engine", 
+            ['tesseract', 'easyocr', 'both'], 
+            index=0,
+            help="Select OCR engine: Tesseract (traditional), EasyOCR (deep learning), or both for comparison"
+        )
+        
+        if ocr_engine in ['easyocr', 'both']:
+            easyocr_use_gpu = st.checkbox("Use GPU for EasyOCR", value=False, help="Requires CUDA-compatible GPU")
+        else:
+            easyocr_use_gpu = False
+        
+        # LLM OCR settings
+        st.markdown("**LLM OCR Configuration:**")
+        enable_llm_ocr = st.checkbox("Enable LLM OCR", value=False, help="Use AI models for enhanced OCR accuracy")
+        
+        if enable_llm_ocr:
+            llm_ocr_model = st.selectbox(
+                "Primary LLM Model",
+                ["gpt-4o-mini", "gpt-3.5-turbo", "claude-3-haiku", "gemini-1.5-flash"],
+                help="Primary model for LLM-based OCR"
+            )
+            max_cost_per_doc = st.slider(
+                "Max Cost per Document ($)",
+                0.01, 0.50, 0.10, 0.01,
+                help="Maximum cost allowed per document"
+            )
+        else:
+            llm_ocr_model = "gpt-4o-mini"
+            max_cost_per_doc = 0.10
+            
         ocr_dpi = st.selectbox("OCR DPI", [150, 200, 300, 400], index=1)
         ocr_parallel = st.checkbox("Parallel OCR Processing", value=True)
     
@@ -409,6 +440,11 @@ def show_performance_settings():
                 'max_cache_size_gb': max_cache_size
             },
             'ocr': {
+                'engine': ocr_engine,
+                'easyocr_use_gpu': easyocr_use_gpu,
+                'enable_llm_ocr': enable_llm_ocr,
+                'llm_ocr_model': llm_ocr_model,
+                'max_llm_cost_per_document': max_cost_per_doc,
                 'dpi': ocr_dpi,
                 'parallel_processing': ocr_parallel
             },

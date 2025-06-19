@@ -17,6 +17,17 @@ from pathlib import Path
 src_path = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(src_path))
 
+# Load environment variables
+project_root = src_path.parent
+env_loader_path = project_root / "load_env.py"
+if env_loader_path.exists():
+    sys.path.insert(0, str(project_root))
+    try:
+        from load_env import load_env_file
+        load_env_file()
+    except ImportError:
+        pass
+
 from dashboard.utils import session_state, ui_components, auth
 from core.pipeline import PIIExtractionPipeline
 from utils.document_processor import DocumentProcessor
@@ -96,6 +107,77 @@ def show_batch_upload():
                 step=0.05
             )
             
+            # OCR Engine Selection
+            st.markdown("**OCR Settings (for Images & PDFs):**")
+            
+            # Check LLM availability
+            import os
+            llm_available = bool(os.getenv("OPENAI_API_KEY") or os.getenv("DEEPSEEK_API") or os.getenv("ANTHROPIC_API_KEY"))
+            
+            ocr_engine_options = ['tesseract', 'easyocr', 'both']
+            if llm_available:
+                ocr_engine_options.extend(['llm', 'llm+traditional'])
+            
+            ocr_engine = st.selectbox(
+                "OCR Engine",
+                ocr_engine_options,
+                index=0,
+                help="Choose OCR method: Traditional or AI-powered LLM OCR"
+            )
+            
+            if ocr_engine in ['easyocr', 'both']:
+                use_gpu = st.checkbox("Use GPU for EasyOCR", value=False)
+            else:
+                use_gpu = False
+            
+            # LLM OCR options for batch processing
+            if ocr_engine in ['llm', 'llm+traditional'] and llm_available:
+                st.markdown("**🤖 LLM OCR Batch Settings:**")
+                
+                # Model selection
+                available_models = []
+                if os.getenv("OPENAI_API_KEY"):
+                    available_models.extend(["gpt-4o-mini", "gpt-3.5-turbo"])
+                if os.getenv("DEEPSEEK_API"):
+                    available_models.append("deepseek-chat")
+                if os.getenv("ANTHROPIC_API_KEY"):
+                    available_models.extend(["claude-3-haiku"])
+                
+                llm_model = st.selectbox(
+                    "LLM Model",
+                    available_models,
+                    index=0 if available_models else None,
+                    help="AI model for batch OCR processing"
+                )
+                
+                # Batch-specific cost controls
+                max_total_cost = st.slider(
+                    "Max Total Batch Cost ($)",
+                    0.10, 10.0, 1.0, 0.10,
+                    help="Maximum total cost for entire batch"
+                )
+                
+                max_cost_per_doc = st.slider(
+                    "Max Cost per Document ($)",
+                    0.01, 0.50, 0.10, 0.01,
+                    help="Maximum cost per single document"
+                )
+                
+                # Show cost estimation for batch
+                if llm_model and uploaded_files:
+                    cost_per_page = {
+                        "gpt-4o-mini": 0.00015,
+                        "gpt-3.5-turbo": 0.0005,
+                        "deepseek-chat": 0.0001,
+                        "claude-3-haiku": 0.00025
+                    }.get(llm_model, 0.0002)
+                    
+                    estimated_batch_cost = len(uploaded_files) * cost_per_page
+                    st.info(f"💰 Est. batch cost: ~${estimated_batch_cost:.4f} ({len(uploaded_files)} files)")
+                    
+                    if estimated_batch_cost > max_total_cost:
+                        st.warning(f"⚠️ Estimated cost exceeds batch limit!")
+            
             parallel_processing = st.checkbox("Enable Parallel Processing", value=True)
             
         with col2:
@@ -112,7 +194,7 @@ def show_batch_upload():
         
         with col1:
             if st.button("Start Batch Processing", type="primary"):
-                start_batch_processing(uploaded_files, processing_model, confidence_threshold)
+                start_batch_processing(uploaded_files, processing_model, confidence_threshold, ocr_engine, use_gpu)
         
         with col2:
             if st.button("Clear Selection"):
@@ -125,7 +207,7 @@ def show_batch_upload():
                     if st.button("Cancel Processing"):
                         cancel_batch_processing()
 
-def start_batch_processing(files: List, model: str, threshold: float):
+def start_batch_processing(files: List, model: str, threshold: float, ocr_engine: str, use_gpu: bool):
     """Start batch processing of uploaded files"""
     batch_id = f"batch_{len(st.session_state.get('batch_jobs', []))}"
     
@@ -137,6 +219,8 @@ def start_batch_processing(files: List, model: str, threshold: float):
         'status': 'processing',
         'model': model,
         'threshold': threshold,
+        'ocr_engine': ocr_engine,
+        'ocr_use_gpu': use_gpu,
         'start_time': pd.Timestamp.now(),
         'results': []
     }
@@ -150,15 +234,16 @@ def start_batch_processing(files: List, model: str, threshold: float):
     
     # Real PII processing pipeline
     with st.spinner(f"Processing {len(files)} files..."):
-        process_batch_real(batch_job, files, model, threshold)
+        process_batch_real(batch_job, files, model, threshold, ocr_engine, use_gpu)
     
     st.success(f"Batch processing completed! Processed {len(files)} files.")
     st.session_state.batch_processing_status = {'is_processing': False}
 
-def process_batch_real(batch_job: Dict, files: List, model: str, threshold: float):
+def process_batch_real(batch_job: Dict, files: List, model: str, threshold: float, ocr_engine: str, use_gpu: bool):
     """Real batch processing using PII extraction pipeline"""
     import tempfile
     import os
+    from core.config import settings
     
     # Map UI model names to internal model names
     model_mapping = {
@@ -186,10 +271,30 @@ def process_batch_real(batch_job: Dict, files: List, model: str, threshold: floa
                 pipeline = PIIExtractionPipeline(models=enabled_models)
                 extraction_result = pipeline.extract_from_file(tmp_file_path)
                 
-                # Extract text content for analysis
-                doc_processor = DocumentProcessor()
-                processed_doc = doc_processor.process_document(tmp_file_path, batch_password if batch_password else None)
-                text_content = processed_doc.get('raw_text', '')
+                # Extract text content for analysis using selected OCR engine
+                # Temporarily override settings with user selection
+                original_ocr_engine = settings.processing.ocr_engine
+                original_ocr_gpu = settings.processing.easyocr_use_gpu
+                
+                settings.processing.ocr_engine = ocr_engine
+                settings.processing.easyocr_use_gpu = use_gpu
+                
+                try:
+                    doc_processor = DocumentProcessor()
+                    processed_doc = doc_processor.process_document(tmp_file_path, batch_password if batch_password else None)
+                    text_content = processed_doc.get('raw_text', '')
+                    
+                    # Store OCR metadata
+                    ocr_metadata = {
+                        'ocr_engine': processed_doc.get('ocr_engine', ocr_engine),
+                        'alternative_text': processed_doc.get('alternative_text', {}),
+                        'bounding_boxes': processed_doc.get('bounding_boxes', [])
+                    }
+                    
+                finally:
+                    # Restore original settings
+                    settings.processing.ocr_engine = original_ocr_engine
+                    settings.processing.easyocr_use_gpu = original_ocr_gpu
                 
                 # Filter entities by confidence threshold
                 filtered_entities = []
@@ -227,6 +332,8 @@ def process_batch_real(batch_job: Dict, files: List, model: str, threshold: floa
                     'confidence_threshold': threshold,
                     'selected_model': model,
                     'enabled_models': enabled_models,
+                    'ocr_engine': ocr_engine,
+                    'ocr_metadata': ocr_metadata,
                     'status': 'completed'
                 }
                 

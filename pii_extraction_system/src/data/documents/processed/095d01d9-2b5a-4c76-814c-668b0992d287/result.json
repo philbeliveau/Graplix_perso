@@ -1,0 +1,61 @@
+{
+  "document_id": "095d01d9-2b5a-4c76-814c-668b0992d287",
+  "extraction_result": {
+    "pii_entities": [],
+    "confidence_scores": [],
+    "processing_time": 0.00010776519775390625,
+    "error": null,
+    "metadata": {
+      "document_id": "095d01d9-2b5a-4c76-814c-668b0992d287",
+      "document_type": ".pdf",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 0,
+          "processing_time": 6.699562072753906e-05,
+          "error": "No text content available"
+        },
+        "ner": {
+          "entity_count": 0,
+          "processing_time": 4.076957702636719e-05,
+          "error": "No text content available"
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 0,
+      "total_entities_after_dedup": 0
+    },
+    "timestamp": "2025-06-18T10:31:00.213574"
+  },
+  "processed_document": {
+    "raw_text": "",
+    "ocr_text": "",
+    "pages": [],
+    "metadata": {},
+    "bounding_boxes": [],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpk0xnooj3_2024-05-14 au 2024-06-03.pdf",
+    "file_name": "tmpk0xnooj3_2024-05-14 au 2024-06-03.pdf",
+    "file_size_mb": 0.07,
+    "file_type": ".pdf",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

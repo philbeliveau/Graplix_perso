@@ -7,7 +7,6 @@ from typing import Dict, List, Optional, Union
 from core.config import settings
 from core.logging_config import get_logger, audit_log
 from utils.data_storage import storage_manager
-from utils.document_processor import DocumentProcessor
 from extractors.base import PIIExtractionResult, PIIEntity
 
 logger = get_logger(__name__)
@@ -28,6 +27,8 @@ class PIIExtractionPipeline:
             models: List of models to use for extraction
             config_override: Configuration overrides
         """
+        # Import DocumentProcessor locally to avoid circular imports
+        from utils.document_processor import DocumentProcessor
         self.document_processor = DocumentProcessor()
         self.storage_manager = storage_manager
         

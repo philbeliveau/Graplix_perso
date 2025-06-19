@@ -1,0 +1,61 @@
+{
+  "document_id": "abe4a26c-72b4-4f34-9710-82d3397d5d2e",
+  "extraction_result": {
+    "pii_entities": [],
+    "confidence_scores": [],
+    "processing_time": 8.511543273925781e-05,
+    "error": null,
+    "metadata": {
+      "document_id": "abe4a26c-72b4-4f34-9710-82d3397d5d2e",
+      "document_type": ".pdf",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 0,
+          "processing_time": 5.316734313964844e-05,
+          "error": "No text content available"
+        },
+        "ner": {
+          "entity_count": 0,
+          "processing_time": 3.1948089599609375e-05,
+          "error": "No text content available"
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 0,
+      "total_entities_after_dedup": 0
+    },
+    "timestamp": "2025-06-18T09:53:18.128846"
+  },
+  "processed_document": {
+    "raw_text": "",
+    "ocr_text": "",
+    "pages": [],
+    "metadata": {},
+    "bounding_boxes": [],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpbqwcuadu_specimen cheque - Souad Touati.pdf",
+    "file_name": "tmpbqwcuadu_specimen cheque - Souad Touati.pdf",
+    "file_size_mb": 0.76,
+    "file_type": ".pdf",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

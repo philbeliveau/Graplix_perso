@@ -1,0 +1,70 @@
+{
+  "gpt-4o-mini": {
+    "success": true,
+    "extracted_text": "CLINIQUE DE MÉDECINE FAMILIALE  \nGMF-Universitaire Laval (Hôpital Cité-de-la-Santé)  \n1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9  \nTéléphone : (450) 975-5444 Télécopieur : (450) 975-5497  \n\nNom, Prénom : TREMBLAY, Steve  \nDate de naissance : 1991-03-17  \nAdresse : 211 Avenue d'Alginy Sainte-Thérèse (Québec) J7E 2J2  \nTéléphone du patient  (438) 462-3020  \n\nRX  \nÀ qui de droit,  \nArrêt de travail jusqu'au 14/05/2024 inclusivement pour raison médicale  \nmerci  \n\nNom du médecin : Georges, Barbara ; 530002  \nSignature du médecin :  \n\nRéf.  1  2  3  4  5  6  NR  \nNom : CHRISTIAN CHADI PHARMACIEN INC.  \nFax : (450) 437-5763  ",
+    "text_length": 642,
+    "pii_analysis": {
+      "name": [
+        "TREMBLAY",
+        "Steve"
+      ],
+      "birth_date": [
+        "1991"
+      ],
+      "phone": [
+        "438",
+        "462"
+      ],
+      "address": [
+        "211",
+        "Avenue"
+      ],
+      "medical": [
+        "Georges",
+        "Barbara"
+      ]
+    },
+    "total_pii_indicators": 9,
+    "contains_template_lines": false,
+    "usage": {
+      "prompt_tokens": 25673,
+      "completion_tokens": 238,
+      "total_tokens": 25911,
+      "estimated_cost": 0.003993749999999999
+    }
+  },
+  "gpt-4o": {
+    "success": true,
+    "extracted_text": "Centre intégré\nde santé et de services sociaux\nde\nQuébec\n\nCLINIQUE DE MÉDECINE FAMILIALE\nGMF-Universitaire Laval (Hôpital Cité-de-la-Santé)\n1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9\nTéléphone : (450) 975-5444 Télécopieur : (450) 975-5497\n\nNom, Prénom : TREMBLAY, Steve\n\nDate de naissance : 1991-03-17\n\nAdresse : 211 Avenue d'Albigny Sainte-Thérèse (Québec)\nJ7E 2J2\n\nDate : 2024-04-12\n\nTéléphone du patient (438) 462-3020\n\nNAM : TRES 9103 1716 2031-03\n\nRX\n\nÀ qui de droit,\n\nArrêt de travail jusqu'au 14/05/2024 inclusivement pour raison médicale\n\nmerci\n\nNom du médecin : Georges, Barbara ; 530002\n\nSignature du médecin :\n\nRép. 1 2 3 4 5 6 NR\n\n- Cette ordonnance est une ordonnance originale.\n- Elle sera conservée au dossier et ne sera pas réutilisée.\n- Le pharmacien désigné ci-dessous est le seul destinataire\n\nNom : CHRISTIAN CHADI PHARMACIEN INC.\n\nFax : (450) 437-5763",
+    "text_length": 887,
+    "pii_analysis": {
+      "name": [
+        "TREMBLAY",
+        "Steve"
+      ],
+      "birth_date": [
+        "1991"
+      ],
+      "phone": [
+        "438",
+        "462"
+      ],
+      "address": [
+        "211",
+        "Avenue"
+      ],
+      "medical": [
+        "Georges",
+        "Barbara"
+      ]
+    },
+    "total_pii_indicators": 9,
+    "contains_template_lines": false,
+    "usage": {
+      "prompt_tokens": 937,
+      "completion_tokens": 303,
+      "total_tokens": 1240,
+      "estimated_cost": 0.00032234999999999995
+    }
+  }
+}

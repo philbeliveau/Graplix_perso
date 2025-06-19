@@ -1,0 +1,49 @@
+{
+  "document_id": "01e54f98-4fe5-4a53-a8e8-270e28f0b97b",
+  "extraction_result": {
+    "pii_entities": [],
+    "confidence_scores": [],
+    "processing_time": 4.8160552978515625e-05,
+    "error": null,
+    "metadata": {
+      "document_id": "01e54f98-4fe5-4a53-a8e8-270e28f0b97b",
+      "document_type": ".pdf",
+      "extractor_results": {
+        "ner": {
+          "entity_count": 0,
+          "processing_time": 4.8160552978515625e-05,
+          "error": "No text content available"
+        }
+      },
+      "total_entities_before_dedup": 0,
+      "total_entities_after_dedup": 0
+    },
+    "timestamp": "2025-06-18T09:57:17.188623"
+  },
+  "processed_document": {
+    "raw_text": "",
+    "ocr_text": "",
+    "pages": [],
+    "metadata": {},
+    "bounding_boxes": [],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpeih0zov__specimen cheque - Souad Touati.pdf",
+    "file_name": "tmpeih0zov__specimen cheque - Souad Touati.pdf",
+    "file_size_mb": 0.76,
+    "file_type": ".pdf",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "ner"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

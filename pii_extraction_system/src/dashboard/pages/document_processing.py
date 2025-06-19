@@ -19,6 +19,17 @@ from pathlib import Path
 src_path = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(src_path))
 
+# Load environment variables
+project_root = src_path.parent
+env_loader_path = project_root / "load_env.py"
+if env_loader_path.exists():
+    sys.path.insert(0, str(project_root))
+    try:
+        from load_env import load_env_file
+        load_env_file()
+    except ImportError:
+        pass
+
 from dashboard.utils import session_state, ui_components, auth
 from core.pipeline import PIIExtractionPipeline
 from utils.document_processor import DocumentProcessor
@@ -86,9 +97,87 @@ def show_upload_section():
             help="Only show PII entities with confidence above this threshold"
         )
     
+    # OCR Engine Selection for images and PDFs
+    st.markdown("#### OCR Settings (for Images & PDFs)")
+    
+    # Check if LLM OCR is available
+    import os
+    llm_available = bool(os.getenv("OPENAI_API_KEY") or os.getenv("DEEPSEEK_API") or os.getenv("ANTHROPIC_API_KEY"))
+    
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        ocr_engine_options = ['tesseract', 'easyocr', 'both']
+        if llm_available:
+            ocr_engine_options.append('llm')
+            ocr_engine_options.append('llm+traditional')
+        
+        ocr_engine = st.selectbox(
+            "OCR Engine",
+            ocr_engine_options,
+            index=0,
+            help="Choose OCR method: Traditional (Tesseract/EasyOCR) or AI-powered LLM OCR"
+        )
+    
+    with col2:
+        if ocr_engine in ['easyocr', 'both']:
+            use_gpu = st.checkbox(
+                "Use GPU for EasyOCR", 
+                value=False, 
+                help="Requires CUDA-compatible GPU for acceleration"
+            )
+        else:
+            use_gpu = False
+        
+        # LLM OCR specific options
+        if ocr_engine in ['llm', 'llm+traditional'] and llm_available:
+            st.markdown("**🤖 LLM OCR Settings**")
+            
+            # Model selection
+            available_models = []
+            if os.getenv("OPENAI_API_KEY"):
+                available_models.extend(["gpt-4o-mini", "gpt-3.5-turbo"])
+            if os.getenv("DEEPSEEK_API"):
+                available_models.append("deepseek-chat")
+            if os.getenv("ANTHROPIC_API_KEY"):
+                available_models.extend(["claude-3-haiku", "claude-3-sonnet"])
+            
+            llm_model = st.selectbox(
+                "LLM Model",
+                available_models,
+                index=0 if available_models else None,
+                help="Choose AI model for OCR processing"
+            )
+            
+            max_cost = st.slider(
+                "Max Cost per Document ($)",
+                0.01, 0.50, 0.10, 0.01,
+                help="Maximum cost limit per document"
+            )
+            
+            # Show estimated cost
+            if llm_model:
+                # Simple cost estimation
+                cost_per_page = {
+                    "gpt-4o-mini": 0.00015,
+                    "gpt-3.5-turbo": 0.0005,
+                    "deepseek-chat": 0.0001,
+                    "claude-3-haiku": 0.00025,
+                    "claude-3-sonnet": 0.003
+                }.get(llm_model, 0.0002)
+                
+                st.info(f"💰 Est. cost: ~${cost_per_page:.5f}/page")
+        else:
+            llm_model = None
+            max_cost = 0.10
+    
     # Store processing options in session state
     st.session_state.processing_model = processing_model
     st.session_state.confidence_threshold = confidence_threshold
+    st.session_state.ocr_engine = ocr_engine
+    st.session_state.ocr_use_gpu = use_gpu
+    st.session_state.llm_model = llm_model if 'llm_model' in locals() else None
+    st.session_state.llm_max_cost = max_cost if 'max_cost' in locals() else 0.10
     
     # File uploader
     uploaded_files = ui_components.show_file_uploader(
@@ -235,11 +324,37 @@ def process_document(file_id: str):
                         'extractor': entity.extractor
                     })
             
-            # Extract text content for display
-            doc_processor = DocumentProcessor()
-            password = st.session_state.get('document_password', '')
-            processed_doc = doc_processor.process_document(tmp_file_path, password if password else None)
-            text_content = processed_doc.get('raw_text', '')
+            # Extract text content for display using selected OCR engine
+            from core.config import settings
+            
+            # Get OCR settings from session state
+            ocr_engine = st.session_state.get('ocr_engine', 'tesseract')
+            ocr_use_gpu = st.session_state.get('ocr_use_gpu', False)
+            
+            # Temporarily override settings with user selection
+            original_ocr_engine = settings.processing.ocr_engine
+            original_ocr_gpu = settings.processing.easyocr_use_gpu
+            
+            settings.processing.ocr_engine = ocr_engine
+            settings.processing.easyocr_use_gpu = ocr_use_gpu
+            
+            try:
+                doc_processor = DocumentProcessor()
+                password = st.session_state.get('document_password', '')
+                processed_doc = doc_processor.process_document(tmp_file_path, password if password else None)
+                text_content = processed_doc.get('raw_text', '')
+                
+                # Store OCR metadata for display
+                ocr_metadata = {
+                    'ocr_engine': processed_doc.get('ocr_engine', ocr_engine),
+                    'alternative_text': processed_doc.get('alternative_text', {}),
+                    'bounding_boxes': processed_doc.get('bounding_boxes', [])
+                }
+                
+            finally:
+                # Restore original settings
+                settings.processing.ocr_engine = original_ocr_engine
+                settings.processing.easyocr_use_gpu = original_ocr_gpu
             
         finally:
             # Clean up temporary file
@@ -257,7 +372,9 @@ def process_document(file_id: str):
             'total_entities': len(pii_results),
             'selected_model': processing_model,
             'enabled_models': enabled_models,
-            'total_entities_before_filter': len(extraction_result.pii_entities)
+            'total_entities_before_filter': len(extraction_result.pii_entities),
+            'ocr_engine': ocr_engine,
+            'ocr_metadata': ocr_metadata
         }
         
         session_state.store_processing_results(file_id, results)
@@ -312,6 +429,27 @@ def show_processing_results():
 def show_document_view(results: Dict[str, Any]):
     """Show document with PII highlighting"""
     st.markdown("### Document with PII Highlighting")
+    
+    # Show OCR engine information
+    ocr_engine = results.get('ocr_engine', 'unknown')
+    ocr_metadata = results.get('ocr_metadata', {})
+    
+    col1, col2, col3 = st.columns([2, 1, 1])
+    with col1:
+        st.info(f"🔍 **OCR Engine Used:** {ocr_engine.title()}")
+    with col2:
+        if ocr_metadata.get('alternative_text'):
+            st.info("📊 **Multiple engines** compared")
+    with col3:
+        if 'bounding_boxes' in ocr_metadata:
+            st.info(f"📍 **{len(ocr_metadata['bounding_boxes'])}** text regions detected")
+    
+    # Show alternative OCR results if available
+    if ocr_metadata.get('alternative_text'):
+        with st.expander("🔍 Compare OCR Results"):
+            for engine_name, alt_text in ocr_metadata['alternative_text'].items():
+                st.markdown(f"**{engine_name.title()} Result:**")
+                st.text_area(f"{engine_name}_result", alt_text, height=100, key=f"alt_text_{engine_name}")
     
     text_content = results.get('text_content', '')
     pii_entities = results.get('pii_entities', [])

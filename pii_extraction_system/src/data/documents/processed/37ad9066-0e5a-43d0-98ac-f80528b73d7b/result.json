@@ -1,0 +1,334 @@
+{
+  "document_id": "37ad9066-0e5a-43d0-98ac-f80528b73d7b",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "DE M\u00c9DE C",
+        "type": "organization",
+        "confidence": 0.8759767413139343,
+        "start_pos": 0,
+        "end_pos": 9,
+        "context": "DE M\u00c9DE CN (GE Lara Cu re on Date de 7 \u00c0 qe our do av DE 70",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "GE Lara",
+        "type": "organization",
+        "confidence": 0.8258547782897949,
+        "start_pos": 12,
+        "end_pos": 19,
+        "context": "DE M\u00c9DE CN (GE Lara Cu re on Date de 7 \u00c0 qe our do av DE 7078 vx ag R",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.8759767413139343,
+      0.8258547782897949
+    ],
+    "processing_time": 2.711482286453247,
+    "error": null,
+    "metadata": {
+      "document_id": "37ad9066-0e5a-43d0-98ac-f80528b73d7b",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 0,
+          "processing_time": 0.00014328956604003906,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 2,
+          "processing_time": 2.711338996887207,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 2,
+      "total_entities_after_dedup": 2
+    },
+    "timestamp": "2025-06-18T09:56:31.464091"
+  },
+  "processed_document": {
+    "raw_text": "DE M\u00c9DE CN (GE Lara Cu re on Date de 7 \u00c0 qe our do av DE 7078 vx ag ROUE 1207 Be om de ce",
+    "ocr_text": "DE M\u00c9DE CN (GE Lara Cu re on Date de 7 \u00c0 qe our do av DE 7078 vx ag ROUE 1207 Be om de ce",
+    "metadata": {
+      "width": 548,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 34.8,
+      "is_jpg": true,
+      "format": ".jpg",
+      "compression_ratio": 0.0270948905109489
+    },
+    "bounding_boxes": [
+      {
+        "text": "DE",
+        "confidence": 60,
+        "x": 260,
+        "y": 123,
+        "width": 10,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "M\u00c9DE",
+        "confidence": 61,
+        "x": 276,
+        "y": 112,
+        "width": 24,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "CN",
+        "confidence": 41,
+        "x": 302,
+        "y": 123,
+        "width": 17,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "(GE",
+        "confidence": 33,
+        "x": 179,
+        "y": 136,
+        "width": 21,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Lara",
+        "confidence": 39,
+        "x": 266,
+        "y": 126,
+        "width": 21,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Cu",
+        "confidence": 32,
+        "x": 333,
+        "y": 126,
+        "width": 13,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "re",
+        "confidence": 47,
+        "x": 354,
+        "y": 126,
+        "width": 22,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "on",
+        "confidence": 31,
+        "x": 385,
+        "y": 126,
+        "width": 28,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Date",
+        "confidence": 37,
+        "x": 335,
+        "y": 189,
+        "width": 24,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "de",
+        "confidence": 79,
+        "x": 365,
+        "y": 189,
+        "width": 10,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "7",
+        "confidence": 45,
+        "x": 441,
+        "y": 199,
+        "width": 9,
+        "height": 4,
+        "engine": "tesseract"
+      },
+      {
+        "text": "\u00c0",
+        "confidence": 92,
+        "x": 79,
+        "y": 297,
+        "width": 6,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "qe",
+        "confidence": 68,
+        "x": 89,
+        "y": 287,
+        "width": 14,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "our",
+        "confidence": 34,
+        "x": 122,
+        "y": 297,
+        "width": 21,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "do",
+        "confidence": 71,
+        "x": 106,
+        "y": 323,
+        "width": 11,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "av",
+        "confidence": 50,
+        "x": 182,
+        "y": 312,
+        "width": 10,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "DE",
+        "confidence": 37,
+        "x": 213,
+        "y": 323,
+        "width": 11,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "7078",
+        "confidence": 44,
+        "x": 229,
+        "y": 323,
+        "width": 23,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "vx",
+        "confidence": 31,
+        "x": 256,
+        "y": 325,
+        "width": 12,
+        "height": 6,
+        "engine": "tesseract"
+      },
+      {
+        "text": "ag",
+        "confidence": 38,
+        "x": 268,
+        "y": 312,
+        "width": 13,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "ROUE",
+        "confidence": 41,
+        "x": 326,
+        "y": 325,
+        "width": 21,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "1207",
+        "confidence": 35,
+        "x": 352,
+        "y": 325,
+        "width": 28,
+        "height": 6,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Be",
+        "confidence": 37,
+        "x": 415,
+        "y": 312,
+        "width": 13,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "om",
+        "confidence": 31,
+        "x": 82,
+        "y": 552,
+        "width": 78,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "de",
+        "confidence": 43,
+        "x": 108,
+        "y": 537,
+        "width": 10,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "ce",
+        "confidence": 59,
+        "x": 438,
+        "y": 550,
+        "width": 11,
+        "height": 5,
+        "engine": "tesseract"
+      }
+    ],
+    "ocr_engine": "tesseract",
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpls6esvk1_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_name": "tmpls6esvk1_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_size_mb": 0.03,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

@@ -19,6 +19,17 @@ warnings.filterwarnings("ignore", message=".*no running event loop.*")
 src_path = Path(__file__).parent.parent
 sys.path.insert(0, str(src_path))
 
+# Load environment variables  
+project_root = src_path.parent
+env_loader_path = project_root / "load_env.py"
+if env_loader_path.exists():
+    sys.path.insert(0, str(project_root))
+    try:
+        from load_env import load_env_file
+        load_env_file()
+    except ImportError:
+        pass
+
 from dashboard.pages import (
     document_processing,
     batch_analysis,
@@ -28,6 +39,12 @@ from dashboard.pages import (
     data_management,
     configuration
 )
+
+# Import LLM OCR config with error handling
+try:
+    from dashboard.pages import llm_ocr_simple as llm_ocr_config
+except ImportError:
+    llm_ocr_config = None
 from dashboard.utils import session_state, auth, ui_components
 
 def main():
@@ -103,6 +120,7 @@ def main():
                 "Error Analysis",
                 "Performance Metrics",
                 "Data Management",
+                "LLM OCR Config",
                 "Configuration"
             ],
             icons=[
@@ -112,6 +130,7 @@ def main():
                 "bug",
                 "graph-up",
                 "database",
+                "robot",
                 "gear"
             ],
             menu_icon="list",
@@ -154,6 +173,12 @@ def main():
         performance_metrics.show_page()
     elif selected_page == "Data Management":
         data_management.show_page()
+    elif selected_page == "LLM OCR Config":
+        if llm_ocr_config:
+            llm_ocr_config.show_llm_ocr_config()
+        else:
+            st.error("LLM OCR configuration not available")
+            st.info("Please check the installation and imports.")
     elif selected_page == "Configuration":
         configuration.show_page()
 

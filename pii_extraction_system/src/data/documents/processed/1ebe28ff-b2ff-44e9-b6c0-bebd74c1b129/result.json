@@ -1,0 +1,444 @@
+{
+  "document_id": "1ebe28ff-b2ff-44e9-b6c0-bebd74c1b129",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "(450) 975-5444",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 152,
+        "end_pos": 166,
+        "context": "...que (Bloc F1, Laval) (Qu\u00e9bec) H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-5444 T\u00e9l\u00e9copieur : (450) 975-5497\n\nNom, Pr\u00e9nom : TREMB...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\(\\d{3}\\)\\s?\\d{3}[-.\\s]?\\d{4}"
+        }
+      },
+      {
+        "text": "450) 975-5444",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 153,
+        "end_pos": 166,
+        "context": "...ue (Bloc F1, Laval) (Qu\u00e9bec) H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-5444 T\u00e9l\u00e9copieur : (450) 975-5497\n\nNom, Pr\u00e9nom : TREMB...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "(450) 975-5497",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 181,
+        "end_pos": 195,
+        "context": "... H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-5444 T\u00e9l\u00e9copieur : (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                Dat...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\(\\d{3}\\)\\s?\\d{3}[-.\\s]?\\d{4}"
+        }
+      },
+      {
+        "text": "450) 975-5497",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 182,
+        "end_pos": 195,
+        "context": "...H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-5444 T\u00e9l\u00e9copieur : (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                Dat...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "Simon                Date",
+        "type": "person_name",
+        "confidence": 0.6,
+        "start_pos": 221,
+        "end_pos": 246,
+        "context": "...copieur : (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                Date de naissance : 1991-02-17\nAdresse :  21, rue du B...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "1991-02-17",
+        "type": "date_of_birth",
+        "confidence": 0.7,
+        "start_pos": 262,
+        "end_pos": 272,
+        "context": "...REMBLAY, Simon                Date de naissance : 1991-02-17\nAdresse :  21, rue du Barry Saint-Thomas (Qu\u00e9bec)...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(19|20)\\d{2}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\\d|3[01])\\b"
+        }
+      },
+      {
+        "text": "Barry Saint",
+        "type": "person_name",
+        "confidence": 0.6,
+        "start_pos": 295,
+        "end_pos": 306,
+        "context": "...e de naissance : 1991-02-17\nAdresse :  21, rue du Barry Saint-Thomas (Qu\u00e9bec) \nJ6E 2Z2\nT\u00e9l\u00e9phone du patient : (...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "(438) 262-2020",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 355,
+        "end_pos": 369,
+        "context": "...t-Thomas (Qu\u00e9bec) \nJ6E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262-2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/0...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\(\\d{3}\\)\\s?\\d{3}[-.\\s]?\\d{4}"
+        }
+      },
+      {
+        "text": "438) 262-2020",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 356,
+        "end_pos": 369,
+        "context": "...-Thomas (Qu\u00e9bec) \nJ6E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262-2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/0...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "14/05/2024",
+        "type": "date_of_birth",
+        "confidence": 0.6,
+        "start_pos": 415,
+        "end_pos": 425,
+        "context": "...2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/05/2024 inclusivement pour raison m\u00e9dicale\nmerci\n\nNom du ...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(0?[1-9]|[12]\\d|3[01])/(0?[1-9]|1[0-2])/(19|20)\\d{2}\\b"
+        }
+      },
+      {
+        "text": "(450) 437-6785",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 803,
+        "end_pos": 817,
+        "context": "...ct\u00e9.\nNom : CHRISTIAN CHAUL PHARMACIEN INC.\nT\u00e9l. : (450) 437-6785\n```",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\(\\d{3}\\)\\s?\\d{3}[-.\\s]?\\d{4}"
+        }
+      },
+      {
+        "text": "450) 437-6785",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 804,
+        "end_pos": 817,
+        "context": "...t\u00e9.\nNom : CHRISTIAN CHAUL PHARMACIEN INC.\nT\u00e9l. : (450) 437-6785\n```",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "Georges",
+        "type": "person_name",
+        "confidence": 0.999394416809082,
+        "start_pos": 394,
+        "end_pos": 401,
+        "context": "ent pour raison m\u00e9dicale\nmerci\n\nNom du m\u00e9decin : (Georges, Barbara)                # : 530002\nSignature du ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Barbara",
+        "type": "person_name",
+        "confidence": 0.9990205764770508,
+        "start_pos": 403,
+        "end_pos": 410,
+        "context": "raison m\u00e9dicale\nmerci\n\nNom du m\u00e9decin : (Georges, Barbara)                # : 530002\nSignature du m\u00e9decin :",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Simon",
+        "type": "person_name",
+        "confidence": 0.9989809393882751,
+        "start_pos": 129,
+        "end_pos": 134,
+        "context": "copieur : (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                Date de naissance : 1991-02-17\nAdr",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Universit\u00e9 Laval",
+        "type": "organization",
+        "confidence": 0.9980172514915466,
+        "start_pos": 43,
+        "end_pos": 59,
+        "context": "```\n- CLINIQUE DE M\u00c9DECINE FAMILIALE -\nGMS-Universit\u00e9 Laval (H\u00f4pital Outaouais)\n1755, boul",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Bloc F1",
+        "type": "organization",
+        "confidence": 0.9979931712150574,
+        "start_pos": 15,
+        "end_pos": 22,
+        "context": "Ren\u00e9-L\u00e9vesque (Bloc F1, Laval) (Qu\u00e9bec) H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-54",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Laval",
+        "type": "organization",
+        "confidence": 0.9972741603851318,
+        "start_pos": 24,
+        "end_pos": 29,
+        "context": "Ren\u00e9-L\u00e9vesque (Bloc F1, Laval) (Qu\u00e9bec) H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-5444 T\u00e9l\u00e9",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Ren\u00e9 - L\u00e9vesque",
+        "type": "person_name",
+        "confidence": 0.9926702380180359,
+        "start_pos": 0,
+        "end_pos": 13,
+        "context": "Ren\u00e9-L\u00e9vesque (Bloc F1, Laval) (Qu\u00e9bec) H7M 3L9\nT\u00e9l\u00e9phone : (45",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Qu\u00e9bec",
+        "type": "location",
+        "confidence": 0.9897133111953735,
+        "start_pos": 32,
+        "end_pos": 38,
+        "context": "Ren\u00e9-L\u00e9vesque (Bloc F1, Laval) (Qu\u00e9bec) H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-5444 T\u00e9l\u00e9copieur :",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "du Barry Saint - Thomas",
+        "type": "location",
+        "confidence": 0.9750024080276489,
+        "start_pos": 200,
+        "end_pos": 221,
+        "context": "Date de naissance : 1991-02-17\nAdresse :  21, rue du Barry Saint-Thomas (Qu\u00e9bec) \nJ6E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 26",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "CHRISTIAN",
+        "type": "miscellaneous",
+        "confidence": 0.8876272439956665,
+        "start_pos": 179,
+        "end_pos": 188,
+        "context": "en d\u00e9sign\u00e9 ci-dessous est le seul contact\u00e9. Nom : CHRISTIAN CHAUL PHARMACIEN INC. T\u00e9l. : (450) 437-6785\n```",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "MISC",
+          "chunk_index": 2
+        }
+      },
+      {
+        "text": "GMS",
+        "type": "organization",
+        "confidence": 0.7668941020965576,
+        "start_pos": 39,
+        "end_pos": 42,
+        "context": "```\n- CLINIQUE DE M\u00c9DECINE FAMILIALE -\nGMS-Universit\u00e9 Laval (H\u00f4pital Outaouais)\n1755, boul",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "##aouais",
+        "type": "location",
+        "confidence": 0.7613266110420227,
+        "start_pos": 72,
+        "end_pos": 78,
+        "context": "CINE FAMILIALE -\nGMS-Universit\u00e9 Laval (H\u00f4pital Outaouais)\n1755, boul",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "CL",
+        "type": "organization",
+        "confidence": 0.7445673942565918,
+        "start_pos": 6,
+        "end_pos": 8,
+        "context": "```\n- CLINIQUE DE M\u00c9DECINE FAMILIALE -\nGMS-Universit\u00e9 Lava",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "H\u00f4pital",
+        "type": "location",
+        "confidence": 0.7175654172897339,
+        "start_pos": 61,
+        "end_pos": 68,
+        "context": "QUE DE M\u00c9DECINE FAMILIALE -\nGMS-Universit\u00e9 Laval (H\u00f4pital Outaouais)\n1755, boul",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.6,
+      0.7,
+      0.6,
+      0.6,
+      0.7445673942565918,
+      0.7668941020965576,
+      0.9980172514915466,
+      0.7175654172897339,
+      0.7613266110420227,
+      0.9926702380180359,
+      0.9979931712150574,
+      0.9972741603851318,
+      0.9897133111953735,
+      0.7400379180908203,
+      0.9989809393882751,
+      0.9750024080276489,
+      0.9987295269966125,
+      0.999394416809082,
+      0.9990205764770508,
+      0.8876272439956665
+    ],
+    "processing_time": 2.9030652046203613,
+    "error": null,
+    "metadata": {
+      "document_id": "1ebe28ff-b2ff-44e9-b6c0-bebd74c1b129",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 12,
+          "processing_time": 0.0008192062377929688,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 14,
+          "processing_time": 2.9022459983825684,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 26,
+      "total_entities_after_dedup": 26
+    },
+    "timestamp": "2025-06-19T10:23:15.677691"
+  },
+  "processed_document": {
+    "raw_text": "```\n- CLINIQUE DE M\u00c9DECINE FAMILIALE -\nGMS-Universit\u00e9 Laval (H\u00f4pital Outaouais)\n1755, boul. Ren\u00e9-L\u00e9vesque (Bloc F1, Laval) (Qu\u00e9bec) H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-5444 T\u00e9l\u00e9copieur : (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                Date de naissance : 1991-02-17\nAdresse :  21, rue du Barry Saint-Thomas (Qu\u00e9bec) \nJ6E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262-2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/05/2024 inclusivement pour raison m\u00e9dicale\nmerci\n\nNom du m\u00e9decin : (Georges, Barbara)                # : 530002\nSignature du m\u00e9decin :\n\nR\u00e9f. :  1  2  3  4  5  6  N\u00b0R.\n- Certes informations doivent \u00eatre conserv\u00e9es originales.\n- De toute correspondance, d\u00e9sirez en avoir par m\u00e9dicale.\n- Le pharmacien d\u00e9sign\u00e9 ci-dessous est le seul contact\u00e9.\nNom : CHRISTIAN CHAUL PHARMACIEN INC.\nT\u00e9l. : (450) 437-6785\n```",
+    "ocr_text": "```\n- CLINIQUE DE M\u00c9DECINE FAMILIALE -\nGMS-Universit\u00e9 Laval (H\u00f4pital Outaouais)\n1755, boul. Ren\u00e9-L\u00e9vesque (Bloc F1, Laval) (Qu\u00e9bec) H7M 3L9\nT\u00e9l\u00e9phone : (450) 975-5444 T\u00e9l\u00e9copieur : (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                Date de naissance : 1991-02-17\nAdresse :  21, rue du Barry Saint-Thomas (Qu\u00e9bec) \nJ6E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262-2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/05/2024 inclusivement pour raison m\u00e9dicale\nmerci\n\nNom du m\u00e9decin : (Georges, Barbara)                # : 530002\nSignature du m\u00e9decin :\n\nR\u00e9f. :  1  2  3  4  5  6  N\u00b0R.\n- Certes informations doivent \u00eatre conserv\u00e9es originales.\n- De toute correspondance, d\u00e9sirez en avoir par m\u00e9dicale.\n- Le pharmacien d\u00e9sign\u00e9 ci-dessous est le seul contact\u00e9.\nNom : CHRISTIAN CHAUL PHARMACIEN INC.\nT\u00e9l. : (450) 437-6785\n```",
+    "metadata": {
+      "width": 548,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 34.8,
+      "is_jpg": true,
+      "format": ".jpg",
+      "compression_ratio": 0.0270948905109489
+    },
+    "bounding_boxes": [],
+    "confidence": 0.85,
+    "structured_data": {},
+    "ocr_engine": "llm",
+    "llm_metadata": {
+      "model_used": "gpt-4o-mini",
+      "provider": "openai",
+      "task_type": "basic_text",
+      "processing_time": 6.69,
+      "cost_info": {
+        "estimated_cost": 9.9e-05,
+        "actual_cost": 0.004017,
+        "input_tokens": 25644,
+        "output_tokens": 284
+      },
+      "image_info": {
+        "width": 548,
+        "height": 800,
+        "format": "PNG"
+      }
+    },
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmp8321i813_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_name": "tmp8321i813_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_size_mb": 0.03,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

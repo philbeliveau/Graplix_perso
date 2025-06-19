@@ -1,0 +1,616 @@
+{
+  "document_id": "6143ea53-b386-477a-918d-022ea2bc1698",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "Rend Laganee",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 57,
+        "end_pos": 69,
+        "context": "... M\u00c9DEQNE Laval (Hopital t\u00e9 de La Sante} 175, bid. Rend Laganee (Bloc FI Laval 7M 315 925 5444 975-5497 fom, Se d...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "315 925 5444",
+        "type": "phone_number",
+        "confidence": 0.8,
+        "start_pos": 88,
+        "end_pos": 100,
+        "context": "...a Sante} 175, bid. Rend Laganee (Bloc FI Laval 7M 315 925 5444 975-5497 fom, Se de naissance esses jo ates Adres...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "Adresses Bates",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 145,
+        "end_pos": 159,
+        "context": "... 5444 975-5497 fom, Se de naissance esses jo ates Adresses Bates prio sion il nai RX dro, do Hal 14/05/2024 four r...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "14/05/2024",
+        "type": "date_of_birth",
+        "confidence": 0.7,
+        "start_pos": 192,
+        "end_pos": 202,
+        "context": "...es Adresses Bates prio sion il nai RX dro, do Hal 14/05/2024 four raisod merci tiom dem\u00e9dedin : on retin: LS T...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(0?[1-9]|[12]\\d|3[01])/(0?[1-9]|1[0-2])/(19|20)\\d{2}\\b"
+        }
+      },
+      {
+        "text": "Bloc FI Laval",
+        "type": "organization",
+        "confidence": 0.9990399479866028,
+        "start_pos": 71,
+        "end_pos": 84,
+        "context": " (Hopital t\u00e9 de La Sante} 175, bid. Rend Laganee (Bloc FI Laval 7M 315 925 5444 975-5497 fom, Se de naissance ess",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Qu\u00e9bec M\u00c9DEQNE Laval",
+        "type": "organization",
+        "confidence": 0.9542231559753418,
+        "start_pos": 1,
+        "end_pos": 21,
+        "context": "\u201cQu\u00e9bec M\u00c9DEQNE Laval (Hopital t\u00e9 de La Sante} 175, bid. Rend Laganee (",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "##ital t\u00e9 de La Sante",
+        "type": "organization",
+        "confidence": 0.9076735377311707,
+        "start_pos": 26,
+        "end_pos": 45,
+        "context": "\u201cQu\u00e9bec M\u00c9DEQNE Laval (Hopital t\u00e9 de La Sante} 175, bid. Rend Laganee (Bloc FI Laval 7M 315 925",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Adresses Bates",
+        "type": "organization",
+        "confidence": 0.8939223885536194,
+        "start_pos": 145,
+        "end_pos": 159,
+        "context": " 5444 975-5497 fom, Se de naissance esses jo ates Adresses Bates prio sion il nai RX dro, do Hal 14/05/2024 four r",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "LS TERE GHADI",
+        "type": "organization",
+        "confidence": 0.8823112845420837,
+        "start_pos": 248,
+        "end_pos": 261,
+        "context": "2024 four raisod merci tiom dem\u00e9dedin : on retin: LS TERE GHADI RG \u00c0 ag \u00c0",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.8,
+      0.8,
+      0.7,
+      0.5,
+      0.5,
+      0.9542231559753418,
+      0.9076735377311707,
+      0.8966609835624695,
+      0.9990399479866028,
+      0.8939223885536194,
+      0.8823112845420837
+    ],
+    "processing_time": 3.362947940826416,
+    "error": null,
+    "metadata": {
+      "document_id": "6143ea53-b386-477a-918d-022ea2bc1698",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 4,
+          "processing_time": 0.00043702125549316406,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 6,
+          "processing_time": 3.362510919570923,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 10,
+      "total_entities_after_dedup": 9
+    },
+    "timestamp": "2025-06-18T08:52:21.598217"
+  },
+  "processed_document": {
+    "raw_text": "\u201cQu\u00e9bec M\u00c9DEQNE Laval (Hopital t\u00e9 de La Sante} 175, bid. Rend Laganee (Bloc FI Laval 7M 315 925 5444 975-5497 fom, Se de naissance esses jo ates Adresses Bates prio sion il nai RX dro, do Hal 14/05/2024 four raisod merci tiom dem\u00e9dedin : on retin: LS TERE GHADI RG \u00c0 ag \u00c0",
+    "ocr_text": "\u201cQu\u00e9bec M\u00c9DEQNE Laval (Hopital t\u00e9 de La Sante} 175, bid. Rend Laganee (Bloc FI Laval 7M 315 925 5444 975-5497 fom, Se de naissance esses jo ates Adresses Bates prio sion il nai RX dro, do Hal 14/05/2024 four raisod merci tiom dem\u00e9dedin : on retin: LS TERE GHADI RG \u00c0 ag \u00c0",
+    "metadata": {
+      "width": 548,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 34.8
+    },
+    "bounding_boxes": [
+      {
+        "text": "\u201cQu\u00e9bec",
+        "confidence": 41,
+        "x": 55,
+        "y": 78,
+        "width": 94,
+        "height": 20
+      },
+      {
+        "text": "M\u00c9DEQNE",
+        "confidence": 82,
+        "x": 277,
+        "y": 109,
+        "width": 45,
+        "height": 31
+      },
+      {
+        "text": "Laval",
+        "confidence": 54,
+        "x": 267,
+        "y": 124,
+        "width": 22,
+        "height": 31
+      },
+      {
+        "text": "(Hopital",
+        "confidence": 49,
+        "x": 293,
+        "y": 124,
+        "width": 37,
+        "height": 31
+      },
+      {
+        "text": "t\u00e9",
+        "confidence": 55,
+        "x": 334,
+        "y": 124,
+        "width": 14,
+        "height": 31
+      },
+      {
+        "text": "de",
+        "confidence": 55,
+        "x": 352,
+        "y": 124,
+        "width": 12,
+        "height": 31
+      },
+      {
+        "text": "La",
+        "confidence": 55,
+        "x": 365,
+        "y": 124,
+        "width": 10,
+        "height": 31
+      },
+      {
+        "text": "Sante}",
+        "confidence": 46,
+        "x": 376,
+        "y": 134,
+        "width": 32,
+        "height": 11
+      },
+      {
+        "text": "175,",
+        "confidence": 57,
+        "x": 161,
+        "y": 148,
+        "width": 22,
+        "height": 9
+      },
+      {
+        "text": "bid.",
+        "confidence": 54,
+        "x": 189,
+        "y": 137,
+        "width": 23,
+        "height": 30
+      },
+      {
+        "text": "Rend",
+        "confidence": 54,
+        "x": 217,
+        "y": 137,
+        "width": 18,
+        "height": 30
+      },
+      {
+        "text": "Laganee",
+        "confidence": 38,
+        "x": 239,
+        "y": 137,
+        "width": 36,
+        "height": 30
+      },
+      {
+        "text": "(Bloc",
+        "confidence": 58,
+        "x": 279,
+        "y": 137,
+        "width": 21,
+        "height": 30
+      },
+      {
+        "text": "FI",
+        "confidence": 41,
+        "x": 304,
+        "y": 148,
+        "width": 8,
+        "height": 10
+      },
+      {
+        "text": "Laval",
+        "confidence": 71,
+        "x": 317,
+        "y": 137,
+        "width": 23,
+        "height": 30
+      },
+      {
+        "text": "7M",
+        "confidence": 67,
+        "x": 389,
+        "y": 137,
+        "width": 13,
+        "height": 30
+      },
+      {
+        "text": "315",
+        "confidence": 49,
+        "x": 409,
+        "y": 137,
+        "width": 18,
+        "height": 30
+      },
+      {
+        "text": "925",
+        "confidence": 38,
+        "x": 248,
+        "y": 161,
+        "width": 15,
+        "height": 11
+      },
+      {
+        "text": "5444",
+        "confidence": 38,
+        "x": 267,
+        "y": 150,
+        "width": 20,
+        "height": 29
+      },
+      {
+        "text": "975-5497",
+        "confidence": 64,
+        "x": 377,
+        "y": 160,
+        "width": 44,
+        "height": 12
+      },
+      {
+        "text": "fom,",
+        "confidence": 53,
+        "x": 73,
+        "y": 188,
+        "width": 28,
+        "height": 30
+      },
+      {
+        "text": "Se",
+        "confidence": 50,
+        "x": 208,
+        "y": 188,
+        "width": 19,
+        "height": 30
+      },
+      {
+        "text": "de",
+        "confidence": 66,
+        "x": 363,
+        "y": 188,
+        "width": 10,
+        "height": 29
+      },
+      {
+        "text": "naissance",
+        "confidence": 66,
+        "x": 377,
+        "y": 198,
+        "width": 47,
+        "height": 10
+      },
+      {
+        "text": "esses",
+        "confidence": 41,
+        "x": 90,
+        "y": 224,
+        "width": 30,
+        "height": 6
+      },
+      {
+        "text": "jo",
+        "confidence": 47,
+        "x": 227,
+        "y": 210,
+        "width": 11,
+        "height": 29
+      },
+      {
+        "text": "ates",
+        "confidence": 76,
+        "x": 345,
+        "y": 224,
+        "width": 5,
+        "height": 6
+      },
+      {
+        "text": "Adresses",
+        "confidence": 50,
+        "x": 76,
+        "y": 221,
+        "width": 44,
+        "height": 11
+      },
+      {
+        "text": "Bates",
+        "confidence": 56,
+        "x": 338,
+        "y": 222,
+        "width": 28,
+        "height": 9
+      },
+      {
+        "text": "prio",
+        "confidence": 31,
+        "x": 76,
+        "y": 238,
+        "width": 36,
+        "height": 30
+      },
+      {
+        "text": "sion",
+        "confidence": 49,
+        "x": 117,
+        "y": 238,
+        "width": 35,
+        "height": 30
+      },
+      {
+        "text": "il",
+        "confidence": 42,
+        "x": 163,
+        "y": 252,
+        "width": 19,
+        "height": 10
+      },
+      {
+        "text": "nai",
+        "confidence": 33,
+        "x": 187,
+        "y": 238,
+        "width": 33,
+        "height": 30
+      },
+      {
+        "text": "RX",
+        "confidence": 65,
+        "x": 77,
+        "y": 263,
+        "width": 14,
+        "height": 16
+      },
+      {
+        "text": "dro,",
+        "confidence": 40,
+        "x": 122,
+        "y": 287,
+        "width": 26,
+        "height": 27
+      },
+      {
+        "text": "do",
+        "confidence": 84,
+        "x": 105,
+        "y": 321,
+        "width": 11,
+        "height": 10
+      },
+      {
+        "text": "Hal",
+        "confidence": 44,
+        "x": 120,
+        "y": 321,
+        "width": 29,
+        "height": 10
+      },
+      {
+        "text": "14/05/2024",
+        "confidence": 42,
+        "x": 197,
+        "y": 321,
+        "width": 54,
+        "height": 13
+      },
+      {
+        "text": "four",
+        "confidence": 62,
+        "x": 327,
+        "y": 311,
+        "width": 18,
+        "height": 29
+      },
+      {
+        "text": "raisod",
+        "confidence": 62,
+        "x": 349,
+        "y": 311,
+        "width": 30,
+        "height": 29
+      },
+      {
+        "text": "merci",
+        "confidence": 51,
+        "x": 78,
+        "y": 346,
+        "width": 26,
+        "height": 13
+      },
+      {
+        "text": "tiom",
+        "confidence": 79,
+        "x": 77,
+        "y": 539,
+        "width": 25,
+        "height": 30
+      },
+      {
+        "text": "dem\u00e9dedin",
+        "confidence": 44,
+        "x": 106,
+        "y": 550,
+        "width": 60,
+        "height": 9
+      },
+      {
+        "text": ":",
+        "confidence": 87,
+        "x": 162,
+        "y": 539,
+        "width": 5,
+        "height": 30
+      },
+      {
+        "text": "on",
+        "confidence": 56,
+        "x": 339,
+        "y": 539,
+        "width": 24,
+        "height": 30
+      },
+      {
+        "text": "retin:",
+        "confidence": 54,
+        "x": 129,
+        "y": 561,
+        "width": 47,
+        "height": 30
+      },
+      {
+        "text": "LS",
+        "confidence": 62,
+        "x": 81,
+        "y": 598,
+        "width": 19,
+        "height": 10
+      },
+      {
+        "text": "TERE",
+        "confidence": 43,
+        "x": 343,
+        "y": 621,
+        "width": 21,
+        "height": 7
+      },
+      {
+        "text": "GHADI",
+        "confidence": 49,
+        "x": 418,
+        "y": 611,
+        "width": 24,
+        "height": 28
+      },
+      {
+        "text": "RG",
+        "confidence": 34,
+        "x": 504,
+        "y": 611,
+        "width": 20,
+        "height": 28
+      },
+      {
+        "text": "\u00c0",
+        "confidence": 38,
+        "x": 98,
+        "y": 634,
+        "width": 5,
+        "height": 3
+      },
+      {
+        "text": "ag",
+        "confidence": 34,
+        "x": 150,
+        "y": 620,
+        "width": 28,
+        "height": 28
+      },
+      {
+        "text": "\u00c0",
+        "confidence": 37,
+        "x": 98,
+        "y": 645,
+        "width": 6,
+        "height": 2
+      }
+    ],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpmgctuz1m_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_name": "tmpmgctuz1m_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_size_mb": 0.03,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

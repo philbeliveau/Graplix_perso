@@ -1,0 +1,905 @@
+{
+  "document_id": "2f4dba3d-647b-42cd-8aee-7e0a9dd4d4c7",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "Roger Mason",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 69,
+        "end_pos": 80,
+        "context": "... PREUVE DE.D\u00c9C\u00c9S DU DIRECTEUR FUN\u00c9RAIRE Lsign\u00e8ri \u2018Roger Mason. 10 7545827. Charehe - 01889 ON de Coliies (soins...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "Lusignen Germaine",
+        "type": "person_name",
+        "confidence": 0.6,
+        "start_pos": 173,
+        "end_pos": 190,
+        "context": "... (soins eu proche de la personne d\u00e9c\u00e9d\u00e9e: \u00e0 ere \u00e9 Lusignen Germaine Fortin - om du p\u00e8re (Nom complet do la m\u00e8re: Ctia...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "13 mars 2025",
+        "type": "date_of_birth",
+        "confidence": 0.7,
+        "start_pos": 382,
+        "end_pos": 394,
+        "context": "...r EN FDL DE dt su de pare . do eu Son A9FUNO145 A 13 mars 2025 \u00ce 7",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(0?[1-9]|[12]\\d|3[01])\\s+(janvier|f\u00e9vrier|mars|avril|mai|juin|juillet|ao\u00fbt|septembre|octobre|novembre|d\u00e9cembre)\\s+(19|20)\\d{2}\\b"
+        }
+      },
+      {
+        "text": "Canada",
+        "type": "location",
+        "confidence": 0.9994126558303833,
+        "start_pos": 253,
+        "end_pos": 259,
+        "context": " du p\u00e8re (Nom complet do la m\u00e8re: Ctiawe; Onta\u00f1o. Canada: 3 f\u00e9vri\u00e8r 1943: : ' eu de naissance\u201d de Av Canad",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Germaine Fortin",
+        "type": "person_name",
+        "confidence": 0.9764224290847778,
+        "start_pos": 183,
+        "end_pos": 198,
+        "context": "u proche de la personne d\u00e9c\u00e9d\u00e9e: \u00e0 ere \u00e9 Lusignen Germaine Fortin - om du p\u00e8re (Nom complet do la m\u00e8re: Ctiawe; Ont",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "##\u00f1o",
+        "type": "organization",
+        "confidence": 0.8912001848220825,
+        "start_pos": 249,
+        "end_pos": 251,
+        "context": "- om du p\u00e8re (Nom complet do la m\u00e8re: Ctiawe; Onta\u00f1o. Canada: 3 f\u00e9vri\u00e8r 1943: : ' eu de naissance\u201d de ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "##E Lsign\u00e8ri",
+        "type": "organization",
+        "confidence": 0.7704127430915833,
+        "start_pos": 58,
+        "end_pos": 68,
+        "context": " 40e Jaunes PREUVE DE. D\u00c9C\u00c9S DU DIRECTEUR FUN\u00c9RAIRE Lsign\u00e8ri \u2018Roger Mason. 10 7545827. Charehe - 01889 ON de C",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.7,
+      0.5,
+      0.6,
+      0.7349288463592529,
+      0.7704127430915833,
+      0.9948107004165649,
+      0.9764224290847778,
+      0.8912001848220825,
+      0.9994126558303833,
+      0.9672411680221558
+    ],
+    "processing_time": 0.42098069190979004,
+    "error": null,
+    "metadata": {
+      "document_id": "2f4dba3d-647b-42cd-8aee-7e0a9dd4d4c7",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 3,
+          "processing_time": 0.00042176246643066406,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 5,
+          "processing_time": 0.4205589294433594,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 8,
+      "total_entities_after_dedup": 7
+    },
+    "timestamp": "2025-06-18T09:49:48.800611"
+  },
+  "processed_document": {
+    "raw_text": "_ \u00e0 de D 40e Jaunes PREUVE DE.D\u00c9C\u00c9S DU DIRECTEUR FUN\u00c9RAIRE Lsign\u00e8ri \u2018Roger Mason. 10 7545827. Charehe - 01889 ON de Coliies (soins eu proche de la personne d\u00e9c\u00e9d\u00e9e: \u00e0 ere \u00e9 Lusignen Germaine Fortin - om du p\u00e8re (Nom complet do la m\u00e8re: Ctiawe; Onta\u00f1o. Canada: 3 f\u00e9vri\u00e8r 1943: : ' eu de naissance\u201d de Av Canada, Dee bons \u201cman Le ia ar EN FDL DE dt su de pare . do eu Son A9FUNO145 A 13 mars 2025 \u00ce 7",
+    "ocr_text": "_ \u00e0 de D 40e Jaunes PREUVE DE.D\u00c9C\u00c9S DU DIRECTEUR FUN\u00c9RAIRE Lsign\u00e8ri \u2018Roger Mason. 10 7545827. Charehe - 01889 ON de Coliies (soins eu proche de la personne d\u00e9c\u00e9d\u00e9e: \u00e0 ere \u00e9 Lusignen Germaine Fortin - om du p\u00e8re (Nom complet do la m\u00e8re: Ctiawe; Onta\u00f1o. Canada: 3 f\u00e9vri\u00e8r 1943: : ' eu de naissance\u201d de Av Canada, Dee bons \u201cman Le ia ar EN FDL DE dt su de pare . do eu Son A9FUNO145 A 13 mars 2025 \u00ce 7",
+    "metadata": {
+      "width": 581,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 67.47
+    },
+    "bounding_boxes": [
+      {
+        "text": "_",
+        "confidence": 64,
+        "x": 104,
+        "y": 5,
+        "width": 3,
+        "height": 1,
+        "engine": "tesseract"
+      },
+      {
+        "text": "\u00e0",
+        "confidence": 76,
+        "x": 18,
+        "y": 8,
+        "width": 44,
+        "height": 63,
+        "engine": "tesseract"
+      },
+      {
+        "text": "de",
+        "confidence": 71,
+        "x": 132,
+        "y": 41,
+        "width": 11,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "D",
+        "confidence": 51,
+        "x": 148,
+        "y": 44,
+        "width": 3,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "40e",
+        "confidence": 35,
+        "x": 176,
+        "y": 31,
+        "width": 14,
+        "height": 31,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Jaunes",
+        "confidence": 54,
+        "x": 182,
+        "y": 43,
+        "width": 44,
+        "height": 12,
+        "engine": "tesseract"
+      },
+      {
+        "text": "PREUVE",
+        "confidence": 90,
+        "x": 83,
+        "y": 125,
+        "width": 77,
+        "height": 18,
+        "engine": "tesseract"
+      },
+      {
+        "text": "DE.D\u00c9C\u00c9S",
+        "confidence": 55,
+        "x": 166,
+        "y": 124,
+        "width": 93,
+        "height": 20,
+        "engine": "tesseract"
+      },
+      {
+        "text": "DU",
+        "confidence": 70,
+        "x": 265,
+        "y": 129,
+        "width": 25,
+        "height": 15,
+        "engine": "tesseract"
+      },
+      {
+        "text": "DIRECTEUR",
+        "confidence": 95,
+        "x": 297,
+        "y": 130,
+        "width": 103,
+        "height": 18,
+        "engine": "tesseract"
+      },
+      {
+        "text": "FUN\u00c9RAIRE",
+        "confidence": 90,
+        "x": 407,
+        "y": 131,
+        "width": 102,
+        "height": 21,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Lsign\u00e8ri",
+        "confidence": 33,
+        "x": 135,
+        "y": 158,
+        "width": 49,
+        "height": 22,
+        "engine": "tesseract"
+      },
+      {
+        "text": "\u2018Roger",
+        "confidence": 47,
+        "x": 410,
+        "y": 165,
+        "width": 36,
+        "height": 21,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Mason.",
+        "confidence": 61,
+        "x": 138,
+        "y": 204,
+        "width": 51,
+        "height": 25,
+        "engine": "tesseract"
+      },
+      {
+        "text": "10",
+        "confidence": 83,
+        "x": 392,
+        "y": 216,
+        "width": 12,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "7545827.",
+        "confidence": 73,
+        "x": 140,
+        "y": 253,
+        "width": 46,
+        "height": 21,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Charehe",
+        "confidence": 43,
+        "x": 413,
+        "y": 255,
+        "width": 41,
+        "height": 23,
+        "engine": "tesseract"
+      },
+      {
+        "text": "-",
+        "confidence": 83,
+        "x": 458,
+        "y": 267,
+        "width": 4,
+        "height": 2,
+        "engine": "tesseract"
+      },
+      {
+        "text": "01889",
+        "confidence": 81,
+        "x": 465,
+        "y": 263,
+        "width": 32,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "ON",
+        "confidence": 41,
+        "x": 151,
+        "y": 265,
+        "width": 10,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "de",
+        "confidence": 44,
+        "x": 171,
+        "y": 284,
+        "width": 3,
+        "height": 2,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Coliies",
+        "confidence": 36,
+        "x": 265,
+        "y": 304,
+        "width": 40,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "(soins",
+        "confidence": 68,
+        "x": 309,
+        "y": 296,
+        "width": 29,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "eu",
+        "confidence": 56,
+        "x": 266,
+        "y": 321,
+        "width": 30,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "proche",
+        "confidence": 88,
+        "x": 126,
+        "y": 375,
+        "width": 33,
+        "height": 23,
+        "engine": "tesseract"
+      },
+      {
+        "text": "de",
+        "confidence": 58,
+        "x": 162,
+        "y": 375,
+        "width": 11,
+        "height": 23,
+        "engine": "tesseract"
+      },
+      {
+        "text": "la",
+        "confidence": 69,
+        "x": 178,
+        "y": 380,
+        "width": 10,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "personne",
+        "confidence": 63,
+        "x": 193,
+        "y": 375,
+        "width": 43,
+        "height": 23,
+        "engine": "tesseract"
+      },
+      {
+        "text": "d\u00e9c\u00e9d\u00e9e:",
+        "confidence": 90,
+        "x": 243,
+        "y": 375,
+        "width": 41,
+        "height": 23,
+        "engine": "tesseract"
+      },
+      {
+        "text": "\u00e0",
+        "confidence": 47,
+        "x": 0,
+        "y": 401,
+        "width": 4,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "ere",
+        "confidence": 33,
+        "x": 150,
+        "y": 425,
+        "width": 35,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "\u00e9",
+        "confidence": 48,
+        "x": 573,
+        "y": 425,
+        "width": 8,
+        "height": 12,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Lusignen",
+        "confidence": 34,
+        "x": 178,
+        "y": 452,
+        "width": 46,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Germaine",
+        "confidence": 90,
+        "x": 377,
+        "y": 453,
+        "width": 48,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Fortin",
+        "confidence": 88,
+        "x": 429,
+        "y": 454,
+        "width": 27,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "-",
+        "confidence": 84,
+        "x": 575,
+        "y": 461,
+        "width": 6,
+        "height": 1,
+        "engine": "tesseract"
+      },
+      {
+        "text": "om",
+        "confidence": 59,
+        "x": 121,
+        "y": 469,
+        "width": 20,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "du",
+        "confidence": 53,
+        "x": 181,
+        "y": 469,
+        "width": 8,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "p\u00e8re",
+        "confidence": 79,
+        "x": 192,
+        "y": 469,
+        "width": 20,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "(Nom",
+        "confidence": 48,
+        "x": 366,
+        "y": 470,
+        "width": 19,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "complet",
+        "confidence": 75,
+        "x": 388,
+        "y": 470,
+        "width": 45,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "do",
+        "confidence": 49,
+        "x": 423,
+        "y": 465,
+        "width": 8,
+        "height": 21,
+        "engine": "tesseract"
+      },
+      {
+        "text": "la",
+        "confidence": 60,
+        "x": 436,
+        "y": 471,
+        "width": 7,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "m\u00e8re:",
+        "confidence": 67,
+        "x": 446,
+        "y": 470,
+        "width": 24,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Ctiawe;",
+        "confidence": 34,
+        "x": 103,
+        "y": 495,
+        "width": 39,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Onta\u00f1o.",
+        "confidence": 40,
+        "x": 146,
+        "y": 494,
+        "width": 40,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Canada:",
+        "confidence": 80,
+        "x": 189,
+        "y": 492,
+        "width": 39,
+        "height": 12,
+        "engine": "tesseract"
+      },
+      {
+        "text": "3",
+        "confidence": 45,
+        "x": 379,
+        "y": 491,
+        "width": 7,
+        "height": 21,
+        "engine": "tesseract"
+      },
+      {
+        "text": "f\u00e9vri\u00e8r",
+        "confidence": 71,
+        "x": 392,
+        "y": 496,
+        "width": 31,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "1943:",
+        "confidence": 91,
+        "x": 427,
+        "y": 496,
+        "width": 24,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": ":",
+        "confidence": 49,
+        "x": 574,
+        "y": 496,
+        "width": 7,
+        "height": 1,
+        "engine": "tesseract"
+      },
+      {
+        "text": "'",
+        "confidence": 61,
+        "x": 2,
+        "y": 505,
+        "width": 1,
+        "height": 5,
+        "engine": "tesseract"
+      },
+      {
+        "text": "eu",
+        "confidence": 35,
+        "x": 127,
+        "y": 512,
+        "width": 18,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "de",
+        "confidence": 84,
+        "x": 148,
+        "y": 512,
+        "width": 10,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "naissance\u201d",
+        "confidence": 63,
+        "x": 161,
+        "y": 512,
+        "width": 43,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "de",
+        "confidence": 77,
+        "x": 400,
+        "y": 513,
+        "width": 9,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Av",
+        "confidence": 42,
+        "x": 169,
+        "y": 527,
+        "width": 10,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Canada,",
+        "confidence": 71,
+        "x": 359,
+        "y": 527,
+        "width": 37,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Dee",
+        "confidence": 35,
+        "x": 275,
+        "y": 555,
+        "width": 36,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "bons",
+        "confidence": 34,
+        "x": 238,
+        "y": 582,
+        "width": 56,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "\u201cman",
+        "confidence": 39,
+        "x": 424,
+        "y": 580,
+        "width": 37,
+        "height": 12,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Le",
+        "confidence": 54,
+        "x": 158,
+        "y": 600,
+        "width": 16,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "ia",
+        "confidence": 52,
+        "x": 184,
+        "y": 600,
+        "width": 14,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "ar",
+        "confidence": 41,
+        "x": 449,
+        "y": 600,
+        "width": 20,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": "EN",
+        "confidence": 59,
+        "x": 41,
+        "y": 632,
+        "width": 15,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "FDL",
+        "confidence": 34,
+        "x": 62,
+        "y": 633,
+        "width": 18,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "DE",
+        "confidence": 34,
+        "x": 88,
+        "y": 634,
+        "width": 13,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "dt",
+        "confidence": 46,
+        "x": 204,
+        "y": 634,
+        "width": 81,
+        "height": 20,
+        "engine": "tesseract"
+      },
+      {
+        "text": "su",
+        "confidence": 45,
+        "x": 323,
+        "y": 633,
+        "width": 41,
+        "height": 23,
+        "engine": "tesseract"
+      },
+      {
+        "text": "de",
+        "confidence": 77,
+        "x": 110,
+        "y": 647,
+        "width": 5,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "pare",
+        "confidence": 52,
+        "x": 246,
+        "y": 635,
+        "width": 25,
+        "height": 32,
+        "engine": "tesseract"
+      },
+      {
+        "text": ".",
+        "confidence": 33,
+        "x": 494,
+        "y": 656,
+        "width": 2,
+        "height": 2,
+        "engine": "tesseract"
+      },
+      {
+        "text": "do",
+        "confidence": 70,
+        "x": 201,
+        "y": 643,
+        "width": 8,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "eu",
+        "confidence": 56,
+        "x": 268,
+        "y": 643,
+        "width": 11,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Son",
+        "confidence": 56,
+        "x": 286,
+        "y": 643,
+        "width": 13,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "A9FUNO145",
+        "confidence": 53,
+        "x": 432,
+        "y": 656,
+        "width": 61,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "A",
+        "confidence": 31,
+        "x": 37,
+        "y": 668,
+        "width": 23,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "13",
+        "confidence": 73,
+        "x": 125,
+        "y": 702,
+        "width": 12,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "mars",
+        "confidence": 66,
+        "x": 142,
+        "y": 689,
+        "width": 25,
+        "height": 32,
+        "engine": "tesseract"
+      },
+      {
+        "text": "2025",
+        "confidence": 58,
+        "x": 171,
+        "y": 702,
+        "width": 25,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "\u00ce",
+        "confidence": 51,
+        "x": 383,
+        "y": 699,
+        "width": 4,
+        "height": 15,
+        "engine": "tesseract"
+      },
+      {
+        "text": "7",
+        "confidence": 47,
+        "x": 157,
+        "y": 722,
+        "width": 5,
+        "height": 6,
+        "engine": "tesseract"
+      }
+    ],
+    "ocr_engine": "tesseract",
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpiyg3ilhc_e1c64004-1dd8-43a2-b2fc-6d3e7ca37b76.jpg",
+    "file_name": "tmpiyg3ilhc_e1c64004-1dd8-43a2-b2fc-6d3e7ca37b76.jpg",
+    "file_size_mb": 0.07,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

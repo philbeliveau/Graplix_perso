@@ -1,0 +1,121 @@
+{
+  "document_id": "8a13214f-3f02-49aa-8a16-030fd7583cfd",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "Qu\u00e9bec",
+        "type": "location",
+        "confidence": 0.9432419538497925,
+        "start_pos": 4,
+        "end_pos": 10,
+        "context": "```\nQu\u00e9bec\n\nCLINIQUE DE M\u00c9DECINE FAMILIALE\nGAM - Unit\u00e9 m\u00e9dic",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Unit\u00e9 m\u00e9dicale Laval",
+        "type": "organization",
+        "confidence": 0.9049620032310486,
+        "start_pos": 49,
+        "end_pos": 69,
+        "context": "```\nQu\u00e9bec\n\nCLINIQUE DE M\u00c9DECINE FAMILIALE\nGAM - Unit\u00e9 m\u00e9dicale Laval (H\u00f4pital Cit\u00e9 de la Sant\u00e9)\n\nNom Pr\u00e9nom :  _______",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "##al Cit\u00e9 de la Sant\u00e9",
+        "type": "location",
+        "confidence": 0.8792945742607117,
+        "start_pos": 76,
+        "end_pos": 95,
+        "context": "DECINE FAMILIALE\nGAM - Unit\u00e9 m\u00e9dicale Laval (H\u00f4pital Cit\u00e9 de la Sant\u00e9)\n\nNom Pr\u00e9nom :  ______________________\nAdresse : ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.9432419538497925,
+      0.9049620032310486,
+      0.7464570999145508,
+      0.8792945742607117
+    ],
+    "processing_time": 3.326223134994507,
+    "error": null,
+    "metadata": {
+      "document_id": "8a13214f-3f02-49aa-8a16-030fd7583cfd",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "ner": {
+          "entity_count": 3,
+          "processing_time": 3.326223134994507,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 3,
+      "total_entities_after_dedup": 3
+    },
+    "timestamp": "2025-06-18T10:23:55.753619"
+  },
+  "processed_document": {
+    "raw_text": "```\nQu\u00e9bec\n\nCLINIQUE DE M\u00c9DECINE FAMILIALE\nGAM - Unit\u00e9 m\u00e9dicale Laval (H\u00f4pital Cit\u00e9 de la Sant\u00e9)\n\nNom Pr\u00e9nom :  ______________________\nAdresse :  __________________________\nRX :  ______________________________\nDate de naissance :  ________________\nDate :  _____________________________\n\n\u00c0 qui de droit,\n\nAvis de travail usuel du 14.05.2023 m.j. concernant pour raison m\u00e9dicale.\n\nmerci.\n\nNom du m\u00e9decin :  ___________________\nSignature :  _________________________\n```",
+    "ocr_text": "```\nQu\u00e9bec\n\nCLINIQUE DE M\u00c9DECINE FAMILIALE\nGAM - Unit\u00e9 m\u00e9dicale Laval (H\u00f4pital Cit\u00e9 de la Sant\u00e9)\n\nNom Pr\u00e9nom :  ______________________\nAdresse :  __________________________\nRX :  ______________________________\nDate de naissance :  ________________\nDate :  _____________________________\n\n\u00c0 qui de droit,\n\nAvis de travail usuel du 14.05.2023 m.j. concernant pour raison m\u00e9dicale.\n\nmerci.\n\nNom du m\u00e9decin :  ___________________\nSignature :  _________________________\n```",
+    "metadata": {
+      "width": 548,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 34.8,
+      "is_jpg": true,
+      "format": ".jpg",
+      "compression_ratio": 0.0270948905109489
+    },
+    "bounding_boxes": [],
+    "confidence": 0.85,
+    "structured_data": {},
+    "ocr_engine": "llm",
+    "llm_metadata": {
+      "model_used": "gpt-4o-mini",
+      "provider": "openai",
+      "task_type": "basic_text",
+      "processing_time": 3.67,
+      "cost_info": {
+        "estimated_cost": 9.9e-05,
+        "actual_cost": 0.003913,
+        "input_tokens": 25644,
+        "output_tokens": 110
+      },
+      "image_info": {
+        "width": 548,
+        "height": 800,
+        "format": "PNG"
+      }
+    },
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmp8ku2cnot_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_name": "tmp8ku2cnot_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_size_mb": 0.03,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "ner"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

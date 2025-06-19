@@ -35,8 +35,17 @@ class ProcessingConfig(BaseModel):
     max_file_size_mb: int = Field(default=50, description="Maximum file size in MB")
     concurrent_jobs: int = Field(default=4, description="Number of concurrent processing jobs")
     timeout_seconds: int = Field(default=300, description="Processing timeout in seconds")
-    ocr_languages: str = Field(default="eng+fra", description="OCR languages")
+    ocr_languages: str = Field(default="fra", description="OCR languages for Tesseract")
     tesseract_cmd: str = Field(default="/opt/homebrew/bin/tesseract", description="Tesseract command path")
+    ocr_engine: str = Field(default="tesseract", description="OCR engine: 'tesseract', 'easyocr', or 'both'")
+    easyocr_use_gpu: bool = Field(default=False, description="Use GPU for EasyOCR (requires CUDA)")
+    
+    # LLM OCR settings
+    enable_llm_ocr: bool = Field(default=True, description="Enable LLM-based OCR for enhanced accuracy")
+    llm_ocr_model: str = Field(default="gpt-4o-mini", description="Default LLM model for OCR")
+    llm_ocr_fallback_model: str = Field(default="gpt-3.5-turbo", description="Fallback LLM model for OCR")
+    max_llm_cost_per_document: float = Field(default=0.10, description="Maximum cost per document for LLM OCR")
+    llm_confidence_threshold: float = Field(default=0.8, description="Minimum confidence to use LLM result")
 
 
 class PrivacyConfig(BaseModel):

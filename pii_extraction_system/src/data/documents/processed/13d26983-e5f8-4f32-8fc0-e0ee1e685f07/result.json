@@ -1,0 +1,49 @@
+{
+  "document_id": "13d26983-e5f8-4f32-8fc0-e0ee1e685f07",
+  "extraction_result": {
+    "pii_entities": [],
+    "confidence_scores": [],
+    "processing_time": 4.601478576660156e-05,
+    "error": null,
+    "metadata": {
+      "document_id": "13d26983-e5f8-4f32-8fc0-e0ee1e685f07",
+      "document_type": ".pdf",
+      "extractor_results": {
+        "ner": {
+          "entity_count": 0,
+          "processing_time": 4.601478576660156e-05,
+          "error": "No text content available"
+        }
+      },
+      "total_entities_before_dedup": 0,
+      "total_entities_after_dedup": 0
+    },
+    "timestamp": "2025-06-18T09:57:16.793545"
+  },
+  "processed_document": {
+    "raw_text": "",
+    "ocr_text": "",
+    "pages": [],
+    "metadata": {},
+    "bounding_boxes": [],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpsoxyj89o_2024-05-01 demande de lemployeur (1).pdf",
+    "file_name": "tmpsoxyj89o_2024-05-01 demande de lemployeur (1).pdf",
+    "file_size_mb": 0.99,
+    "file_type": ".pdf",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "ner"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

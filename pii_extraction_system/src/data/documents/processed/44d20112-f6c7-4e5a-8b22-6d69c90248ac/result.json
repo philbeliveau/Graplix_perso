@@ -1,0 +1,598 @@
+{
+  "document_id": "44d20112-f6c7-4e5a-8b22-6d69c90248ac",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "Bloc Laval",
+        "type": "person_name",
+        "confidence": 0.6,
+        "start_pos": 47,
+        "end_pos": 57,
+        "context": "V5 DE M\u00c9DECINE Laval (H\u00f4pital 1755, bou, Ren\u00e9 (Bloc Laval 315 : (450 Nom, Pr\u00e9nom | Store 1941047 jte: Adres...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "Gite Dates",
+        "type": "person_name",
+        "confidence": 0.6,
+        "start_pos": 111,
+        "end_pos": 121,
+        "context": "... : (450 Nom, Pr\u00e9nom | Store 1941047 jte: Adresse; Gite Dates TRES 5100 rx \u00c0 quEde do aval 14/05/2024 Inclusira...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "14/05/2024",
+        "type": "date_of_birth",
+        "confidence": 0.6,
+        "start_pos": 151,
+        "end_pos": 161,
+        "context": "... Adresse; Gite Dates TRES 5100 rx \u00c0 quEde do aval 14/05/2024 Inclusiramont pour raison med Nom : Signature du ...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(0?[1-9]|[12]\\d|3[01])/(0?[1-9]|1[0-2])/(19|20)\\d{2}\\b"
+        }
+      },
+      {
+        "text": "Bloc Laval",
+        "type": "organization",
+        "confidence": 0.999198853969574,
+        "start_pos": 47,
+        "end_pos": 57,
+        "context": "V5 DE M\u00c9DECINE Laval (H\u00f4pital 1755, bou, Ren\u00e9 (Bloc Laval 315 : (450 Nom, Pr\u00e9nom | Store 1941047 jte: Adres",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Ren\u00e9",
+        "type": "person_name",
+        "confidence": 0.9964832067489624,
+        "start_pos": 41,
+        "end_pos": 45,
+        "context": "V5 DE M\u00c9DECINE Laval (H\u00f4pital 1755, bou, Ren\u00e9 (Bloc Laval 315 : (450 Nom, Pr\u00e9nom | Store 194104",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "##NE Laval",
+        "type": "organization",
+        "confidence": 0.9310670495033264,
+        "start_pos": 12,
+        "end_pos": 20,
+        "context": "V5 DE M\u00c9DECINE Laval (H\u00f4pital 1755, bou, Ren\u00e9 (Bloc Laval 315 : (450 N",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "du LES EN CHA",
+        "type": "organization",
+        "confidence": 0.8883489370346069,
+        "start_pos": 208,
+        "end_pos": 221,
+        "context": "024 Inclusiramont pour raison med Nom : Signature du LES EN CHA 2 so partit, |,",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "Gite",
+        "type": "organization",
+        "confidence": 0.825957179069519,
+        "start_pos": 111,
+        "end_pos": 115,
+        "context": " : (450 Nom, Pr\u00e9nom | Store 1941047 jte: Adresse; Gite Dates TRES 5100 rx \u00c0 quEde do aval 14/05/2024 Inc",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "##resse",
+        "type": "organization",
+        "confidence": 0.7060216665267944,
+        "start_pos": 104,
+        "end_pos": 109,
+        "context": "val 315 : (450 Nom, Pr\u00e9nom | Store 1941047 jte: Adresse; Gite Dates TRES 5100 rx \u00c0 quEde do aval 14/05/20",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.6,
+      0.6,
+      0.6,
+      0.9310670495033264,
+      0.9964832067489624,
+      0.999198853969574,
+      0.7482825517654419,
+      0.7060216665267944,
+      0.825957179069519,
+      0.8883489370346069
+    ],
+    "processing_time": 3.1880290508270264,
+    "error": null,
+    "metadata": {
+      "document_id": "44d20112-f6c7-4e5a-8b22-6d69c90248ac",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 3,
+          "processing_time": 0.0003151893615722656,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 6,
+          "processing_time": 3.187713861465454,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 9,
+      "total_entities_after_dedup": 9
+    },
+    "timestamp": "2025-06-18T09:52:48.809876"
+  },
+  "processed_document": {
+    "raw_text": "V5 DE M\u00c9DECINE Laval (H\u00f4pital 1755, bou, Ren\u00e9 (Bloc Laval 315 : (450 Nom, Pr\u00e9nom | Store 1941047 jte: Adresse; Gite Dates TRES 5100 rx \u00c0 quEde do aval 14/05/2024 Inclusiramont pour raison med Nom : Signature du LES EN CHA 2 so partit, |,",
+    "ocr_text": "V5 DE M\u00c9DECINE Laval (H\u00f4pital 1755, bou, Ren\u00e9 (Bloc Laval 315 : (450 Nom, Pr\u00e9nom | Store 1941047 jte: Adresse; Gite Dates TRES 5100 rx \u00c0 quEde do aval 14/05/2024 Inclusiramont pour raison med Nom : Signature du LES EN CHA 2 so partit, |,",
+    "metadata": {
+      "width": 548,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 34.8
+    },
+    "bounding_boxes": [
+      {
+        "text": "V5",
+        "confidence": 40,
+        "x": 490,
+        "y": 85,
+        "width": 28,
+        "height": 16,
+        "engine": "tesseract"
+      },
+      {
+        "text": "DE",
+        "confidence": 93,
+        "x": 259,
+        "y": 122,
+        "width": 12,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "M\u00c9DECINE",
+        "confidence": 79,
+        "x": 274,
+        "y": 119,
+        "width": 48,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Laval",
+        "confidence": 63,
+        "x": 265,
+        "y": 126,
+        "width": 24,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "(H\u00f4pital",
+        "confidence": 58,
+        "x": 291,
+        "y": 134,
+        "width": 37,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "1755,",
+        "confidence": 85,
+        "x": 161,
+        "y": 148,
+        "width": 25,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "bou,",
+        "confidence": 78,
+        "x": 189,
+        "y": 148,
+        "width": 22,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Ren\u00e9",
+        "confidence": 54,
+        "x": 214,
+        "y": 148,
+        "width": 22,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "(Bloc",
+        "confidence": 63,
+        "x": 278,
+        "y": 138,
+        "width": 22,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Laval",
+        "confidence": 56,
+        "x": 318,
+        "y": 138,
+        "width": 21,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "315",
+        "confidence": 60,
+        "x": 409,
+        "y": 148,
+        "width": 16,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": ":",
+        "confidence": 53,
+        "x": 216,
+        "y": 150,
+        "width": 3,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "(450",
+        "confidence": 55,
+        "x": 348,
+        "y": 150,
+        "width": 26,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Nom,",
+        "confidence": 69,
+        "x": 77,
+        "y": 189,
+        "width": 25,
+        "height": 29,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Pr\u00e9nom",
+        "confidence": 32,
+        "x": 104,
+        "y": 189,
+        "width": 40,
+        "height": 29,
+        "engine": "tesseract"
+      },
+      {
+        "text": "|",
+        "confidence": 42,
+        "x": 152,
+        "y": 201,
+        "width": 1,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Store",
+        "confidence": 52,
+        "x": 205,
+        "y": 189,
+        "width": 26,
+        "height": 29,
+        "engine": "tesseract"
+      },
+      {
+        "text": "1941047",
+        "confidence": 44,
+        "x": 436,
+        "y": 197,
+        "width": 42,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "jte:",
+        "confidence": 45,
+        "x": 345,
+        "y": 224,
+        "width": 5,
+        "height": 6,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Adresse;",
+        "confidence": 42,
+        "x": 76,
+        "y": 221,
+        "width": 44,
+        "height": 11,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Gite",
+        "confidence": 35,
+        "x": 238,
+        "y": 221,
+        "width": 67,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Dates",
+        "confidence": 76,
+        "x": 338,
+        "y": 222,
+        "width": 28,
+        "height": 9,
+        "engine": "tesseract"
+      },
+      {
+        "text": "TRES",
+        "confidence": 40,
+        "x": 364,
+        "y": 237,
+        "width": 25,
+        "height": 29,
+        "engine": "tesseract"
+      },
+      {
+        "text": "5100",
+        "confidence": 42,
+        "x": 435,
+        "y": 249,
+        "width": 30,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "rx",
+        "confidence": 74,
+        "x": 77,
+        "y": 269,
+        "width": 14,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "\u00c0",
+        "confidence": 70,
+        "x": 77,
+        "y": 293,
+        "width": 7,
+        "height": 12,
+        "engine": "tesseract"
+      },
+      {
+        "text": "quEde",
+        "confidence": 37,
+        "x": 88,
+        "y": 289,
+        "width": 29,
+        "height": 25,
+        "engine": "tesseract"
+      },
+      {
+        "text": "do",
+        "confidence": 65,
+        "x": 104,
+        "y": 311,
+        "width": 10,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "aval",
+        "confidence": 55,
+        "x": 120,
+        "y": 321,
+        "width": 29,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "14/05/2024",
+        "confidence": 74,
+        "x": 197,
+        "y": 321,
+        "width": 54,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Inclusiramont",
+        "confidence": 35,
+        "x": 255,
+        "y": 321,
+        "width": 67,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "pour",
+        "confidence": 94,
+        "x": 326,
+        "y": 311,
+        "width": 18,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "raison",
+        "confidence": 61,
+        "x": 349,
+        "y": 311,
+        "width": 30,
+        "height": 30,
+        "engine": "tesseract"
+      },
+      {
+        "text": "med",
+        "confidence": 47,
+        "x": 78,
+        "y": 346,
+        "width": 26,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Nom",
+        "confidence": 84,
+        "x": 81,
+        "y": 551,
+        "width": 21,
+        "height": 8,
+        "engine": "tesseract"
+      },
+      {
+        "text": ":",
+        "confidence": 88,
+        "x": 161,
+        "y": 540,
+        "width": 6,
+        "height": 29,
+        "engine": "tesseract"
+      },
+      {
+        "text": "Signature",
+        "confidence": 46,
+        "x": 81,
+        "y": 573,
+        "width": 95,
+        "height": 10,
+        "engine": "tesseract"
+      },
+      {
+        "text": "du",
+        "confidence": 85,
+        "x": 122,
+        "y": 562,
+        "width": 11,
+        "height": 29,
+        "engine": "tesseract"
+      },
+      {
+        "text": "LES",
+        "confidence": 43,
+        "x": 81,
+        "y": 588,
+        "width": 23,
+        "height": 29,
+        "engine": "tesseract"
+      },
+      {
+        "text": "EN",
+        "confidence": 48,
+        "x": 145,
+        "y": 599,
+        "width": 4,
+        "height": 7,
+        "engine": "tesseract"
+      },
+      {
+        "text": "CHA",
+        "confidence": 61,
+        "x": 416,
+        "y": 611,
+        "width": 21,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "2",
+        "confidence": 62,
+        "x": 98,
+        "y": 634,
+        "width": 5,
+        "height": 3,
+        "engine": "tesseract"
+      },
+      {
+        "text": "so",
+        "confidence": 32,
+        "x": 236,
+        "y": 620,
+        "width": 10,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "partit,",
+        "confidence": 31,
+        "x": 255,
+        "y": 620,
+        "width": 45,
+        "height": 28,
+        "engine": "tesseract"
+      },
+      {
+        "text": "|,",
+        "confidence": 48,
+        "x": 343,
+        "y": 651,
+        "width": 11,
+        "height": 6,
+        "engine": "tesseract"
+      }
+    ],
+    "ocr_engine": "tesseract",
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmp_lpd4hzd_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_name": "tmp_lpd4hzd_b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_size_mb": 0.03,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

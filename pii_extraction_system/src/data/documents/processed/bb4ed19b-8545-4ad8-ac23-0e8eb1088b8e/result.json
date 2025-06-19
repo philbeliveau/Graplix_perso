@@ -1,0 +1,415 @@
+{
+  "document_id": "bb4ed19b-8545-4ad8-ac23-0e8eb1088b8e",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "(450) 975-5444",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 255,
+        "end_pos": 269,
+        "context": "...) H7M 3L9\n                             T\u00e9l\u00e9phone: (450) 975-5444 T\u00e9l\u00e9copieur: (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBL...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\(\\d{3}\\)\\s?\\d{3}[-.\\s]?\\d{4}"
+        }
+      },
+      {
+        "text": "450) 975-5444",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 256,
+        "end_pos": 269,
+        "context": "... H7M 3L9\n                             T\u00e9l\u00e9phone: (450) 975-5444 T\u00e9l\u00e9copieur: (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBL...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "(450) 975-5497",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 283,
+        "end_pos": 297,
+        "context": "...           T\u00e9l\u00e9phone: (450) 975-5444 T\u00e9l\u00e9copieur: (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                   ...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\(\\d{3}\\)\\s?\\d{3}[-.\\s]?\\d{4}"
+        }
+      },
+      {
+        "text": "450) 975-5497",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 284,
+        "end_pos": 297,
+        "context": "...          T\u00e9l\u00e9phone: (450) 975-5444 T\u00e9l\u00e9copieur: (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                   ...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "Simon                     Date",
+        "type": "person_name",
+        "confidence": 0.6,
+        "start_pos": 323,
+        "end_pos": 353,
+        "context": "...\u00e9copieur: (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                     Date de naissance :  1991-02-17\nAdresse :  21, rue pri...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "1991-02-17",
+        "type": "date_of_birth",
+        "confidence": 0.7,
+        "start_pos": 370,
+        "end_pos": 380,
+        "context": "...Y, Simon                     Date de naissance :  1991-02-17\nAdresse :  21, rue principale Albany Saint-Philip...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(19|20)\\d{2}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\\d|3[01])\\b"
+        }
+      },
+      {
+        "text": "Albany Saint",
+        "type": "person_name",
+        "confidence": 0.6,
+        "start_pos": 411,
+        "end_pos": 423,
+        "context": "...sance :  1991-02-17\nAdresse :  21, rue principale Albany Saint-Philippe (Qu\u00e9bec) J7E 2Z2\nT\u00e9l\u00e9phone du patient : ...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "(438) 262-2020",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 473,
+        "end_pos": 487,
+        "context": "...-Philippe (Qu\u00e9bec) J7E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262-2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/0...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\(\\d{3}\\)\\s?\\d{3}[-.\\s]?\\d{4}"
+        }
+      },
+      {
+        "text": "438) 262-2020",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 474,
+        "end_pos": 487,
+        "context": "...Philippe (Qu\u00e9bec) J7E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262-2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/0...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "14/05/2024",
+        "type": "date_of_birth",
+        "confidence": 0.6,
+        "start_pos": 533,
+        "end_pos": 543,
+        "context": "...2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/05/2024 inclusivement pour raison m\u00e9dicale\nmerci\n\nNom du ...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(0?[1-9]|[12]\\d|3[01])/(0?[1-9]|1[0-2])/(19|20)\\d{2}\\b"
+        }
+      },
+      {
+        "text": "(450) 437-6785",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 921,
+        "end_pos": 935,
+        "context": "...on.\nNom :  CHRISTIAN CHAUL PHARMACIEN INC.\nT\u00e9l. : (450) 437-6785\n```",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\(\\d{3}\\)\\s?\\d{3}[-.\\s]?\\d{4}"
+        }
+      },
+      {
+        "text": "450) 437-6785",
+        "type": "phone_number",
+        "confidence": 0.9,
+        "start_pos": 922,
+        "end_pos": 935,
+        "context": "...n.\nNom :  CHRISTIAN CHAUL PHARMACIEN INC.\nT\u00e9l. : (450) 437-6785\n```",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(\\+?1[-.\\s]?)?\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})\\b"
+        }
+      },
+      {
+        "text": "Georges",
+        "type": "person_name",
+        "confidence": 0.999356210231781,
+        "start_pos": 437,
+        "end_pos": 444,
+        "context": "nt pour raison m\u00e9dicale\nmerci\n\nNom du m\u00e9decin :  (Georges, Barbara)                     # 530002\nSignature ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Barbara",
+        "type": "person_name",
+        "confidence": 0.9989598989486694,
+        "start_pos": 446,
+        "end_pos": 453,
+        "context": "aison m\u00e9dicale\nmerci\n\nNom du m\u00e9decin :  (Georges, Barbara)                     # 530002\nSignature du m\u00e9deci",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Simon",
+        "type": "person_name",
+        "confidence": 0.9988893866539001,
+        "start_pos": 155,
+        "end_pos": 160,
+        "context": "\u00e9copieur: (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                     Date de naissance :  1991-02-",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Qu\u00e9bec",
+        "type": "location",
+        "confidence": 0.9910688400268555,
+        "start_pos": 31,
+        "end_pos": 37,
+        "context": "Ren\u00e9-L\u00e9vesque (Bloc 1), Laval (Qu\u00e9bec) H7M 3L9\n                             T\u00e9l\u00e9phone: ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Ren\u00e9 - L\u00e9vesque",
+        "type": "person_name",
+        "confidence": 0.9885744452476501,
+        "start_pos": 0,
+        "end_pos": 13,
+        "context": "Ren\u00e9-L\u00e9vesque (Bloc 1), Laval (Qu\u00e9bec) H7M 3L9\n                ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "PER",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Bloc 1",
+        "type": "organization",
+        "confidence": 0.9843361377716064,
+        "start_pos": 15,
+        "end_pos": 21,
+        "context": "Ren\u00e9-L\u00e9vesque (Bloc 1), Laval (Qu\u00e9bec) H7M 3L9\n                        ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Laval",
+        "type": "organization",
+        "confidence": 0.9675028920173645,
+        "start_pos": 24,
+        "end_pos": 29,
+        "context": "Ren\u00e9-L\u00e9vesque (Bloc 1), Laval (Qu\u00e9bec) H7M 3L9\n                             T\u00e9l",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "CHRISTIAN",
+        "type": "miscellaneous",
+        "confidence": 0.9442328214645386,
+        "start_pos": 201,
+        "end_pos": 210,
+        "context": "sign\u00e9e ci-dessous est le lieu d'ex\u00e9cution. Nom :  CHRISTIAN CHAUL PHARMACIEN INC. T\u00e9l. : (450) 437-6785\n```",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "MISC",
+          "chunk_index": 2
+        }
+      },
+      {
+        "text": "##e Albany Saint - Philippe",
+        "type": "location",
+        "confidence": 0.8951340913772583,
+        "start_pos": 241,
+        "end_pos": 264,
+        "context": "issance :  1991-02-17\nAdresse :  21, rue principale Albany Saint-Philippe (Qu\u00e9bec) J7E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 1
+        }
+      },
+      {
+        "text": "Uuniversit\u00e9 Laval",
+        "type": "organization",
+        "confidence": 0.8259317874908447,
+        "start_pos": 89,
+        "end_pos": 106,
+        "context": " DE M\u00c9DECINE FAMILIALE\n                       GIM-Uuniversit\u00e9 Laval (H\u00f4pital Outaouais)\n                             ",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "H\u00f4pital Outaouais",
+        "type": "location",
+        "confidence": 0.7962899208068848,
+        "start_pos": 108,
+        "end_pos": 125,
+        "context": "ALE\n                       GIM-Uuniversit\u00e9 Laval (H\u00f4pital Outaouais)\n                             1755, boul",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "LOC",
+          "chunk_index": 0
+        }
+      },
+      {
+        "text": "##L P",
+        "type": "organization",
+        "confidence": 0.7551844716072083,
+        "start_pos": 215,
+        "end_pos": 218,
+        "context": "ous est le lieu d'ex\u00e9cution. Nom :  CHRISTIAN CHAUL PHARMACIEN INC. T\u00e9l. : (450) 437-6785\n```",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 2
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.9,
+      0.6,
+      0.7,
+      0.6,
+      0.6,
+      0.8259317874908447,
+      0.7962899208068848,
+      0.9885744452476501,
+      0.9843361377716064,
+      0.9675028920173645,
+      0.9910688400268555,
+      0.9988893866539001,
+      0.8951340913772583,
+      0.9981794357299805,
+      0.999356210231781,
+      0.9989598989486694,
+      0.9442328214645386,
+      0.7551844716072083
+    ],
+    "processing_time": 2.8900368213653564,
+    "error": null,
+    "metadata": {
+      "document_id": "bb4ed19b-8545-4ad8-ac23-0e8eb1088b8e",
+      "document_type": ".jpg",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 12,
+          "processing_time": 0.0011408329010009766,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 12,
+          "processing_time": 2.8888959884643555,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 24,
+      "total_entities_after_dedup": 24
+    },
+    "timestamp": "2025-06-19T10:28:09.884591"
+  },
+  "processed_document": {
+    "raw_text": "```\n                           CLINIQUE DE M\u00c9DECINE FAMILIALE\n                       GIM-Uuniversit\u00e9 Laval (H\u00f4pital Outaouais)\n                             1755, boul. Ren\u00e9-L\u00e9vesque (Bloc 1), Laval (Qu\u00e9bec) H7M 3L9\n                             T\u00e9l\u00e9phone: (450) 975-5444 T\u00e9l\u00e9copieur: (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                     Date de naissance :  1991-02-17\nAdresse :  21, rue principale Albany Saint-Philippe (Qu\u00e9bec) J7E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262-2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/05/2024 inclusivement pour raison m\u00e9dicale\nmerci\n\nNom du m\u00e9decin :  (Georges, Barbara)                     # 530002\nSignature du m\u00e9decin :\n\nR\u00e9f. :  1  2  3  4  5  6  N\u00b0R\n- Certes informations doivent \u00eatre conserv\u00e9es originales.\n- De toute comment\u00e9, je d\u00e9sire en avoir par \u00e9crit.\n- La pharmacie d\u00e9sign\u00e9e ci-dessous est le lieu d'ex\u00e9cution.\nNom :  CHRISTIAN CHAUL PHARMACIEN INC.\nT\u00e9l. : (450) 437-6785\n```",
+    "ocr_text": "```\n                           CLINIQUE DE M\u00c9DECINE FAMILIALE\n                       GIM-Uuniversit\u00e9 Laval (H\u00f4pital Outaouais)\n                             1755, boul. Ren\u00e9-L\u00e9vesque (Bloc 1), Laval (Qu\u00e9bec) H7M 3L9\n                             T\u00e9l\u00e9phone: (450) 975-5444 T\u00e9l\u00e9copieur: (450) 975-5497\n\nNom, Pr\u00e9nom : TREMBLAY, Simon                     Date de naissance :  1991-02-17\nAdresse :  21, rue principale Albany Saint-Philippe (Qu\u00e9bec) J7E 2Z2\nT\u00e9l\u00e9phone du patient : (438) 262-2020\nRX\n\u00c0 qui de droit,\nArr\u00eat de travail jusqu'au 14/05/2024 inclusivement pour raison m\u00e9dicale\nmerci\n\nNom du m\u00e9decin :  (Georges, Barbara)                     # 530002\nSignature du m\u00e9decin :\n\nR\u00e9f. :  1  2  3  4  5  6  N\u00b0R\n- Certes informations doivent \u00eatre conserv\u00e9es originales.\n- De toute comment\u00e9, je d\u00e9sire en avoir par \u00e9crit.\n- La pharmacie d\u00e9sign\u00e9e ci-dessous est le lieu d'ex\u00e9cution.\nNom :  CHRISTIAN CHAUL PHARMACIEN INC.\nT\u00e9l. : (450) 437-6785\n```",
+    "metadata": {
+      "width": 548,
+      "height": 800,
+      "channels": 3,
+      "file_size_kb": 34.8,
+      "is_jpg": true,
+      "format": ".jpg",
+      "compression_ratio": 0.0270948905109489
+    },
+    "bounding_boxes": [],
+    "confidence": 0.85,
+    "structured_data": {},
+    "ocr_engine": "llm",
+    "llm_metadata": {
+      "model_used": "gpt-4o-mini",
+      "provider": "openai",
+      "task_type": "basic_text",
+      "processing_time": 7.42,
+      "cost_info": {
+        "estimated_cost": 9.9e-05,
+        "actual_cost": 0.004021,
+        "input_tokens": 25644,
+        "output_tokens": 291
+      },
+      "image_info": {
+        "width": 548,
+        "height": 800,
+        "format": "PNG"
+      }
+    },
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpz29piyu__b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_name": "tmpz29piyu__b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "file_size_mb": 0.03,
+    "file_type": ".jpg",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

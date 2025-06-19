@@ -1,0 +1,194 @@
+{
+  "document_id": "d8ce43f5-bfce-471f-a7bd-6260b9503026",
+  "extraction_result": {
+    "pii_entities": [
+      {
+        "text": "15 mai 2014",
+        "type": "date_of_birth",
+        "confidence": 0.6,
+        "start_pos": 112,
+        "end_pos": 123,
+        "context": "...aire \u2013 Absences / Retour au travail Mise \u00e0 jour : 15 mai 2014 !\nDOMAINE DU PERSONNEL    D001 Distribution  D002...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(0?[1-9]|[12]\\d|3[01])\\s+(janvier|f\u00e9vrier|mars|avril|mai|juin|juillet|ao\u00fbt|septembre|octobre|novembre|d\u00e9cembre)\\s+(19|20)\\d{2}\\b"
+        }
+      },
+      {
+        "text": "Parental Dernier",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 1406,
+        "end_pos": 1422,
+        "context": "...e net  CSE - Infotype 0058  Maternit\u00e9  Paternit\u00e9  Parental Dernier jour travaill\u00e9 2023  AAAA 07  MM 06  JJ  AVS - Na...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "Parental Date",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 1595,
+        "end_pos": 1608,
+        "context": "...nit\u00e9 - Date : _____________________  CSE - PA40 \u2013 Parental Date :________________________  Autres Dernier jour tr...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "Autres Dernier",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 1636,
+        "end_pos": 1650,
+        "context": "...- PA40 \u2013 Parental Date :________________________  Autres Dernier jour travaill\u00e9   AAAA   MM   JJ  Cong\u00e9 sans solde...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "Suspension  Autres",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 1702,
+        "end_pos": 1720,
+        "context": "...our travaill\u00e9   AAAA   MM   JJ  Cong\u00e9 sans solde  Suspension  Autres : _____________________________________________ C...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "24 juillet 2023",
+        "type": "date_of_birth",
+        "confidence": 0.7,
+        "start_pos": 1817,
+        "end_pos": 1832,
+        "context": "..._ COMMENTAIRES  Il prendra deux semaines du 10 au 24 juillet 2023. S\u2019il vous plait payer la journ\u00e9e du 7 juillet en...",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(0?[1-9]|[12]\\d|3[01])\\s+(janvier|f\u00e9vrier|mars|avril|mai|juin|juillet|ao\u00fbt|septembre|octobre|novembre|d\u00e9cembre)\\s+(19|20)\\d{2}\\b"
+        }
+      },
+      {
+        "text": "Audrey Sercia",
+        "type": "person_name",
+        "confidence": 0.5,
+        "start_pos": 2428,
+        "end_pos": 2441,
+        "context": "...re libre  APPROBATION Signature du gestionnaire : Audrey Sercia Date :2023-07-07  \n\n",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b[A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,}\\b"
+        }
+      },
+      {
+        "text": "2023-07-07",
+        "type": "date_of_birth",
+        "confidence": 0.6,
+        "start_pos": 2448,
+        "end_pos": 2458,
+        "context": "...N Signature du gestionnaire : Audrey Sercia Date :2023-07-07  \n\n",
+        "extractor": "rule_based",
+        "metadata": {
+          "pattern_used": "\\b(19|20)\\d{2}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\\d|3[01])\\b"
+        }
+      },
+      {
+        "text": "AU",
+        "type": "organization",
+        "confidence": 0.7127891778945923,
+        "start_pos": 17,
+        "end_pos": 19,
+        "context": "ABSENCE / RETOUR AU TRAVAIL  R\u00e9serv\u00e9 RH # matricule  \nFormulaire \u2013 Ab",
+        "extractor": "ner_extractor",
+        "metadata": {
+          "ner_label": "ORG",
+          "chunk_index": 0
+        }
+      }
+    ],
+    "confidence_scores": [
+      0.6,
+      0.6,
+      0.7,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.7127891778945923,
+      0.9979360699653625
+    ],
+    "processing_time": 3.1105079650878906,
+    "error": null,
+    "metadata": {
+      "document_id": "d8ce43f5-bfce-471f-a7bd-6260b9503026",
+      "document_type": ".pdf",
+      "extractor_results": {
+        "rule_based": {
+          "entity_count": 8,
+          "processing_time": 0.0016169548034667969,
+          "error": null
+        },
+        "ner": {
+          "entity_count": 2,
+          "processing_time": 3.108891010284424,
+          "error": null
+        },
+        "layout_aware": {
+          "entity_count": 0,
+          "processing_time": 0.0,
+          "error": null
+        }
+      },
+      "total_entities_before_dedup": 10,
+      "total_entities_after_dedup": 9
+    },
+    "timestamp": "2025-06-19T10:58:16.832572"
+  },
+  "processed_document": {
+    "raw_text": "  ABSENCE / RETOUR AU TRAVAIL  R\u00e9serv\u00e9 RH # matricule  \nFormulaire \u2013 Absences / Retour au travail Mise \u00e0 jour : 15 mai 2014 !\nDOMAINE DU PERSONNEL    D001 Distribution  D002 Fabrication  D003 Ma\u00eetre Saladier  R001 Si\u00e8ge Social  R002 CSC    R\u00f4tisserie #_________ IDENTIFICATION DE L\u2019EMPLOY\u00c9 Nom BOUCHER  Pr\u00e9nom JOEL Poste  Repr\u00e9sentant mise en march\u00e9  CSE - Employ\u00e9 syndiqu\u00e9 Service D\u00e9tail - Admin  CSE - Employ\u00e9 non syndiqu\u00e9 ABSENCES  Maladie / Invalidit\u00e9  Dernier jour travaill\u00e9   AAAA   MM   JJ  Joindre le certificat m\u00e9dical  CSE - ICD non pay\u00e9e   CSE - ICD pay\u00e9e  AVS - ILD - Date : ___________________________________  CSST  Dernier jour travaill\u00e9      AAAA      MM     JJ  Heures c\u00e9dul\u00e9es non travaill\u00e9es la journ\u00e9e de l\u2019accident :   ___  Joindre le certificat m\u00e9dical  Joindre l\u2019horaire normal de travail  Joindre le formulaire (ADR /CSST)       \u00ab l\u2019avis de l\u2019employeur et demande de remboursement \u00bb  CSE - Payer 14 premiers jours \u00e0 90% du salaire net  Retrait pr\u00e9ventif  Dernier jour travaill\u00e9          AAA          MM          JJ  Joindre le certificat m\u00e9dical  Joindre l\u2019horaire normal de travail  Joindre le formulaire (CSST)        \u00ab Demande de remboursement pour un retrait pr\u00e9ventif de la travailleuse enceinte             ou qui allaite \u00bb  CSE - Payer 5 premiers jours \u00e0 100% de son salaire  CSE - Payer 14 jours suivants \u00e0 90% de son salaire net  CSE - Infotype 0058  Maternit\u00e9  Paternit\u00e9  Parental Dernier jour travaill\u00e9 2023  AAAA 07  MM 06  JJ  AVS - Naissance - Date : __2023-07-07________________________  CSE - PA40 \u2013 Maternit\u00e9 - Date : _____________________  CSE - PA40 \u2013 Parental Date :________________________  Autres Dernier jour travaill\u00e9   AAAA   MM   JJ  Cong\u00e9 sans solde  Suspension  Autres : _____________________________________________ COMMENTAIRES  Il prendra deux semaines du 10 au 24 juillet 2023. S\u2019il vous plait payer la journ\u00e9e du 7 juillet en cong\u00e9 de naissance.    RETOUR AU TRAVAIL Retour progressif DU    AU    AAAA MM JJ AAAA MM JJ # heures / jour pr\u00e9vus par semaine : _____________________________________________________  Le formulaire \u00ab Feuille de temps\u00bb doit \u00eatre compl\u00e9t\u00e9 \u00e0 chaque semaine pendant la p\u00e9riode du retour progressif  CSE - PA40 - Mesure de retour CSE - PA61 - Remplacement horaire libre  Retour \u00e0 temps plein AU 2023 07 24  AAAA MM JJ  CSE - PA40 - Mesure de retour CSE - PA30 - 2003 - D\u00e9limiter - Remplacement horaire libre  APPROBATION Signature du gestionnaire : Audrey Sercia Date :2023-07-07  \n\n",
+    "ocr_text": "",
+    "pages": [
+      {
+        "page_number": 1,
+        "text": "  ABSENCE / RETOUR AU TRAVAIL  R\u00e9serv\u00e9 RH # matricule  \nFormulaire \u2013 Absences / Retour au travail Mise \u00e0 jour : 15 mai 2014 !\nDOMAINE DU PERSONNEL    D001 Distribution  D002 Fabrication  D003 Ma\u00eetre Saladier  R001 Si\u00e8ge Social  R002 CSC    R\u00f4tisserie #_________ IDENTIFICATION DE L\u2019EMPLOY\u00c9 Nom BOUCHER  Pr\u00e9nom JOEL Poste  Repr\u00e9sentant mise en march\u00e9  CSE - Employ\u00e9 syndiqu\u00e9 Service D\u00e9tail - Admin  CSE - Employ\u00e9 non syndiqu\u00e9 ABSENCES  Maladie / Invalidit\u00e9  Dernier jour travaill\u00e9   AAAA   MM   JJ  Joindre le certificat m\u00e9dical  CSE - ICD non pay\u00e9e   CSE - ICD pay\u00e9e  AVS - ILD - Date : ___________________________________  CSST  Dernier jour travaill\u00e9      AAAA      MM     JJ  Heures c\u00e9dul\u00e9es non travaill\u00e9es la journ\u00e9e de l\u2019accident :   ___  Joindre le certificat m\u00e9dical  Joindre l\u2019horaire normal de travail  Joindre le formulaire (ADR /CSST)       \u00ab l\u2019avis de l\u2019employeur et demande de remboursement \u00bb  CSE - Payer 14 premiers jours \u00e0 90% du salaire net  Retrait pr\u00e9ventif  Dernier jour travaill\u00e9          AAA          MM          JJ  Joindre le certificat m\u00e9dical  Joindre l\u2019horaire normal de travail  Joindre le formulaire (CSST)        \u00ab Demande de remboursement pour un retrait pr\u00e9ventif de la travailleuse enceinte             ou qui allaite \u00bb  CSE - Payer 5 premiers jours \u00e0 100% de son salaire  CSE - Payer 14 jours suivants \u00e0 90% de son salaire net  CSE - Infotype 0058  Maternit\u00e9  Paternit\u00e9  Parental Dernier jour travaill\u00e9 2023  AAAA 07  MM 06  JJ  AVS - Naissance - Date : __2023-07-07________________________  CSE - PA40 \u2013 Maternit\u00e9 - Date : _____________________  CSE - PA40 \u2013 Parental Date :________________________  Autres Dernier jour travaill\u00e9   AAAA   MM   JJ  Cong\u00e9 sans solde  Suspension  Autres : _____________________________________________ COMMENTAIRES  Il prendra deux semaines du 10 au 24 juillet 2023. S\u2019il vous plait payer la journ\u00e9e du 7 juillet en cong\u00e9 de naissance.    RETOUR AU TRAVAIL Retour progressif DU    AU    AAAA MM JJ AAAA MM JJ # heures / jour pr\u00e9vus par semaine : _____________________________________________________  Le formulaire \u00ab Feuille de temps\u00bb doit \u00eatre compl\u00e9t\u00e9 \u00e0 chaque semaine pendant la p\u00e9riode du retour progressif  CSE - PA40 - Mesure de retour CSE - PA61 - Remplacement horaire libre  Retour \u00e0 temps plein AU 2023 07 24  AAAA MM JJ  CSE - PA40 - Mesure de retour CSE - PA30 - 2003 - D\u00e9limiter - Remplacement horaire libre  APPROBATION Signature du gestionnaire : Audrey Sercia Date :2023-07-07  \n",
+        "char_count": 2461
+      }
+    ],
+    "metadata": {
+      "num_pages": 1,
+      "title": "",
+      "author": "",
+      "creation_date": "D:20250618214720Z00'00'",
+      "is_encrypted": false
+    },
+    "bounding_boxes": [],
+    "file_path": "/var/folders/dj/q5s8lngd1msdbb76w1tn9x1r0000gn/T/tmpkf6sbdjc_2023-07-07 -Formulaire Absence - Paternite\u0301.pdf",
+    "file_name": "tmpkf6sbdjc_2023-07-07 -Formulaire Absence - Paternite\u0301.pdf",
+    "file_size_mb": 0.11,
+    "file_type": ".pdf",
+    "processing_status": "success"
+  },
+  "timestamp": null,
+  "settings": {
+    "data_source": "local",
+    "enabled_models": [
+      "rule_based",
+      "ner",
+      "layout_aware"
+    ],
+    "privacy_settings": {
+      "redaction_enabled": true,
+      "compliance_mode": {
+        "gdpr": true,
+        "law25": true
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+[
+  {
+    "file": "b3965576-c316-467c-b2c6-df28e8581236.jpg",
+    "result": {
+      "success": true,
+      "method": "pure_gpt_structured",
+      "raw_response": "```json\n{\n  \"transcribed_text\": \"CLINIQUE DE MÉDECINE FAMILIALE\\nGMF-Universitaire Laval (Hôpital Cité-de-la-Santé)\\n1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9\\nTéléphone : (450) 975-5444 Télécopieur : (450) 975-5497\\n\\nNom, Prénom : TREMBLAY, Steve\\nAdresse : 211 Avenue d'Albigny Sainte-Thérèse (Quebec) J7E 2J2\\nTéléphone du patient (438) 462-3020\\n\\nDate de naissance : 1991-03-17\\nDate : 2024-04-12\\nNAM : TRES 9103 1716 2031-03\\n\\nRX\\nÀ qui de droit,\\nArrêt de travail jusqu'au 14/05/2024 inclusivement pour raison médicale\\nmerci\\n\\nNom du médecin : Georges, Barbara ; 530002\\nSignature du médecin :\\n\\nRép. 1 2 3 4 5 6 NR\\n\\n- Cette ordonnance est une ordonnance originale.\\n- Elle sera conservée au dossier et ne sera pas réutilisée.\\n- Le pharmacien désigné ci-dessous est le seul destinataire\\n\\nNom : CHRISTIAN CHADI PHARMACIEN INC.\\nFax : (450) 437-5763\",\n  \"extracted_information\": {\n    \"names\": [\"Steve Tremblay\", \"Barbara Georges\", \"Christian Chadi\"],\n    \"contact_info\": {\n      \"emails\": [],\n      \"phone_numbers\": [\"(450) 975-5444\", \"(450) 975-5497\", \"(438) 462-3020\", \"(450) 437-5763\"],\n      \"addresses\": [\"1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9\", \"211 Avenue d'Albigny Sainte-Thérèse (Quebec) J7E 2J2\"]\n    },\n    \"dates\": [\"1991-03-17\", \"2024-04-12\", \"14/05/2024\"],\n    \"identification_numbers\": [\"TRES 9103 1716 2031-03\", \"530002\"],\n    \"other_relevant_info\": []\n  }\n}\n```",
+      "structured_data": {
+        "transcribed_text": "CLINIQUE DE MÉDECINE FAMILIALE\nGMF-Universitaire Laval (Hôpital Cité-de-la-Santé)\n1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9\nTéléphone : (450) 975-5444 Télécopieur : (450) 975-5497\n\nNom, Prénom : TREMBLAY, Steve\nAdresse : 211 Avenue d'Albigny Sainte-Thérèse (Quebec) J7E 2J2\nTéléphone du patient (438) 462-3020\n\nDate de naissance : 1991-03-17\nDate : 2024-04-12\nNAM : TRES 9103 1716 2031-03\n\nRX\nÀ qui de droit,\nArrêt de travail jusqu'au 14/05/2024 inclusivement pour raison médicale\nmerci\n\nNom du médecin : Georges, Barbara ; 530002\nSignature du médecin :\n\nRép. 1 2 3 4 5 6 NR\n\n- Cette ordonnance est une ordonnance originale.\n- Elle sera conservée au dossier et ne sera pas réutilisée.\n- Le pharmacien désigné ci-dessous est le seul destinataire\n\nNom : CHRISTIAN CHADI PHARMACIEN INC.\nFax : (450) 437-5763",
+        "extracted_information": {
+          "names": [
+            "Steve Tremblay",
+            "Barbara Georges",
+            "Christian Chadi"
+          ],
+          "contact_info": {
+            "emails": [],
+            "phone_numbers": [
+              "(450) 975-5444",
+              "(450) 975-5497",
+              "(438) 462-3020",
+              "(450) 437-5763"
+            ],
+            "addresses": [
+              "1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9",
+              "211 Avenue d'Albigny Sainte-Thérèse (Quebec) J7E 2J2"
+            ]
+          },
+          "dates": [
+            "1991-03-17",
+            "2024-04-12",
+            "14/05/2024"
+          ],
+          "identification_numbers": [
+            "TRES 9103 1716 2031-03",
+            "530002"
+          ],
+          "other_relevant_info": []
+        }
+      },
+      "usage": {
+        "prompt_tokens": 941,
+        "completion_tokens": 514,
+        "total_tokens": 1455,
+        "estimated_cost": 0.00044954999999999995
+      }
+    }
+  },
+  {
+    "file": "e1c64004-1dd8-43a2-b2fc-6d3e7ca37b76.jpg",
+    "result": {
+      "success": true,
+      "method": "pure_gpt_structured",
+      "raw_response": "```json\n{\n  \"transcribed_text\": \"Siège social\\n95, boul. de la Cité-des-Jeunes\\nGatineau (QC) J8Y 6X3\\nTéléphone : 819 778-2425\\nTélécopieur : 819 778-2426\\nCourriel : conl@cfo.coop\\nSecteur Hull\\n95, boul. de la Cité-des-Jeunes\\nGatineau (Québec) J8Y 6X3\\nTéléphone : 819 778-2425\\nTélécopieur : 819 778-2426\\nCourriel : conl@cfo.coop\\nPREUVE DE DÉCÈS DU DIRECTEUR FUNÉRAIRE\\nLusignan\\nNom de famille\\nRoger\\nPrénom\\nMasculin\\nSexe\\n10 mars 2023\\nDate du décès\\n7545827\\nNuméro SP3, SP4 ou de l'avis au coroner :\\nDr Sophie Charette - 01889\\nNom du médecin\\nMaison des Collines (soins palliatifs)\\nLieu du décès\\nInformations complémentaires\\nfournies par un proche de la personne décédée\\nVeuf(ve)\\nÉtat civil\\n405 175 332\\nNuméro d'assurance sociale\\nJean-Wilfred Lusignan\\nNom complet du père\\nGermaine Fortin\\nNom complet de la mère\\nOttawa, Ontario, Canada\\nLieu de naissance\\n9 février 1943\\nDate de naissance\\n292 Av Des Paysans, Gatineau, Québec, Canada, J9J 1T5\\nDomicile\\nLieu de la crémation\\nCoopérative funéraire de l'Outaouais\\n15 mars 2023\\nDate\\nEN FOI DE QUOI, je déclare détenir le bulletin de décès ou l'autorisation de disposition du corps émise par le coroner et je signe la présente en tant que directeur de funérailles, ou son représentant dûment mandaté, détenant le permis numéro :\\n19FUN0145\\n13 mars 2023\\nDate\\nSignature du représentant mandaté pour la Coopérative Funéraire de l'Outaouais\",\n  \"extracted_information\": {\n    \"names\": [\n      \"Roger Lusignan\",\n      \"Dr Sophie Charette\",\n      \"Jean-Wilfred Lusignan\",\n      \"Germaine Fortin\"\n    ],\n    \"contact_info\": {\n      \"emails\": [\n        \"conl@cfo.coop\"\n      ],\n      \"phone_numbers\": [\n        \"819 778-2425\",\n        \"819 778-2426\"\n      ],\n      \"addresses\": [\n        \"95, boul. de la Cité-des-Jeunes, Gatineau (QC) J8Y 6X3\",\n        \"292 Av Des Paysans, Gatineau, Québec, Canada, J9J 1T5\"\n      ]\n    },\n    \"dates\": [\n      \"10 mars 2023\",\n      \"9 février 1943\",\n      \"15 mars 2023\",\n      \"13 mars 2023\"\n    ],\n    \"identification_numbers\": [\n      \"7545827\",\n      \"01889\",\n      \"405 175 332\",\n      \"19FUN0145\"\n    ],\n    \"other_relevant_info\": [\n      \"Masculin\",\n      \"Veuf(ve)\",\n      \"Maison des Collines (soins palliatifs)\",\n      \"Coopérative funéraire de l'Outaouais\"\n    ]\n  }\n}\n```",
+      "structured_data": {
+        "transcribed_text": "Siège social\n95, boul. de la Cité-des-Jeunes\nGatineau (QC) J8Y 6X3\nTéléphone : 819 778-2425\nTélécopieur : 819 778-2426\nCourriel : conl@cfo.coop\nSecteur Hull\n95, boul. de la Cité-des-Jeunes\nGatineau (Québec) J8Y 6X3\nTéléphone : 819 778-2425\nTélécopieur : 819 778-2426\nCourriel : conl@cfo.coop\nPREUVE DE DÉCÈS DU DIRECTEUR FUNÉRAIRE\nLusignan\nNom de famille\nRoger\nPrénom\nMasculin\nSexe\n10 mars 2023\nDate du décès\n7545827\nNuméro SP3, SP4 ou de l'avis au coroner :\nDr Sophie Charette - 01889\nNom du médecin\nMaison des Collines (soins palliatifs)\nLieu du décès\nInformations complémentaires\nfournies par un proche de la personne décédée\nVeuf(ve)\nÉtat civil\n405 175 332\nNuméro d'assurance sociale\nJean-Wilfred Lusignan\nNom complet du père\nGermaine Fortin\nNom complet de la mère\nOttawa, Ontario, Canada\nLieu de naissance\n9 février 1943\nDate de naissance\n292 Av Des Paysans, Gatineau, Québec, Canada, J9J 1T5\nDomicile\nLieu de la crémation\nCoopérative funéraire de l'Outaouais\n15 mars 2023\nDate\nEN FOI DE QUOI, je déclare détenir le bulletin de décès ou l'autorisation de disposition du corps émise par le coroner et je signe la présente en tant que directeur de funérailles, ou son représentant dûment mandaté, détenant le permis numéro :\n19FUN0145\n13 mars 2023\nDate\nSignature du représentant mandaté pour la Coopérative Funéraire de l'Outaouais",
+        "extracted_information": {
+          "names": [
+            "Roger Lusignan",
+            "Dr Sophie Charette",
+            "Jean-Wilfred Lusignan",
+            "Germaine Fortin"
+          ],
+          "contact_info": {
+            "emails": [
+              "conl@cfo.coop"
+            ],
+            "phone_numbers": [
+              "819 778-2425",
+              "819 778-2426"
+            ],
+            "addresses": [
+              "95, boul. de la Cité-des-Jeunes, Gatineau (QC) J8Y 6X3",
+              "292 Av Des Paysans, Gatineau, Québec, Canada, J9J 1T5"
+            ]
+          },
+          "dates": [
+            "10 mars 2023",
+            "9 février 1943",
+            "15 mars 2023",
+            "13 mars 2023"
+          ],
+          "identification_numbers": [
+            "7545827",
+            "01889",
+            "405 175 332",
+            "19FUN0145"
+          ],
+          "other_relevant_info": [
+            "Masculin",
+            "Veuf(ve)",
+            "Maison des Collines (soins palliatifs)",
+            "Coopérative funéraire de l'Outaouais"
+          ]
+        }
+      },
+      "usage": {
+        "prompt_tokens": 947,
+        "completion_tokens": 757,
+        "total_tokens": 1704,
+        "estimated_cost": 0.00059625
+      }
+    }
+  }
+]

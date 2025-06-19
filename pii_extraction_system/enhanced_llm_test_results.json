@@ -3,9 +3,9 @@
     "total_files": 10,
     "successful_extractions": 9,
     "success_rate": "90.0%",
-    "total_cost_usd": 0.0409,
+    "total_cost_usd": 0.0017,
     "password_used": "Hubert",
-    "timestamp": "2025-06-19 10:42:36",
+    "timestamp": "2025-06-19 11:36:36",
     "supported_formats": [
       ".pdf",
       ".jpg",
@@ -27,15 +27,32 @@
         "pdf_pages": [
           {
             "success": true,
-            "extracted_text": "I'm sorry, but I can't assist with that.",
-            "text_length": 40,
-            "pii_analysis": {},
-            "total_pii_indicators": 0,
+            "extracted_text": "Sure, here is the transcribed text from the image:\n\n```\nCentre intégré\nde santé et de services sociaux\nde Laval\n\nQuébec\n\nCLINIQUE DE MÉDECINE FAMILIALE\nGMF-Universitaire Laval (Hôpital Cité-de-la-Santé)\n1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9\nTéléphone : (450) 975-5444 Télécopieur : (450) 975-5497\n\nNom, Prénom : TREMBLAY, Steve\nAdresse : 211 Avenue d'Albigny Sainte-Thérèse (Québec)\nJ7E 3J2\nTéléphone du patient (438) 462-3020\n\nDate de naissance : 1991-03-17\nDate : 2024-05-14\nNAM : TRES 9103 1716 2031-03\n\nRX\n\nÀ qui de droit,\n\nArrêt de travail pour raison médicale jusqu'au 3 juin 2024 inclusivement.\n\nmerci beaucoup\n\nNom du médecin : Georgos, Barbara 530002\nSignature du médecin :\n\nRép. 1 2 3 4 5 6 NR\n\n- Cette ordonnance est une ordonnance originale.\n- Elle sera conservée au dossier et ne sera pas réutilisée.\n- Le pharmacien désigné ci-dessous est le seul destinataire\n\nNom : CHRISTIAN CHADI PHARMACIEN INC.\nFax : (450) 437-5763\n```",
+            "text_length": 957,
+            "pii_analysis": {
+              "names": [
+                "Steve TREMBLAY"
+              ],
+              "dates": [
+                "3 juin 2024",
+                "2024-05-14",
+                "1991-03-17"
+              ],
+              "addresses": [
+                "211 Avenue d'Albigny Sainte-Thérèse (Québec)"
+              ],
+              "postal_codes": [
+                "J7E 3J2",
+                "H7M 3L9"
+              ]
+            },
+            "total_pii_indicators": 7,
+            "pii_entities_found": 7,
             "usage": {
-              "prompt_tokens": 25582,
-              "completion_tokens": 10,
-              "total_tokens": 25592,
-              "estimated_cost": 0.003843299999999999
+              "prompt_tokens": 791,
+              "completion_tokens": 320,
+              "total_tokens": 1111,
+              "estimated_cost": 0.00031065
             },
             "page_number": 1
           }
@@ -52,29 +69,16 @@
         "pdf_pages": [
           {
             "success": true,
-            "extracted_text": "Here is the extracted text from the French form document:\n\n---\n\n**ABSENCE / RETOUR AU TRAVAIL**\n\n**DOMAINE DU PERSONNEL**\n\n☑ D001 Distribution  \n☑ D002 Fabrication  \n☑ D003 Maître Saladier  \n☑ R001 Siège Social  \n☑ R002 CSC  \n☑ Rôtisserie #_________\n\n**IDENTIFICATION DE L’EMPLOYÉ**\n\nNom: BOUCHER  \nPrénom: JOËL  \nPoste: Représentant mise en marché  \nService: Détail - Admin  \n☑ CSE - Employé syndiqué  \n☑ CSE - Employé non syndiqué  \n\n**ABSENCES**\n\n**Maladie / Invalidité**  \nDernier jour travaillé: AAAA MM JJ  \n☐ Joindre le certificat médical  \n☐ CSE - ICD non payée  \n☐ CSE - ICD payée  \n☐ AVS - ILD - Date : __________________________  \n\n**CSST**  \nDernier jour travaillé: AAAA MM JJ  \n☐ Heures cédulées non travaillées la journée de l'accident : ___  \n☐ Joindre le certificat médical  \n☐ Joindre l'horaire normal de travail  \n☐ Joindre le formulaire (ADR /CSST)  \n« L'avis de l'employeur et demande de remboursement »  \n☐ CSE - Payer 14 premiers jours à 90% du salaire net  \n\n**Retrait préventif**  \nDernier jour travaillé: AAAA MM JJ  \n☐ Joindre le certificat médical  \n☐ Joindre l'horaire normal de travail  \n☐ Joindre le formulaire (CSST)  \n« Demande de remboursement pour un retrait préventif de la travailleuse enceinte ou qui allaite »  \n☐ CSE - Payer 5 premiers jours à 100% de son salaire  \n☐ CSE - Payer 14 jours suivants à 90% de son salaire net  \n☐ CSE - Infotype 0058  \n\n**Maternité**  \n**Paternité**  \n**Parental**  \nDernier jour travaillé: 2023 07 06  \n☐ AVS - Naissance - Date : _2023-07-07  \n☐ CSE - PA40 - Maternité - Date : __________________  \n☐ CSE - PA40 - Parental Date : __________________  \n\n**Autres**  \nDernier jour travaillé: AAAA MM JJ  \n☐ Congé sans solde  \n☐ Suspension  \n☐ Autres :  \n\n**COMMENTAIRES**  \nIl prendra deux semaines du 10 au 24 juillet 2023.  \nS’il vous plaît payer la journée du 7 juillet en congé de naissance.  \n\n**RETOUR AU TRAVAIL**\n\nDU  \nAAAA MM JJ  \nAU  \nAAAA MM JJ  \n# heures / jour prévus par semaine : ___________________________________________  \n\n**Retour progressif**  \nLe formulaire « Feuille de temps» doit être complété à chaque semaine pendant la période du retour progressif  \n☐ CSE - PA40 - Mesure de retour  \n☐ CSE - PA61 - Remplacement horaire libre  \n\n**Retour à temps plein**  \nAU  \n2023 07 24  \n☐ CSE - PA40 - Mesure de retour  \n☐ CSE - PA30 - 2003 - Délimiter - Remplacement horaire libre  \n\n**APPROBATION**  \nSignature du gestionnaire : Audrey Sercia  \nDate : 2023-07-07  \n\n---\n\nThis text includes all the specified fields and maintains the original formatting and accents.",
-            "text_length": 2549,
-            "pii_analysis": {
-              "names": [
-                "nom",
-                "prénom"
-              ],
-              "dates": [
-                "naissance",
-                "2023"
-              ],
-              "employment": [
-                "employé",
-                "travail",
-                "salaire"
-              ]
-            },
-            "total_pii_indicators": 7,
+            "extracted_text": "I'm sorry, I can't assist with that.",
+            "text_length": 36,
+            "pii_analysis": {},
+            "total_pii_indicators": 0,
+            "pii_entities_found": 0,
             "usage": {
-              "prompt_tokens": 36924,
-              "completion_tokens": 756,
-              "total_tokens": 37680,
-              "estimated_cost": 0.0059922
+              "prompt_tokens": 1139,
+              "completion_tokens": 9,
+              "total_tokens": 1148,
+              "estimated_cost": 0.00017624999999999997
             },
             "page_number": 1
           }
@@ -91,29 +95,31 @@
         "pdf_pages": [
           {
             "success": true,
-            "extracted_text": "I'm sorry, but I can't assist with that.",
-            "text_length": 40,
+            "extracted_text": "I'm sorry, I can't assist with that.",
+            "text_length": 36,
             "pii_analysis": {},
             "total_pii_indicators": 0,
+            "pii_entities_found": 0,
             "usage": {
-              "prompt_tokens": 25582,
-              "completion_tokens": 10,
-              "total_tokens": 25592,
-              "estimated_cost": 0.003843299999999999
+              "prompt_tokens": 791,
+              "completion_tokens": 9,
+              "total_tokens": 800,
+              "estimated_cost": 0.00012405
             },
             "page_number": 1
           },
           {
             "success": true,
-            "extracted_text": "I'm sorry, but I can't assist with that.",
-            "text_length": 40,
+            "extracted_text": "I'm sorry, I can't assist with that.",
+            "text_length": 36,
             "pii_analysis": {},
             "total_pii_indicators": 0,
+            "pii_entities_found": 0,
             "usage": {
-              "prompt_tokens": 25582,
-              "completion_tokens": 10,
-              "total_tokens": 25592,
-              "estimated_cost": 0.003843299999999999
+              "prompt_tokens": 791,
+              "completion_tokens": 9,
+              "total_tokens": 800,
+              "estimated_cost": 0.00012405
             },
             "page_number": 2
           }
@@ -142,15 +148,16 @@
       "processing_results": {
         "llm_ocr": {
           "success": true,
-          "extracted_text": "I'm sorry, but I can't assist with that.",
-          "text_length": 40,
+          "extracted_text": "I'm sorry, I can't assist with that.",
+          "text_length": 36,
           "pii_analysis": {},
           "total_pii_indicators": 0,
+          "pii_entities_found": 0,
           "usage": {
-            "prompt_tokens": 25582,
-            "completion_tokens": 10,
-            "total_tokens": 25592,
-            "estimated_cost": 0.003843299999999999
+            "prompt_tokens": 791,
+            "completion_tokens": 9,
+            "total_tokens": 800,
+            "estimated_cost": 0.00012405
           }
         }
       }
@@ -164,45 +171,31 @@
         "pdf_pages": [
           {
             "success": true,
-            "extracted_text": "Sure! Here’s the extracted text from the CV/resume document:\n\n---\n\n**Souad TOUATI**\n\n1680, rue de L’Avocatier, Terrebonne (QC) J7M 0J1  \nsouad.touati@hotmail.com – (438) 992 9029\n\n---\n\n**SYNTHÈSE DES COMPÉTENCES**\n\n- Très bonne capacité d’analyse des coûts, à consolider et remonter les informations financières dans les délais\n- Capacité établie à mettre en place des tableaux de suivi et d’analyse automatisés (grande habileté avec les bases de données)\n- Informatique : Excel avancé, D365, Vision, SAP, VAM (Epsilia), Acomba, Nethris, Ceridian, ADP\n- Esprit analytique, rigueur, rapidité d’adaptation, autonomie\n\n---\n\n**EXPÉRIENCES PROFESSIONNELLES**\n\n**ANALYSTE FINANCIER**  \nACCEO SOLUTION INC, DIVISION DU GROUPE HARRIS COMPUTER SYSTEMS  \nFournisseur de services professionnels variés sur le marché des technologies de l’information – Québec  \n2022/10 – A aujourd’hui\n\n- Participer au processus de clôture de fin de mois, de fin de trimestre et de fin d’année\n- Préparer et comptabiliser diverses opérations de compte\n- Reporting mensuel au siège\n- Effectuer diverses analyses du bilan et des rapports financiers\n- Refacturation projets\n- Identifier, améliorer et optimiser les processus comptables\n- Gérer, interpréter et manipuler des données financières provenant de diverses sources de systèmes d’information\n- Participer aux projets spéciaux et aux rapports ad hoc requis par le contrôleur\n\n---\n\n**ANALYSTE FINANCIER**  \nDEMIX CONSTRUCTION, DIVISION DU GROUPE CRH CANDA INC.  \nEntrepreneur majeur en construction des routes et génie civil – Laval  \n2020/02 – 2022/10\n\n- Suivre les coûts et marges par projet\n- Produire et analyser les résultats financiers mensuels et de fin d’exercice\n- Effectuer le reporting mensuel au siège social\n- Suivre et analyser les comptes de bilan\n- Appuyer l’équipe des comptes payables et de paie en haute saison\n- Assurer la conformité avec l’acte de Sarbanes-Oxley (SOX) dans les rapports financiers\n- Divers : conciliation bancaire, prévision hebdo du cashflow, refacturation du transport et des heures d’utilisation d’équipement aux projets, refacturation intercompagnie, suivi des actifs, demande de lettre CCQ et CNESST, maintenance du système informatique\n\n--- \n\nThis text has been extracted while preserving the original structure and formatting.",
-            "text_length": 2296,
-            "pii_analysis": {
-              "names": [
-                "nom",
-                "souad",
-                "touati"
-              ],
-              "contact": [
-                "@"
-              ],
-              "financial": [
-                "compte"
-              ]
-            },
-            "total_pii_indicators": 5,
+            "extracted_text": "I'm sorry, I can't assist with that.",
+            "text_length": 36,
+            "pii_analysis": {},
+            "total_pii_indicators": 0,
+            "pii_entities_found": 0,
             "usage": {
-              "prompt_tokens": 25568,
-              "completion_tokens": 578,
-              "total_tokens": 26146,
-              "estimated_cost": 0.004181999999999999
+              "prompt_tokens": 791,
+              "completion_tokens": 9,
+              "total_tokens": 800,
+              "estimated_cost": 0.00012405
             },
             "page_number": 1
           },
           {
             "success": true,
-            "extracted_text": "Sure! Here’s the extracted text from the CV/resume document:\n\n---\n\n**ANALYSTE FINANCIER ET PRIX DE REVIENT**  \nECOALIT LTÉE acheté par MONTPAK INTERNATIONAL INC. (en nov.2017)  \nProduction et transformation de veau, d’agneau et bœuf – Terrebonne …puis… Laval  \n**2013 – 2020/01**\n\n**Comptabilité financière :**  \n- Produire et analyser les états financiers mensuels (cycle comptable complet, écritures de régularisation, analyse des écarts, écritures interco, analyse de comptes de bilan)  \n- Comptabiliser et analyser les paies  \n- Produire les conciliations bancaires mensuelles (suivi trésorerie)  \n- Suivre et comptabiliser les actifs immobilisés  \n- Préparer les dossiers de vérification annuelle  \n- Optimiser les procédures et processus comptables  \n\n**Coût de revient :**  \n- Mettre en place un système de calcul des coûts  \n- Maintenir les fiches produit et les coûts de revient  \n- Elaborer des rapports d’analyse de coûts, de vente, de rentabilité, de rendement de production  \n- Suivre et valoriser les inventaires  \n- Participer aux inventaires physiques et analyser les écarts d’inventaire  \n\n**Projet divers :**  \n- Mise en place d’un logiciel de gestion électronique de documents avec archivage et approbation électronique  \n- Mise en place un système de consommation informatique  \n- Participer à l’implantation d’un nouveau système de paie et gestion de temps (Ceridian)  \n\n---\n\n**ANALYSTE ADJOINT - PRIX DE REVIENT**  \nL’ORÉAL, site de production de produits cosmétiques et de styling – Saint-Quentin (France)  \n**2006 – 2012**\n\n**Contrôle :**  \n- Assurer le calcul, l’analyse et la révision des prix de revient industriel des produits  \n- Analyser les écarts entre les coûts standards et les coûts réels  \n- Établir les travaux de clôture du résultat de gestion mensuel  \n- Participer aux réunions de gestion mensuelles : présentation et analyse des résultats  \n- Élaborer et mettre à jour des tableaux de bord opérationnels  \n- Analyser les provisions pour stocks et produire les documents de synthèse  \n- Suivre les résultats des inventaires périodiques et organiser les activités des inventaires annuels  \n- Participer aux activités de vérifications annuelles et au processus budgétaire  \n- Assurer l’application des bonnes pratiques de gestion  \n\n**Projet :**  \n- Participer au déploiement de SAP : analyse des processus, réalisation des tests de simulation, mise à jour des données  \n- Mettre en place des procédures : formalisation des processus, formation du personnel  \n\n---\n\n**FORMATION**  \n\n**Master en finance contrôle de gestion**  \nINSTITUT D’ADMINISTRATION DES ENTREPRISES – Orléans (France)  \n**2006**\n\n**Licence en administration et management de la performance**  \nINSTITUT UNIVERSITAIRE PROFESSIONNALISE : MANAGEMENT ET GESTION DES ENTREPRISES – Clermont-Ferrand (France)  \n**2004**\n\n--- \n\nLet me know if you need anything else!",
-            "text_length": 2866,
-            "pii_analysis": {
-              "financial": [
-                "compte"
-              ]
-            },
-            "total_pii_indicators": 1,
+            "extracted_text": "I'm sorry, I can't assist with that.",
+            "text_length": 36,
+            "pii_analysis": {},
+            "total_pii_indicators": 0,
+            "pii_entities_found": 0,
             "usage": {
-              "prompt_tokens": 25568,
-              "completion_tokens": 687,
-              "total_tokens": 26255,
-              "estimated_cost": 0.0042474
+              "prompt_tokens": 791,
+              "completion_tokens": 9,
+              "total_tokens": 800,
+              "estimated_cost": 0.00012405
             },
             "page_number": 2
           }
@@ -219,15 +212,16 @@
         "pdf_pages": [
           {
             "success": true,
-            "extracted_text": "I'm sorry, but I can't assist with that.",
-            "text_length": 40,
+            "extracted_text": "I'm sorry, I can't assist with that.",
+            "text_length": 36,
             "pii_analysis": {},
             "total_pii_indicators": 0,
+            "pii_entities_found": 0,
             "usage": {
-              "prompt_tokens": 48234,
-              "completion_tokens": 10,
-              "total_tokens": 48244,
-              "estimated_cost": 0.0072410999999999994
+              "prompt_tokens": 1471,
+              "completion_tokens": 9,
+              "total_tokens": 1480,
+              "estimated_cost": 0.00022604999999999997
             },
             "page_number": 1
           }
@@ -243,15 +237,42 @@
       "processing_results": {
         "llm_ocr": {
           "success": true,
-          "extracted_text": "I'm sorry, but I can't assist with that.",
-          "text_length": 40,
-          "pii_analysis": {},
-          "total_pii_indicators": 0,
+          "extracted_text": "Siège social\n95, boul. de la Cité-des-Jeunes\nGatineau (QC) J8Y 6X3\nTéléphone : 819 778-2425\nTélécopieur : 819 778-2426\nCourriel : conf@cfo.coop\n\nSecteur Hull\n95, boul. de la Cité-des-Jeunes\nGatineau (Québec) J8Y 6X3\nTéléphone : 819 778-2425\nTélécopieur : 819 778-2426\nCourriel : conf@cfo.coop\n\nPREUVE DE DÉCÈS DU DIRECTEUR FUNÉRAIRE\n\nLusignan\nNom de famille\n\nRoger\nPrénom\n\nMasculin\nSexe\n\n10 mars 2023\nDate du décès\n\n7545827\nNuméro SP3, SP4 ou de l'avis au coroner :\n\nDre Sophie Charette - 01889\nNom du médecin\n\nMaison des Collines (soins palliatifs)\nLieu du décès\n\nInformations complémentaires\nfournies par un proche de la personne décédée\n\nVeuf(ve)\nÉtat civil\n\n405 175 332\nNuméro d'assurance sociale\n\nJean-Wilfred Lusignan\nNom complet du père\n\nGermaine Fortin\nNom complet de la mère\n\nOttawa, Ontario, Canada\nLieu de naissance\n\n9 février 1943\nDate de naissance\n\n292 Av Des Paysans, Gatineau, Québec, Canada, J9J 1T5\nDomicile\n\nCoopérative funéraire de l'Outaouais\nLieu de la crémation\n\n15 mars 2023\nDate\n\nEN FOI DE QUOI, je déclare détenir le bulletin de décès ou\nl'autorisation de disposition du corps émise par le coroner et je signe\nla présente en tant que directeur de funérailles, ou son représentant\ndûment mandaté, détenant le permis numéro :\n\n19FUN0145\n\n13 mars 2023\nDate\n\n(Signature du représentant mandaté pour\nla Coopérative Funéraire de l'Outaouais)",
+          "text_length": 1360,
+          "pii_analysis": {
+            "emails": [
+              "conf@cfo.coop"
+            ],
+            "phone_numbers": [
+              "819 778-2426",
+              "819 778-2425"
+            ],
+            "dates": [
+              "15 mars 2023",
+              "10 mars 2023",
+              "9 février 1943",
+              "13 mars 2023"
+            ],
+            "addresses": [
+              "292 Av Des Paysans, Gatineau",
+              "2023\nDate\n\nEN FOI DE QUOI, je"
+            ],
+            "social_insurance_numbers": [
+              "405 175 332"
+            ],
+            "postal_codes": [
+              "J9J 1T5",
+              "01889",
+              "J8Y 6X3"
+            ]
+          },
+          "total_pii_indicators": 13,
+          "pii_entities_found": 13,
           "usage": {
-            "prompt_tokens": 25582,
-            "completion_tokens": 10,
-            "total_tokens": 25592,
-            "estimated_cost": 0.003843299999999999
+            "prompt_tokens": 791,
+            "completion_tokens": 461,
+            "total_tokens": 1252,
+            "estimated_cost": 0.00039524999999999993
           }
         }
       }
@@ -264,9 +285,69 @@
       "processing_results": {
         "office_extraction": {
           "success": true,
-          "text_content": "ID Heure de début Heure de fin Adresse de messagerie Nom Nom | Last name Prénom | First name Lieu de travail | Work Location Date d'approbation | Approved on Diffuser, à l’interne seulement, ma photo d’employé.e. Lors d’événements corporatifs, un photographe est invité afin de prendre des photos et celles-ci sont diffusées sur intranet.\nDisplay my employee photo in-house only. A photographer is invited at corp Divulguer mon jour et mois de naissance seulement pour recevoir des vœux de fête lors de cette journée.\nDisclose my birth date (day and month) only to receive festive greetings on that day.\n Divulguer ma date d’embauche afin de souligner mes années de service à chaque année.\nDisclose my hiring date to acknowledge my years of service each year.\n Participer aux concours internes et publier mon nom ainsi que le prix gagné, le cas échéant.\nTake part in office contests and publish my name and the prize won, if applicable.\n Publier de l’information me concernant à ma demande. Exemples : décès familial, naissance.\nPublish information about me at my request. Examples: family death, birth.\n\n\n1 2023-09-29 14:13:50 2023-09-29 14:15:39 anonymous Therrien Julien Boisbriand 2023-09-29 00:00:00 OUI, je consens. | YES, I agree. NON, je ne consens pas. | NO, I don't agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n2 2023-10-04 08:14:18 2023-10-04 08:18:34 anonymous Grégoire Mathieu Boisbriand – Lionel-Bertrand 2023-10-04 00:00:00 NON, je ne consens pas. | NO, I don't agree. NON, je ne consens pas. | NO, I don't agree. NON, je ne consens pas. | NO, I don't agree. NON, je ne consens pas. | NO, I don't agree. NON, je ne consens pas. | NO, I don't agree.\n3 2024-01-03 13:16:10 2024-01-03 15:31:44 anonymous Mian Jay remote (Ontario home base) 2024-01-03 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n4 2024-01-05 07:32:55 2024-01-05 07:34:06 anonymous Wu-Huo Tiffany Boisbriand 2024-01-05 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n5 2024-01-05 08:22:57 2024-01-05 08:24:32 anonymous Lupien Jennifer Boisbriand 2024-01-03 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n6 2024-02-13 15:48:43 2024-02-13 15:50:30 anonymous Lemieux  Camille  Quebec 2024-02-13 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n7 2024-02-21 20:48:18 2024-02-21 20:50:20 anonymous Picard Alexandra 1755 Bd Lionel Bertrand, Boisbriand, Quebec, J7H 1N8 2024-02-21 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n8 2024-03-26 16:17:21 2024-03-26 16:19:06 anonymous Negue Eugenio-Cedric Boisbriand 2024-03-26 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. NON, je ne consens pas. | NO, I don't agree.\n9 2024-04-23 09:22:23 2024-04-23 09:22:59 anonymous Gionet Daniel Dieppe 2024-04-24 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n10 2024-04-23 09:26:46 2024-04-23 09:27:33 anonymous Gionet Daniel Dieppe 2024-04-22 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n11 2024-04-26 09:59:53 2024-04-26 10:00:26 anonymous Gionet Daniel Moncton 2024-04-22 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n12 2024-04-30 15:11:17 2024-04-30 15:13:01 anonymous Bluteau Jean-Philippe Boisbriand 2024-04-22 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n13 2024-05-01 09:53:52 2024-05-01 09:54:29 anonymous Bédard Marie-Ève Boisbriand (Siège social) 2024-05-01 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n14 2024-05-02 12:10:16 2024-05-02 12:11:59 anonymous Provost Frederic Sur la route  2024-04-29 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n15 2024-05-14 14:05:18 2024-05-14 14:06:21 anonymous Thibault Philippe Blainville 2024-05-14 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n16 2024-05-30 09:24:54 2024-05-30 09:27:44 anonymous Ferrari Kelly-Ann Boisbriand 2024-05-30 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n17 2024-06-04 15:34:36 2024-06-04 15:36:22 anonymous Issa Sébastien Restaurants Corporatifs 2024-06-04 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n18 2024-06-18 15:04:32 2024-06-18 15:06:45 anonymous Morel Véronique Boisbriand  2024-06-12 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n19 2024-06-21 08:26:13 2024-06-21 08:27:51 anonymous Ségeat Stéphane Groupe St-Hubert 2024-06-17 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n20 2024-07-10 09:30:30 2024-07-10 09:32:05 anonymous Chouinard Frédérick Siège social Boisbriand 2024-07-10 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n21 2024-07-29 10:46:49 2024-07-29 10:48:37 anonymous Brosseau Guylaine Sièege social Boisbriand 2024-07-29 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n22 2024-08-09 10:03:50 2024-08-09 10:06:12 anonymous Hutcheson Paul Gananoque 2024-08-05 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. NON, je ne consens pas. | NO, I don't agree.\n23 2024-08-21 13:36:18 2024-08-21 13:40:54 anonymous Bélisle Maude Boisbriand 2024-08-21 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n24 2024-08-27 17:01:49 2024-08-27 17:03:07 anonymous Rondeau Denis Mascouche 2024-08-27 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n25 2024-08-28 10:47:08 2024-08-28 10:51:38 anonymous Genevieve Lefebvre Boisbriand  2024-08-28 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n26 2024-09-11 15:02:34 2024-09-11 15:06:07 anonymous Catineau Guillaume siege social boisbriand 2024-09-11 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n27 2024-09-12 10:37:16 2024-09-12 10:38:24 anonymous Thimot Bettina Boisbriand et télétravail 2024-09-12 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n28 2024-11-12 16:08:33 2024-11-12 16:09:47 anonymous Desjardins Philippe Boisbriand 2024-11-12 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n29 2024-11-25 16:25:12 2024-11-25 16:26:33 anonymous simard alexandre siege social Boisbriand 2024-11-25 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n30 2024-12-03 15:50:42 2024-12-03 15:51:35 anonymous Richer Fannie Blainville 2024-12-03 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n31 2024-12-04 14:01:32 2024-12-04 14:06:12 anonymous Munoz Rommy-Michelle Centre de distribution Mascouche 2024-12-04 00:00:00 NON, je ne consens pas. | NO, I don't agree. NON, je ne consens pas. | NO, I don't agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. NON, je ne consens pas. | NO, I don't agree.\n32 2024-12-04 14:28:17 2024-12-04 15:05:31 anonymous Grasso Raffaela Boisbriands 2024-12-04 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n33 2025-01-07 16:14:39 2025-01-07 16:16:05 anonymous Hilario Paulo Boisbriand 2025-01-07 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n34 2025-01-08 12:18:17 2025-01-08 12:19:36 anonymous Canuel Stephane Boisbriand 2025-01-06 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n35 2025-01-21 11:37:45 2025-01-21 11:39:20 anonymous Lampron Benoît Boisbriand 2025-01-21 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n36 2025-01-29 08:10:16 2025-01-29 08:11:54 anonymous Landry Frédérike Boisbriand 2025-01-29 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n37 2025-02-12 06:49:01 2025-02-12 06:51:02 anonymous Habib Joseph Boisbriand 2025-02-10 00:00:00 OUI, je consens. | YES, I agree. NON, je ne consens pas. | NO, I don't agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. NON, je ne consens pas. | NO, I don't agree.\n38 2025-03-14 08:08:11 2025-03-14 08:10:26 anonymous Bélanger-De Ville Catherine Boisbriand 2025-03-14 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n39 2025-03-19 09:45:50 2025-03-19 09:46:31 anonymous Morin David Boisbriand 2025-03-19 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n40 2025-03-24 16:20:05 2025-03-24 16:21:11 anonymous Miville-Deschênes Patrick Boisbriand 2025-03-24 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.\n41 2025-03-26 15:06:13 2025-03-26 15:08:42 anonymous Dunn Lauriane Boisbriand 2025-03-26 00:00:00 OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree. OUI, je consens. | YES, I agree.",
-          "text_length": 12337,
-          "method": "direct_text_extraction"
+          "text_content": "\n--- Sheet: Sheet1 ---\nID | Heure de début | Heure de fin | Adresse de messagerie | Nom | Nom | Last name | Prénom | First name | Lieu de travail | Work Location | Date d'approbation | Approved on | Diffuser, à l’interne seulement, ma photo d’employé.e. Lors d’événements corporatifs, un photographe est invité afin de prendre des photos et celles-ci sont diffusées sur intranet.\nDisplay my employee photo in-house only. A photographer is invited at corp | Divulguer mon jour et mois de naissance seulement pour recevoir des vœux de fête lors de cette journée.\nDisclose my birth date (day and month) only to receive festive greetings on that day.\n | Divulguer ma date d’embauche afin de souligner mes années de service à chaque année.\nDisclose my hiring date to acknowledge my years of service each year.\n | Participer aux concours internes et publier mon nom ainsi que le prix gagné, le cas échéant.\nTake part in office contests and publish my name and the prize won, if applicable.\n | Publier de l’information me concernant à ma demande. Exemples : décès familial, naissance.\nPublish information about me at my request. Examples: family death, birth.\n\n\n1 | 2023-09-29 14:13:50 | 2023-09-29 14:15:39 | anonymous | Therrien | Julien | Boisbriand | 2023-09-29 00:00:00 | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n2 | 2023-10-04 08:14:18 | 2023-10-04 08:18:34 | anonymous | Grégoire | Mathieu | Boisbriand – Lionel-Bertrand | 2023-10-04 00:00:00 | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree.\n3 | 2024-01-03 13:16:10 | 2024-01-03 15:31:44 | anonymous | Mian | Jay | remote (Ontario home base) | 2024-01-03 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n4 | 2024-01-05 07:32:55 | 2024-01-05 07:34:06 | anonymous | Wu-Huo | Tiffany | Boisbriand | 2024-01-05 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n5 | 2024-01-05 08:22:57 | 2024-01-05 08:24:32 | anonymous | Lupien | Jennifer | Boisbriand | 2024-01-03 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n6 | 2024-02-13 15:48:43 | 2024-02-13 15:50:30 | anonymous | Lemieux  | Camille  | Quebec | 2024-02-13 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n7 | 2024-02-21 20:48:18 | 2024-02-21 20:50:20 | anonymous | Picard | Alexandra | 1755 Bd Lionel Bertrand, Boisbriand, Quebec, J7H 1N8 | 2024-02-21 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n8 | 2024-03-26 16:17:21 | 2024-03-26 16:19:06 | anonymous | Negue | Eugenio-Cedric | Boisbriand | 2024-03-26 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree.\n9 | 2024-04-23 09:22:23 | 2024-04-23 09:22:59 | anonymous | Gionet | Daniel | Dieppe | 2024-04-24 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n10 | 2024-04-23 09:26:46 | 2024-04-23 09:27:33 | anonymous | Gionet | Daniel | Dieppe | 2024-04-22 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n11 | 2024-04-26 09:59:53 | 2024-04-26 10:00:26 | anonymous | Gionet | Daniel | Moncton | 2024-04-22 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n12 | 2024-04-30 15:11:17 | 2024-04-30 15:13:01 | anonymous | Bluteau | Jean-Philippe | Boisbriand | 2024-04-22 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n13 | 2024-05-01 09:53:52 | 2024-05-01 09:54:29 | anonymous | Bédard | Marie-Ève | Boisbriand (Siège social) | 2024-05-01 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n14 | 2024-05-02 12:10:16 | 2024-05-02 12:11:59 | anonymous | Provost | Frederic | Sur la route  | 2024-04-29 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n15 | 2024-05-14 14:05:18 | 2024-05-14 14:06:21 | anonymous | Thibault | Philippe | Blainville | 2024-05-14 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n16 | 2024-05-30 09:24:54 | 2024-05-30 09:27:44 | anonymous | Ferrari | Kelly-Ann | Boisbriand | 2024-05-30 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n17 | 2024-06-04 15:34:36 | 2024-06-04 15:36:22 | anonymous | Issa | Sébastien | Restaurants Corporatifs | 2024-06-04 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n18 | 2024-06-18 15:04:32 | 2024-06-18 15:06:45 | anonymous | Morel | Véronique | Boisbriand  | 2024-06-12 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n19 | 2024-06-21 08:26:13 | 2024-06-21 08:27:51 | anonymous | Ségeat | Stéphane | Groupe St-Hubert | 2024-06-17 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n20 | 2024-07-10 09:30:30 | 2024-07-10 09:32:05 | anonymous | Chouinard | Frédérick | Siège social Boisbriand | 2024-07-10 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n21 | 2024-07-29 10:46:49 | 2024-07-29 10:48:37 | anonymous | Brosseau | Guylaine | Sièege social Boisbriand | 2024-07-29 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n22 | 2024-08-09 10:03:50 | 2024-08-09 10:06:12 | anonymous | Hutcheson | Paul | Gananoque | 2024-08-05 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree.\n23 | 2024-08-21 13:36:18 | 2024-08-21 13:40:54 | anonymous | Bélisle | Maude | Boisbriand | 2024-08-21 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n24 | 2024-08-27 17:01:49 | 2024-08-27 17:03:07 | anonymous | Rondeau | Denis | Mascouche | 2024-08-27 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n25 | 2024-08-28 10:47:08 | 2024-08-28 10:51:38 | anonymous | Genevieve | Lefebvre | Boisbriand  | 2024-08-28 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n26 | 2024-09-11 15:02:34 | 2024-09-11 15:06:07 | anonymous | Catineau | Guillaume | siege social boisbriand | 2024-09-11 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n27 | 2024-09-12 10:37:16 | 2024-09-12 10:38:24 | anonymous | Thimot | Bettina | Boisbriand et télétravail | 2024-09-12 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n28 | 2024-11-12 16:08:33 | 2024-11-12 16:09:47 | anonymous | Desjardins | Philippe | Boisbriand | 2024-11-12 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n29 | 2024-11-25 16:25:12 | 2024-11-25 16:26:33 | anonymous | simard | alexandre | siege social Boisbriand | 2024-11-25 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n30 | 2024-12-03 15:50:42 | 2024-12-03 15:51:35 | anonymous | Richer | Fannie | Blainville | 2024-12-03 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n31 | 2024-12-04 14:01:32 | 2024-12-04 14:06:12 | anonymous | Munoz | Rommy-Michelle | Centre de distribution Mascouche | 2024-12-04 00:00:00 | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree.\n32 | 2024-12-04 14:28:17 | 2024-12-04 15:05:31 | anonymous | Grasso | Raffaela | Boisbriands | 2024-12-04 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n33 | 2025-01-07 16:14:39 | 2025-01-07 16:16:05 | anonymous | Hilario | Paulo | Boisbriand | 2025-01-07 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n34 | 2025-01-08 12:18:17 | 2025-01-08 12:19:36 | anonymous | Canuel | Stephane | Boisbriand | 2025-01-06 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n35 | 2025-01-21 11:37:45 | 2025-01-21 11:39:20 | anonymous | Lampron | Benoît | Boisbriand | 2025-01-21 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n36 | 2025-01-29 08:10:16 | 2025-01-29 08:11:54 | anonymous | Landry | Frédérike | Boisbriand | 2025-01-29 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n37 | 2025-02-12 06:49:01 | 2025-02-12 06:51:02 | anonymous | Habib | Joseph | Boisbriand | 2025-02-10 00:00:00 | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree.\n38 | 2025-03-14 08:08:11 | 2025-03-14 08:10:26 | anonymous | Bélanger-De Ville | Catherine | Boisbriand | 2025-03-14 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n39 | 2025-03-19 09:45:50 | 2025-03-19 09:46:31 | anonymous | Morin | David | Boisbriand | 2025-03-19 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n40 | 2025-03-24 16:20:05 | 2025-03-24 16:21:11 | anonymous | Miville-Deschênes | Patrick | Boisbriand | 2025-03-24 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n41 | 2025-03-26 15:06:13 | 2025-03-26 15:08:42 | anonymous | Dunn | Lauriane | Boisbriand | 2025-03-26 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\n\n--- Sheet: Feuil1 ---",
+          "text_length": 13393,
+          "method": "password_aware_extraction",
+          "extracted_pii": {
+            "names": [
+              "Restaurants Corporatifs",
+              "De Ville"
+            ],
+            "dates": [
+              "2024-04-29",
+              "2025-01-08",
+              "2024-08-28",
+              "2024-05-02",
+              "2024-12-03",
+              "2025-03-19",
+              "2024-04-22",
+              "2025-02-10",
+              "2024-01-05",
+              "2024-04-26",
+              "2024-05-30",
+              "2025-01-07",
+              "2025-01-06",
+              "2025-03-24",
+              "2024-06-12",
+              "2024-06-21",
+              "2024-12-04",
+              "2023-10-04",
+              "2024-05-14",
+              "2024-07-10",
+              "2024-06-18",
+              "2024-11-25",
+              "2024-04-30",
+              "2024-08-21",
+              "2024-02-13",
+              "2024-08-09",
+              "2025-01-21",
+              "2025-01-29",
+              "2024-02-21",
+              "2024-09-11",
+              "2023-09-29",
+              "2024-01-03",
+              "2025-03-26",
+              "2024-06-04",
+              "2024-09-12",
+              "2024-08-05",
+              "2024-03-26",
+              "2024-08-27",
+              "2025-02-12",
+              "2024-06-17",
+              "2024-07-29",
+              "2025-03-14",
+              "2024-11-12",
+              "2024-05-01",
+              "2024-04-23",
+              "2024-04-24"
+            ],
+            "addresses": [
+              "1755 Bd Lionel Bertrand, Boisbriand"
+            ],
+            "postal_codes": [
+              "J7H 1N8"
+            ]
+          }
         }
       }
     },
@@ -279,7 +360,7 @@
         "office_extraction": {
           "success": false,
           "error": "Word processing failed: file '/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/2023-07-07 -Formulaire Absence - Paternité.doc' is not a Word file, content type is 'application/vnd.openxmlformats-officedocument.themeManager+xml'",
-          "note": "May need password handling with msoffcrypto"
+          "note": "Document may be corrupted or use unsupported encryption"
         }
       }
     }

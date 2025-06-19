@@ -1,0 +1,486 @@
+{
+  "test_summary": {
+    "total_files": 10,
+    "successful_extractions": 9,
+    "success_rate": "90.0%",
+    "total_cost_usd": 0.0019,
+    "password_used": "Hubert",
+    "timestamp": "2025-06-19 11:51:27",
+    "supported_formats": [
+      ".pdf",
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".doc",
+      ".docx",
+      ".xlsx",
+      ".txt"
+    ]
+  },
+  "file_results": [
+    {
+      "file_name": "2024-05-14 au 2024-06-03.pdf",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/2024-05-14 au 2024-06-03.pdf",
+      "file_type": ".pdf",
+      "file_size_kb": 75.3,
+      "processing_results": {
+        "pdf_pages": [
+          {
+            "success": true,
+            "extracted_text": "Sure, here is the transcribed text from the image:\n\n```\nCentre intégré\nde santé et de services sociaux\nde Laval\n\nQuébec\n\nCLINIQUE DE MÉDECINE FAMILIALE\nGMF-Universitaire Laval (Hôpital Cité-de-la-Santé)\n1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9\nTéléphone : (450) 975-5444 Télécopieur : (450) 975-5497\n\nNom, Prénom : TREMBLAY, Steve\nAdresse : 211 Avenue d'Albigny Sainte-Thérèse (Québec)\nJ7E 3J2\nTéléphone du patient (438) 462-3020\n\nDate de naissance : 1991-03-17\nDate : 2024-05-14\nNAM : TRES 9103 1716 2031-03\n\nRX\n\nÀ qui de droit,\n\nArrêt de travail pour raison médicale jusqu'au 3 juin 2024 inclusivement.\n\nmerci beaucoup\n\nNom du médecin : Georges, Barbara 530002\nSignature du médecin :\n\nRép. 1 2 3 4 5 6 NR\n\n- Cette ordonnance est une ordonnance originale.\n- Elle sera conservée au dossier et ne sera pas réutilisée.\n- Le pharmacien désigné ci-dessous est le seul destinataire\n\nNom : CHRISTIAN CHADI PHARMACIEN INC.\nFax : (450) 437-5763\n```",
+            "text_length": 957,
+            "pii_analysis": {
+              "names": [
+                "Steve TREMBLAY"
+              ],
+              "dates": [
+                "1991-03-17",
+                "2024-05-14",
+                "3 juin 2024"
+              ],
+              "addresses": [
+                "211 Avenue d'Albigny Sainte-Thérèse (Québec)"
+              ],
+              "postal_codes": [
+                "H7M 3L9",
+                "J7E 3J2"
+              ]
+            },
+            "total_pii_indicators": 7,
+            "pii_entities_found": 7,
+            "method": "openai_gpt4o",
+            "usage": {
+              "prompt_tokens": 791,
+              "completion_tokens": 319,
+              "total_tokens": 1110,
+              "estimated_cost": 0.00031005
+            },
+            "page_number": 1
+          }
+        ],
+        "pdf_status": "unlocked_with_password"
+      }
+    },
+    {
+      "file_name": "2023-07-07 -Formulaire Absence - Paternité.pdf",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/2023-07-07 -Formulaire Absence - Paternité.pdf",
+      "file_type": ".pdf",
+      "file_size_kb": 116.3,
+      "processing_results": {
+        "pdf_pages": [
+          {
+            "success": true,
+            "extracted_text": "Pa\n\n‘suthabert\n\nABSENCE / RETOUR AU TRAVAIL\n\nRéservé RH\n# matricule\n\nDOMAINE DU PERSONNEL\n\nF poo Distribution © D002 Fabrication\n\nTF 0003 Maître Saladier\n\nTF Root siège Social TRoo2csc T Rotisserie #\n\nIDENTIFICATION DE L’EMPLOYE\n\nNom BOUCHER Prénom | JOEL\nPoste Représentant mise en marché M CSE- Employé syndiqué\nService Détail - Admin M cse- Employé non syndiqué\nABSENCES\nM Joindre le certificat médical\n1” Maladie / Invalidité tial [CSE - ICD non payée\ntravaillé | | MM | 2 IT” cse -1CD payée\n[AVS - ILD - Date :\nM Heures cédulées non travaillées la journée de l'accident :\nD Joindre le certificat médical\nF cssr Dernier F Joindre l'horaire normal de travail\njour —\ntravaillé Joindre le formulaire (ADR /CSST)\nAAA MM 2 , .\n« l'avis de l'employeur et demande de remboursement »\nM cse- Payer 14 premiers jours à 90% du salaire net\nM Joindre le certificat médical\nP Joindre l'horaire normal de travail\n- T~ Joindre le formulaire (CSST)\n1 Retrait préventif Dernier « Demande de remboursement pour un retrait préventif de la travailleuse enceinte\ntravaillé ou qui allaite »\nD cse- Payer S premiers jours à 100% de son salaire\nas \"A D | csE- Payer 14 jours suivants à 90% de son salaire net\n[CSE - Infotype 0058\nnu ité . [AVS - Naissance - Date : __ 2023-07-07\n__ Maternité Dernier | 202 | o7 | 06 | ;\nVW Paternité jour aa wi n CSE - PA40 — Maternité - Date :\n- travaillé\nParental ss [CSE - PA4O — Parental Date :\nF 5\n_ Dernier Congé sans solde\nAutres jour T suspension\ntravaillé | 44 MM » Fr\nAutres :\nCOMMENTAIRES\n\nIl prendra deux semaines du 10 au 24 juillet 2023.\nS'il vous plait payer la journée du 7 juillet en congé de naissance.\n\nRETOUR AU TRAVAIL\n\npu\n\nAMA MH\n\nD AMAA\n\n# heures / jour prévus par semaine :\n\nM Retour progressif\n\nLe formulaire « Feuille de temps» doit être complété à chaque semaine pendant la période du retour progressif\n\nT” CSE - PA4O - Mesure de retour\n\nT” Se - PA61 - Remplacement horaire libre\n\n2023\n\nAAAA\n\n07\n\nAU mt\n\n24\n\nD\n\nrd à in\nM Retour à temps plein CSE - PA40 - Mesure de retour\n\n1 CSE - PA30 - 2003 - Délimiter - Remplacement horaire libre\n\nAPPROBATION\n\nSignature du gestionnaire :\n\nAudrey Sercia\n\nDate :2023-07-07\n\nFormulaire — Absences / Retour au travail\n\nMise à jour : 15 mai 2014\n",
+            "text_length": 2218,
+            "pii_analysis": {
+              "names": [
+                "Fabrication TF",
+                "Réservé RH",
+                "Saladier TF",
+                "Maternité Dernier",
+                "Nom BOUCHER"
+              ],
+              "dates": [
+                "15 mai 2014",
+                "24 juillet 2023",
+                "2023-07-07"
+              ]
+            },
+            "total_pii_indicators": 8,
+            "pii_entities_found": 8,
+            "method": "tesseract_fallback",
+            "usage": {
+              "prompt_tokens": 1139,
+              "completion_tokens": 9,
+              "total_tokens": 1148,
+              "estimated_cost": 0.00017624999999999997
+            },
+            "page_number": 1
+          }
+        ],
+        "pdf_status": "unlocked_with_password"
+      }
+    },
+    {
+      "file_name": "2024-05-01 demande de lemployeur (1).pdf",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/2024-05-01 demande de lemployeur (1).pdf",
+      "file_type": ".pdf",
+      "file_size_kb": 863.6,
+      "processing_results": {
+        "pdf_pages": [
+          {
+            "success": true,
+            "extracted_text": "Mm Manuvie Déclaration du promoteur de régime — Assurance collective\nDemande de prestation d’invalidité - Assurance collective\n\n+ Veuillez répondre à toutes les questions. Veuillez envoyer le formulaire dûment rempli à l'adresse suivante :\nP' q\n\n+ Veuillez joindre tout renseignement complémentaire Assurance collective, Manuvie\nRèglements Invalidité\n\npont, Selon vous, er sors tenircomptelorsde CP 400, succ. Place-d'Armes, Montréal (Québec) H2Y 3H1\nétude qu dossier de \"employe. Tél.: 1 866 236-6313 ou 514 288-6268 Téléc.: 1 866 292-9050 ou 514 286-6738\n+ Le présent avis doit être envoyé à Manuvie sans délai. Courriel : groupe_invalidite@manuvie.com\n\n1 Demande de Veuillez préciser le type de garantie pour laquelle le participant au régime soumet une demande de prestation :\nprestation @ invalidité de courte durée ©) Invalidité de longue durée +) Exonération de primes  {) Maladies graves ) Mutilation\n\n2 Renseignements\n\nsur le promoteur Numéro de contrat 0110893 Nom du promoteur de régime _Groupe St-Hubert\nde régime\nAdresse (numéro, rue et bureau) 1755 boul. Lionel-Bertrand\nVille Boisbriand Province QC Code postal J7NINS\nNo Pe ta corsonne ressource Amélie Taillefer Titre du poste Conseillère RH et avantages sociaux\nTéléphone 4504350674 Télécopieur Courriel ataillefer@ st-hubert.com\n\nCoordonnées des personnes-ressources du centre de santé et pour le retour au travail\nVeuillez fournir les renseignements sur la personne-ressource du centre de santé responsable des absences liées à l'invalidité, s'il s’agit d’une autre personne que celle indiquée ci-dessus.\n\nNom Titre du poste\n\nTéléphone Courriel\n\nS'il s’agit d'une autre personne que celle indiquée ci-dessus, veuillez fournir les renseignements sur la personne-ressource responsable du retour au travail lorsque les capacités et les limitations\nde l'employé sont connues.\n\nNom Titre du poste\n\nTéléphone Courriel\n\n3 Renseignements Re (orénom(s) et nom de famille) STEVE TREMBLAY\n\nsur le participant\n\nrégim I\nau regime et le Date de naissance (jj/mmmm/aaaa) 17/mars/1991\n\ntravail\nNuméro de certificat 20048 Téléphone principal Téléphone cellulaire\nCatégorie _20 Division B Titre du poste Coord. princ., transport\n\nEmployé permanent @ Oui © Non Date d'embauche (jj/mmmm/aaaa) 30/janv./2024\nA quelle date la couverture du participant est-elle entrée en vigueur dans le cadre du présent régime? Date (j{mmmm/aaaa} 30/janv./2024\nY at-il eu interruption de la couverture du participant au régime? Oo Oui @ Non\n\nVeuillez indiquer l'HORAIRE de travail d’une semaine normale.\nS'agit-il d'un travail par quarts?  (} Oui  @ Non\n\nSi oui, veuillez indiquer l'horaire de travail ou joindre une copie de celui-ci.\n\nJours Lundi Mardi Mercredi Jeudi Vendredi Samedi Dimanche\n\nHoraire de travail\nquotidien\n\nVeuillez fournir des précisions si l'horaire de travail du participant au régime est rotatif ou variable :\n\nLe participant doit-il effectuer des quarts de nuit? CO Oui © Non\n\nSalaire brut du participant au régime à son dernier jour de travail 1307.69 $ C2 Par semaine (>) Par mois\nLe participant au régime est un : @ Employé salarié ©) Employé horaire\n\nQuelle est la date de la dernière journée de travail du participant? Date (j{mmmm/aaaa) 15/mars/2024\n\nLa Compagnie d’Assurance-Vie Manufacturers Page 1 de 3 GL5448F (03/2017)\n",
+            "text_length": 3285,
+            "pii_analysis": {
+              "emails": [
+                "groupe_invalidite@manuvie.com"
+              ],
+              "phone_numbers": [
+                "866 292-9050",
+                "514 288-6268",
+                "866 236-6313",
+                "514 286-6738",
+                "4504350674"
+              ],
+              "names": [
+                "Conseillère RH"
+              ],
+              "postal_codes": [
+                "20048",
+                "H2Y 3H1"
+              ]
+            },
+            "total_pii_indicators": 9,
+            "pii_entities_found": 9,
+            "method": "tesseract_fallback",
+            "usage": {
+              "prompt_tokens": 791,
+              "completion_tokens": 9,
+              "total_tokens": 800,
+              "estimated_cost": 0.00012405
+            },
+            "page_number": 1
+          },
+          {
+            "success": true,
+            "extracted_text": "3 Renseignements S'agissait-il d'une journée complète ou d'un quart complet? = @ Oui  {) Non\nsur le participant\nau régime et le Si non, combien d'heures de travail ont été effectuées? L'absence est-elle liée au travail? ©) Oui  @ Non\n\ntravail (suite\n( ) Quelle est la date de la première journée de travail manquée par le participant? Date {j/mmmm/aaas) 18/mars/2024\nLe participant est-il retourné au travail? © Oui @ Non — Si oui, quand? Date (j/ÿmmmm/aaaa)\n\nDans le cadre de son retour au travail, le participant effectue : ©) Ses tâches habituelles O Des tâches modifiées\n\nRenseignements fiscaux — ne remplir que si les prestations sont imposables\n\nCode TD1 Code TP1 Veuillez indiquer la province de résidence du participant aux fins de l'impôt sur le revenu\n\nLe revenu d'emploi est-il exempté selon les dispositions de la Loi sur les Indiens et de la Loi de l'impôt sur le revenu? ©) Oui (©) Non Si oui, veuillez fournir une copie du formulaire TD1-IN.\n\nVeuillez indiquer si les prestations suivantes ont été versées (ou sont payables) depuis la date de la dernière journée de travail du participant.\n\nMontant Dates (jj{mmmm/aaaa)\nContinuation du salaire Du au\nVacances Du au\nCongés de maladie Du au\nIndemnité de départ Du au\nPrestations d’assurance-emploi Du au\nAutre* Du au\n\n(veuillez préciser de quelle source)\n\n* Par exemple : prestations d'invalidité de courte durée, commissions, bonis ou rente de retraite. Si vous manquez d'espace, veuillez joindre une feuille distincte.\n\n4 Assurance vie Remplissez la présente section pour les régimes autogérés demandant l'exonération de primes ou veuillez\nfournir une copie de la demande d’adhésion.\n\nAssurance vie collective\n\nNuméro de contrat Division Date d'effet de la couverture (j{mmmm/aaaa)\n\nSalaire annuel $ Date de la dernière augmentation (jj/mmmm/aaaa)\nEtat de la couverture d'assurance vie lors de la dernière journée où le participant a été effectivement au travail ©) Résiliée ©) Active ©) Suspendue\n\nMontant de la couverture d'assurance vie\n\n© De base $ © Du conjoint $ © Des enfants à charge $\n© Facultative $ © Facultative du conjoint $ () Autre $\n\n(veuillez préciser)\nAssurance décès et mutilation accidentels (DMA)\n\nNuméro de contrat Division Date d'effet de la couverture (j/{mmmm/aaaa)\n\nMontant de la couverture d'assurance DMA\n© De base $ © Facultative $ © Du conjoint $ © Facultative du conjoint $\n\nRente de survie\n\nNuméro de contrat Division Date d'effet de la couverture (jj/mmmm/aaaa)\n\nMontant mensuel de la rente de survie $ Type de couverture oO Conjoint oO Conjoint et enfants oO Autre\n(veuillez préciser)\n\nAssurance maladies graves\n\nNuméro de contrat Division Date d'effet de la couverture (j{mmmm/aaaa)\n\nMontant d'assurance maladies graves\n\nPS\n\n© De base du participant $ © Facultative du participant $ ©) Du conjoint $ (Des enfants $\n\n5 Déclaration Je certifie que tous les renseignements fournis sont, à ma connaissance, véridiques et complets.\n\nNom Amélie Taillefer Titre Cons. RH\niA 01-05-2024\n\ni nea vi. Date (j/mmmm/aaaa)\n\n)\n\nLa Compagnie d’Assurance-Vie Manufacturers Page 2 de 3 GL5448F (03/2017)\n\nSignature\n\n",
+            "text_length": 3097,
+            "pii_analysis": {
+              "dates": [
+                "01-05-2024"
+              ]
+            },
+            "total_pii_indicators": 1,
+            "pii_entities_found": 1,
+            "method": "tesseract_fallback",
+            "usage": {
+              "prompt_tokens": 791,
+              "completion_tokens": 9,
+              "total_tokens": 800,
+              "estimated_cost": 0.00012405
+            },
+            "page_number": 2
+          }
+        ],
+        "pdf_status": "unlocked_with_password"
+      }
+    },
+    {
+      "file_name": "test_pii_document.txt",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/test_pii_document.txt",
+      "file_type": ".txt",
+      "file_size_kb": 0.7,
+      "processing_results": {
+        "direct_text": {
+          "success": true,
+          "text_length": 739,
+          "preview": "Employee Information Form\n\nName: Jean Dupont\nEmail: jean.dupont@example.com\nPhone: (514) 123-4567\nDate of Birth: January 15, 1985\nAddress: 123 Main Street, Montreal, QC\nPostal Code: H1A 2B3\nEmployee ID: EMP12345\n\nEmergency Contact:\nName: Marie Dupont\nPhone: +1-514-987-6543\nEmail: marie.dupont@gmail...."
+        }
+      }
+    },
+    {
+      "file_name": "b3965576-c316-467c-b2c6-df28e8581236.jpg",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/b3965576-c316-467c-b2c6-df28e8581236.jpg",
+      "file_type": ".jpg",
+      "file_size_kb": 34.8,
+      "processing_results": {
+        "llm_ocr": {
+          "success": true,
+          "extracted_text": "Centre intégré\nde santé et de services sociaux\nde Laval\n\nQuébec\n\nCLINIQUE DE MÉDECINE FAMILIALE\nGMF-Universitaire Laval (Hôpital Cité-de-la-Santé)\n1755, boul. René Laennec (Bloc F), Laval (Québec) H7M 3L9\nTéléphone : (450) 975-5444 Télécopieur : (450) 975-5497\n\nNom, Prénom : TREMBLAY, Steve\n\nDate de naissance : 1991-03-17\n\nAdresse : 211 Avenue d'Albigny Sainte-Thérèse (Québec)\nJ7E 2J2\n\nDate : 2024-04-12\n\nTéléphone du patient (438) 462-3020\n\nNAM : TRES 9103 1716 2031-03\n\nRX\n\nÀ qui de droit,\n\nArrêt de travail jusqu'au 14/05/2024 inclusivement pour raison médicale\n\nmerci\n\nNom du médecin : Georges, Barbara ; 530002\n\nSignature du médecin :\n\nRépt. 1 2 3 4 5 6 NR\n\nNom : CHRISTIAN CHADI PHARMACIEN INC.\n\nFax : (450) 437-5763\n\n- Cette ordonnance est une ordonnance originale.\n- Elle sera conservée au dossier et ne sera pas réutilisée.\n- Le pharmacien désigné ci-dessous est le seul destinataire",
+          "text_length": 895,
+          "pii_analysis": {
+            "names": [
+              "Steve TREMBLAY"
+            ],
+            "dates": [
+              "1991-03-17",
+              "2024-04-12",
+              "14/05/2024"
+            ],
+            "addresses": [
+              "211 Avenue d'Albigny Sainte-Thérèse (Québec)"
+            ],
+            "postal_codes": [
+              "J7E 2J2",
+              "H7M 3L9"
+            ]
+          },
+          "total_pii_indicators": 7,
+          "pii_entities_found": 7,
+          "method": "openai_gpt4o",
+          "usage": {
+            "prompt_tokens": 791,
+            "completion_tokens": 304,
+            "total_tokens": 1095,
+            "estimated_cost": 0.00030104999999999997
+          }
+        }
+      }
+    },
+    {
+      "file_name": "Souad Touati - Curriculum Vitae.pdf",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/Souad Touati - Curriculum Vitae.pdf",
+      "file_type": ".pdf",
+      "file_size_kb": 897.5,
+      "processing_results": {
+        "pdf_pages": [
+          {
+            "success": true,
+            "extracted_text": "Souad TOUATI\n\n1680, rue de L’Avocatier, Terrebonne (QC) J7M OJ1 souad.touati@hotmail.com — (438) 992 9029\nSYNTHESE DES COMPETENCES\n\no Très bonne capacité d’analyse des coûts, à consolider et remonter les informations financières dans les\ndélais\n0 Capacité établie à mettre en place des tableaux de suivi et d’analyse automatisés (grande\n\nhabilité avec les bases de données}\n\n0 Informatique : Excel avancé, D365, Vision, SAP, VAM (Epsilia), Acomba, Nethris, Ceridian, ADP\n\nO Esprit analytique, rigueur, rapidité d’adaptation, autonomie\n\nEXPERIENCES PROFESSIONNELLES\n\nANALYSTE FINANCIER 2022/10 — A aujourd’hui\nACCEO SOLUTION INC, DIVISION DU GROUPE HARRIS COMPUTER SYSTEMS\nFournisseur de services professionnels variés sur le marché des technologies de l'information — Québec\n\n-  Participer au processus de clôture de fin de mois, de fin de trimestre et de fin d'année\n\n-__ Préparer et comptabiliser diverses opérations de compte\n\n- Reporting mensuel au siège\n\n-  Effectuer diverses analyses du bilan et des rapports financiers\n\n-  Refacturation projets\n\n- Identifier, améliorer et optimiser les processus comptables\n\n-  Gérer, interpréter et manipuler des données financières provenant de diverses sources de systèmes\nd’information\n\n-  Participer aux projets spéciaux et aux rapports ad hoc requis par le contrôleur\n\nANALYSTE Financier 2020/02 — 2022/10\nDEMIX CONSTRUCTION, DIVISION DU GROUPE CRH CANDA INC.\nEntrepreneur majeur en construction des routes et génie civil — Laval\n\n-  Suivre les coûts et marges par projet\n\n-  Produire et analyser les résultats financiers mensuels et de fin d'exercice\n\n-  Effectuer le reporting mensuel au siège social\n\n-  Suivre et analyser les comptes de bilan\n\n-  Appuyer l’équipe des comptes payables et de paie en haute saison\n\n-  Assurer la conformité avec l'acte de Sarbanes-Oxley (SOX) dans les rapports financiers\n\n- Divers : conciliation bancaire, prévision hebdo du cashflow, refacturation du transport et des heures\nd'utilisation d’équipement aux projets, refacturation intercompagnie, suivi des actifs, demande de lettre CCQ\net CNESST, maintenance du systéme informatique\n",
+            "text_length": 2117,
+            "pii_analysis": {
+              "emails": [
+                "souad.touati@hotmail.com"
+              ],
+              "names": [
+                "Souad TOUATI"
+              ],
+              "addresses": [
+                "10\nDEMIX CONSTRUCTION, DIVISION DU GROUPE CRH CANDA INC"
+              ]
+            },
+            "total_pii_indicators": 3,
+            "pii_entities_found": 3,
+            "method": "tesseract_fallback",
+            "usage": {
+              "prompt_tokens": 791,
+              "completion_tokens": 9,
+              "total_tokens": 800,
+              "estimated_cost": 0.00012405
+            },
+            "page_number": 1
+          },
+          {
+            "success": true,
+            "extracted_text": "ANALYSTE FINANCIER ET PRIX DE REVIENT 2013 - 2020/01\nECOLAIT LTÉE acheté par MONTPAK INTERNATIONAL INC. (en nov.2017)\nProduction et transformation de veau, d’agneau et bœuf — Terrebonne ... puis... Laval\n\nm Comptabilité financière :\n-  Produire et analyser les états financiers mensuels (cycle comptable complet, écritures de régularisation,\nanalyse des écarts, écritures interco, analyse de comptes de bilan)\n- Comptabiliser et analyser les paies\n-  Produire les conciliations bancaires mensuelles (suivi trésorerie)\n-  Suivre et comptabiliser les actifs immobilisés\n-  Préparer les dossiers de vérification annuelle\n- Optimiser les procédures et processus comptables\n\nmw Coût de revient :\n- Mettre en place un système de calcul des coûts\n-  Maintenir les fiches produit et les coûts de revient\n-  Elaborer des rapports d'analyse de coûts, de vente, de rentabilité, de rendement de production\n-  Suivre et valoriser les inventaires\n-  Participer aux inventaires physiques et analyser les écarts d'inventaire\n\n= Projet divers:\n- Mise en place d’un logiciel de gestion électronique de documents avec archivage et approbation électronique\n- Mise en place un système de consommation informatique\n-  Participer à l'implantation d’un nouveau système de paie et gestion de temps (Ceridian)\n\nANALYSTE ADJOINT - PRIX DE REVIENT 2006 -2012\nL'ORÉAL, site de production de produits cosmétiques et de styling — Saint-Quentin (France)\n\nH Contrôle :\n-  Assurer le calcul, l'analyse et la révision des prix de revient industriel des produits\n- Analyser les écarts entre les coûts standards et les coûts réels\n-  Etablir les travaux de clôture du résultat de gestion mensuel\n-  Participer aux réunions de gestion mensuelles : présentation et analyse des résultats\n-  Elaborer et mettre à jour des tableaux de bord opérationnels\n- Analyser les provisions pour stocks et produire les documents de synthèse\n-  Suivre les résultats des inventaires périodiques et organiser les activités des inventaires annuels\n-  Participer aux activités de vérifications annuelles et au processus budgétaire\n-  Assurer l'application des bonnes pratiques de gestion\n\n= Projet:\n-  Participer au déploiement de SAP : analyse des processus, réalisation des tests de simulation, mise à jour\ndes données\n- Mettre en place des procédures : formalisation des processus, formation du personnel\n\nFORMATION\n\nMaster en finance contréle de gestion 2006\nINSTITUT D’ADMINISTRATION DES ENTREPRISES — Orléans (France)\n\nLicence en administration et management de la performance 2004\nINSTITUT UNIVERSITAIRE PROFESSIONNALISE : MANAGEMENT ET GESTION DES ENTREPRISES — Clermont-Ferrand (France)\n",
+            "text_length": 2638,
+            "pii_analysis": {},
+            "total_pii_indicators": 0,
+            "pii_entities_found": 0,
+            "method": "tesseract_fallback",
+            "usage": {
+              "prompt_tokens": 791,
+              "completion_tokens": 9,
+              "total_tokens": 800,
+              "estimated_cost": 0.00012405
+            },
+            "page_number": 2
+          }
+        ],
+        "pdf_status": "unlocked_with_password"
+      }
+    },
+    {
+      "file_name": "specimen cheque - Souad Touati.pdf",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/specimen cheque - Souad Touati.pdf",
+      "file_type": ".pdf",
+      "file_size_kb": 782.5,
+      "processing_results": {
+        "pdf_pages": [
+          {
+            "success": true,
+            "extracted_text": "nen\n\n0550\n\n_——$ Vang\nv Labgue pemearie G08 Sarna! TT\nSAT [BA TT GT TTT ee OT.\n\nNOM: —————————————_—_—\nTD CANADA TRUST\n\nADRESSE: a\n590, -DES-NEIGES\nDER H3S 1Z5\nTÉLÉPHONE: NS | REOR\nay ¢ changes\" . r- :\nN DRE i E quis > ae a one! ng _ J |\nBe oe how à quantity A |\nan 00 DOLLARS .\nperine ite —-\nnun ise colour VO Î D\ndi\n\nPOUR\nPAR\n\nDATE J J M M A A À A\n\nW\"OO0S550O\" 1LAO8dwOOLE 0O07kmELO?795SEI\n\n",
+            "text_length": 392,
+            "pii_analysis": {
+              "addresses": [],
+              "postal_codes": [
+                "H3S 1Z5"
+              ]
+            },
+            "total_pii_indicators": 1,
+            "pii_entities_found": 1,
+            "method": "tesseract_fallback",
+            "usage": {
+              "prompt_tokens": 1471,
+              "completion_tokens": 9,
+              "total_tokens": 1480,
+              "estimated_cost": 0.00022604999999999997
+            },
+            "page_number": 1
+          }
+        ],
+        "pdf_status": "unlocked_with_password"
+      }
+    },
+    {
+      "file_name": "e1c64004-1dd8-43a2-b2fc-6d3e7ca37b76.jpg",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/e1c64004-1dd8-43a2-b2fc-6d3e7ca37b76.jpg",
+      "file_type": ".jpg",
+      "file_size_kb": 67.5,
+      "processing_results": {
+        "llm_ocr": {
+          "success": true,
+          "extracted_text": "**Siège social**\n\n95, boul. de la Cité-des-Jeunes  \nGatineau (QC) J8Y 6X3  \nTéléphone : 819 778-2425  \nTélécopieur : 819 778-2426  \nCourriel : conf@cfo.coop  \n\n**Secteur Hull**\n\n95, boul. de la Cité-des-Jeunes  \nGatineau (Québec) J8Y 6X3  \nTéléphone : 819 778-2425  \nTélécopieur : 819 778-2426  \nCourriel : conf@cfo.coop  \n\n**PREUVE DE DÉCÈS DU DIRECTEUR FUNÉRAIRE**\n\nLusignan  \nNom de famille\n\nRoger  \nPrénom\n\nMasculin  \nSexe\n\n10 mars 2023  \nDate du décès\n\n7545827  \nNuméro SP3, SP4 ou de l'avis au coroner :\n\nDre Sophie Charette - 01889  \nNom du médecin\n\nMaison des Collines (soins palliatifs)  \nLieu du décès\n\n**Informations complémentaires**\n\nfournies par un proche de la personne décédée\n\nVeuf(ve)  \nÉtat civil\n\n405 175 332  \nNuméro d'assurance sociale\n\nJean-Wilfred Lusignan  \nNom complet du père\n\nGermaine Fortin  \nNom complet de la mère\n\nOttawa, Ontario, Canada  \nLieu de naissance\n\n9 février 1943  \nDate de naissance\n\n292 Av Des Paysans, Gatineau, Québec, Canada, J9J 1T5  \nDomicile\n\nCoopérative funéraire de l'Outaouais  \nLieu de la crémation\n\n15 mars 2023  \nDate\n\nEN FOI DE QUOI, je déclare détenir le bulletin de décès ou  \nl'autorisation de disposition du corps émise par le coroner et je signe  \nla présente en tant que directeur de funérailles, ou son représentant  \ndument mandaté, détenant le permis numéro :\n\n19FUN0145  \n\n13 mars 2023  \nDate\n\n(Signature)  \nSignature du représentant mandaté pour  \nla Coopérative Funéraire de l'Outaouais",
+          "text_length": 1455,
+          "pii_analysis": {
+            "emails": [
+              "conf@cfo.coop"
+            ],
+            "phone_numbers": [
+              "819 778-2425",
+              "819 778-2426"
+            ],
+            "dates": [
+              "9 février 1943",
+              "15 mars 2023",
+              "10 mars 2023",
+              "13 mars 2023"
+            ],
+            "addresses": [
+              "2023  \nDate\n\nEN FOI DE QUOI, je",
+              "292 Av Des Paysans, Gatineau"
+            ],
+            "social_insurance_numbers": [
+              "405 175 332"
+            ],
+            "postal_codes": [
+              "J9J 1T5",
+              "01889",
+              "J8Y 6X3"
+            ]
+          },
+          "total_pii_indicators": 13,
+          "pii_entities_found": 13,
+          "method": "openai_gpt4o",
+          "usage": {
+            "prompt_tokens": 791,
+            "completion_tokens": 468,
+            "total_tokens": 1259,
+            "estimated_cost": 0.00039945
+          }
+        }
+      }
+    },
+    {
+      "file_name": "Compilation - Formulaire de consentement employé.e _ Employee Consent Form(1-41)_2025-04-07.xlsx",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/Compilation - Formulaire de consentement employé.e _ Employee Consent Form(1-41)_2025-04-07.xlsx",
+      "file_type": ".xlsx",
+      "file_size_kb": 25.5,
+      "processing_results": {
+        "office_extraction": {
+          "success": true,
+          "text_content": "\n--- Sheet: Sheet1 ---\nID | Heure de début | Heure de fin | Adresse de messagerie | Nom | Nom | Last name | Prénom | First name | Lieu de travail | Work Location | Date d'approbation | Approved on | Diffuser, à l’interne seulement, ma photo d’employé.e. Lors d’événements corporatifs, un photographe est invité afin de prendre des photos et celles-ci sont diffusées sur intranet.\nDisplay my employee photo in-house only. A photographer is invited at corp | Divulguer mon jour et mois de naissance seulement pour recevoir des vœux de fête lors de cette journée.\nDisclose my birth date (day and month) only to receive festive greetings on that day. | Divulguer ma date d’embauche afin de souligner mes années de service à chaque année.\nDisclose my hiring date to acknowledge my years of service each year. | Participer aux concours internes et publier mon nom ainsi que le prix gagné, le cas échéant.\nTake part in office contests and publish my name and the prize won, if applicable. | Publier de l’information me concernant à ma demande. Exemples : décès familial, naissance.\nPublish information about me at my request. Examples: family death, birth.\n1 | 2023-09-29 14:13:50 | 2023-09-29 14:15:39 | anonymous | Therrien | Julien | Boisbriand | 2023-09-29 00:00:00 | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2023-09-29 14:13:50\nName: 2023-09-29 14:15:39\nName: 2023-09-29 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: NON, je ne consens pas. | NO, I don't agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n2 | 2023-10-04 08:14:18 | 2023-10-04 08:18:34 | anonymous | Grégoire | Mathieu | Boisbriand – Lionel-Bertrand | 2023-10-04 00:00:00 | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree.\nName: 2023-10-04 08:14:18\nName: 2023-10-04 08:18:34\nName: Boisbriand – Lionel-Bertrand\nName: 2023-10-04 00:00:00\nName: NON, je ne consens pas. | NO, I don't agree.\nName: NON, je ne consens pas. | NO, I don't agree.\nName: NON, je ne consens pas. | NO, I don't agree.\nName: NON, je ne consens pas. | NO, I don't agree.\nName: NON, je ne consens pas. | NO, I don't agree.\n3 | 2024-01-03 13:16:10 | 2024-01-03 15:31:44 | anonymous | Mian | Jay | remote (Ontario home base) | 2024-01-03 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-01-03 13:16:10\nName: 2024-01-03 15:31:44\nName: remote (Ontario home base)\nName: 2024-01-03 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n4 | 2024-01-05 07:32:55 | 2024-01-05 07:34:06 | anonymous | Wu-Huo | Tiffany | Boisbriand | 2024-01-05 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-01-05 07:32:55\nName: 2024-01-05 07:34:06\nName: 2024-01-05 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n5 | 2024-01-05 08:22:57 | 2024-01-05 08:24:32 | anonymous | Lupien | Jennifer | Boisbriand | 2024-01-03 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-01-05 08:22:57\nName: 2024-01-05 08:24:32\nName: 2024-01-03 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n6 | 2024-02-13 15:48:43 | 2024-02-13 15:50:30 | anonymous | Lemieux | Camille | Quebec | 2024-02-13 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-02-13 15:48:43\nName: 2024-02-13 15:50:30\nName: 2024-02-13 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n7 | 2024-02-21 20:48:18 | 2024-02-21 20:50:20 | anonymous | Picard | Alexandra | 1755 Bd Lionel Bertrand, Boisbriand, Quebec, J7H 1N8 | 2024-02-21 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-02-21 20:48:18\nName: 2024-02-21 20:50:20\nName: 1755 Bd Lionel Bertrand, Boisbriand, Quebec, J7H 1N8\nName: 2024-02-21 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n8 | 2024-03-26 16:17:21 | 2024-03-26 16:19:06 | anonymous | Negue | Eugenio-Cedric | Boisbriand | 2024-03-26 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree.\nName: 2024-03-26 16:17:21\nName: 2024-03-26 16:19:06\nName: 2024-03-26 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: NON, je ne consens pas. | NO, I don't agree.\n9 | 2024-04-23 09:22:23 | 2024-04-23 09:22:59 | anonymous | Gionet | Daniel | Dieppe | 2024-04-24 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-04-23 09:22:23\nName: 2024-04-23 09:22:59\nName: 2024-04-24 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n10 | 2024-04-23 09:26:46 | 2024-04-23 09:27:33 | anonymous | Gionet | Daniel | Dieppe | 2024-04-22 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-04-23 09:26:46\nName: 2024-04-23 09:27:33\nName: 2024-04-22 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n11 | 2024-04-26 09:59:53 | 2024-04-26 10:00:26 | anonymous | Gionet | Daniel | Moncton | 2024-04-22 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-04-26 09:59:53\nName: 2024-04-26 10:00:26\nName: 2024-04-22 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n12 | 2024-04-30 15:11:17 | 2024-04-30 15:13:01 | anonymous | Bluteau | Jean-Philippe | Boisbriand | 2024-04-22 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-04-30 15:11:17\nName: 2024-04-30 15:13:01\nName: 2024-04-22 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n13 | 2024-05-01 09:53:52 | 2024-05-01 09:54:29 | anonymous | Bédard | Marie-Ève | Boisbriand (Siège social) | 2024-05-01 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-05-01 09:53:52\nName: 2024-05-01 09:54:29\nName: Boisbriand (Siège social)\nName: 2024-05-01 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n14 | 2024-05-02 12:10:16 | 2024-05-02 12:11:59 | anonymous | Provost | Frederic | Sur la route | 2024-04-29 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-05-02 12:10:16\nName: 2024-05-02 12:11:59\nName: Sur la route\nName: 2024-04-29 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n15 | 2024-05-14 14:05:18 | 2024-05-14 14:06:21 | anonymous | Thibault | Philippe | Blainville | 2024-05-14 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-05-14 14:05:18\nName: 2024-05-14 14:06:21\nName: 2024-05-14 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n16 | 2024-05-30 09:24:54 | 2024-05-30 09:27:44 | anonymous | Ferrari | Kelly-Ann | Boisbriand | 2024-05-30 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-05-30 09:24:54\nName: 2024-05-30 09:27:44\nName: 2024-05-30 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n17 | 2024-06-04 15:34:36 | 2024-06-04 15:36:22 | anonymous | Issa | Sébastien | Restaurants Corporatifs | 2024-06-04 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-06-04 15:34:36\nName: 2024-06-04 15:36:22\nName: Restaurants Corporatifs\nName: 2024-06-04 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n18 | 2024-06-18 15:04:32 | 2024-06-18 15:06:45 | anonymous | Morel | Véronique | Boisbriand | 2024-06-12 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-06-18 15:04:32\nName: 2024-06-18 15:06:45\nName: 2024-06-12 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n19 | 2024-06-21 08:26:13 | 2024-06-21 08:27:51 | anonymous | Ségeat | Stéphane | Groupe St-Hubert | 2024-06-17 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-06-21 08:26:13\nName: 2024-06-21 08:27:51\nName: Groupe St-Hubert\nName: 2024-06-17 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n20 | 2024-07-10 09:30:30 | 2024-07-10 09:32:05 | anonymous | Chouinard | Frédérick | Siège social Boisbriand | 2024-07-10 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-07-10 09:30:30\nName: 2024-07-10 09:32:05\nName: Siège social Boisbriand\nName: 2024-07-10 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n21 | 2024-07-29 10:46:49 | 2024-07-29 10:48:37 | anonymous | Brosseau | Guylaine | Sièege social Boisbriand | 2024-07-29 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-07-29 10:46:49\nName: 2024-07-29 10:48:37\nName: Sièege social Boisbriand\nName: 2024-07-29 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n22 | 2024-08-09 10:03:50 | 2024-08-09 10:06:12 | anonymous | Hutcheson | Paul | Gananoque | 2024-08-05 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree.\nName: 2024-08-09 10:03:50\nName: 2024-08-09 10:06:12\nName: 2024-08-05 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: NON, je ne consens pas. | NO, I don't agree.\n23 | 2024-08-21 13:36:18 | 2024-08-21 13:40:54 | anonymous | Bélisle | Maude | Boisbriand | 2024-08-21 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-08-21 13:36:18\nName: 2024-08-21 13:40:54\nName: 2024-08-21 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n24 | 2024-08-27 17:01:49 | 2024-08-27 17:03:07 | anonymous | Rondeau | Denis | Mascouche | 2024-08-27 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-08-27 17:01:49\nName: 2024-08-27 17:03:07\nName: 2024-08-27 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n25 | 2024-08-28 10:47:08 | 2024-08-28 10:51:38 | anonymous | Genevieve | Lefebvre | Boisbriand | 2024-08-28 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-08-28 10:47:08\nName: 2024-08-28 10:51:38\nName: 2024-08-28 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n26 | 2024-09-11 15:02:34 | 2024-09-11 15:06:07 | anonymous | Catineau | Guillaume | siege social boisbriand | 2024-09-11 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-09-11 15:02:34\nName: 2024-09-11 15:06:07\nName: siege social boisbriand\nName: 2024-09-11 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n27 | 2024-09-12 10:37:16 | 2024-09-12 10:38:24 | anonymous | Thimot | Bettina | Boisbriand et télétravail | 2024-09-12 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-09-12 10:37:16\nName: 2024-09-12 10:38:24\nName: Boisbriand et télétravail\nName: 2024-09-12 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n28 | 2024-11-12 16:08:33 | 2024-11-12 16:09:47 | anonymous | Desjardins | Philippe | Boisbriand | 2024-11-12 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-11-12 16:08:33\nName: 2024-11-12 16:09:47\nName: 2024-11-12 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n29 | 2024-11-25 16:25:12 | 2024-11-25 16:26:33 | anonymous | simard | alexandre | siege social Boisbriand | 2024-11-25 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-11-25 16:25:12\nName: 2024-11-25 16:26:33\nName: siege social Boisbriand\nName: 2024-11-25 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n30 | 2024-12-03 15:50:42 | 2024-12-03 15:51:35 | anonymous | Richer | Fannie | Blainville | 2024-12-03 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-12-03 15:50:42\nName: 2024-12-03 15:51:35\nName: 2024-12-03 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n31 | 2024-12-04 14:01:32 | 2024-12-04 14:06:12 | anonymous | Munoz | Rommy-Michelle | Centre de distribution Mascouche | 2024-12-04 00:00:00 | NON, je ne consens pas. | NO, I don't agree. | NON, je ne consens pas. | NO, I don't agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree.\nName: 2024-12-04 14:01:32\nName: 2024-12-04 14:06:12\nName: Centre de distribution Mascouche\nName: 2024-12-04 00:00:00\nName: NON, je ne consens pas. | NO, I don't agree.\nName: NON, je ne consens pas. | NO, I don't agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: NON, je ne consens pas. | NO, I don't agree.\n32 | 2024-12-04 14:28:17 | 2024-12-04 15:05:31 | anonymous | Grasso | Raffaela | Boisbriands | 2024-12-04 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2024-12-04 14:28:17\nName: 2024-12-04 15:05:31\nName: 2024-12-04 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n33 | 2025-01-07 16:14:39 | 2025-01-07 16:16:05 | anonymous | Hilario | Paulo | Boisbriand | 2025-01-07 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2025-01-07 16:14:39\nName: 2025-01-07 16:16:05\nName: 2025-01-07 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n34 | 2025-01-08 12:18:17 | 2025-01-08 12:19:36 | anonymous | Canuel | Stephane | Boisbriand | 2025-01-06 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2025-01-08 12:18:17\nName: 2025-01-08 12:19:36\nName: 2025-01-06 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n35 | 2025-01-21 11:37:45 | 2025-01-21 11:39:20 | anonymous | Lampron | Benoît | Boisbriand | 2025-01-21 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2025-01-21 11:37:45\nName: 2025-01-21 11:39:20\nName: 2025-01-21 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n36 | 2025-01-29 08:10:16 | 2025-01-29 08:11:54 | anonymous | Landry | Frédérike | Boisbriand | 2025-01-29 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2025-01-29 08:10:16\nName: 2025-01-29 08:11:54\nName: 2025-01-29 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n37 | 2025-02-12 06:49:01 | 2025-02-12 06:51:02 | anonymous | Habib | Joseph | Boisbriand | 2025-02-10 00:00:00 | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | NON, je ne consens pas. | NO, I don't agree.\nName: 2025-02-12 06:49:01\nName: 2025-02-12 06:51:02\nName: 2025-02-10 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: NON, je ne consens pas. | NO, I don't agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: NON, je ne consens pas. | NO, I don't agree.\n38 | 2025-03-14 08:08:11 | 2025-03-14 08:10:26 | anonymous | Bélanger-De Ville | Catherine | Boisbriand | 2025-03-14 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2025-03-14 08:08:11\nName: 2025-03-14 08:10:26\nName: Bélanger-De Ville\nName: 2025-03-14 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n39 | 2025-03-19 09:45:50 | 2025-03-19 09:46:31 | anonymous | Morin | David | Boisbriand | 2025-03-19 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2025-03-19 09:45:50\nName: 2025-03-19 09:46:31\nName: 2025-03-19 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n40 | 2025-03-24 16:20:05 | 2025-03-24 16:21:11 | anonymous | Miville-Deschênes | Patrick | Boisbriand | 2025-03-24 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2025-03-24 16:20:05\nName: 2025-03-24 16:21:11\nName: 2025-03-24 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n41 | 2025-03-26 15:06:13 | 2025-03-26 15:08:42 | anonymous | Dunn | Lauriane | Boisbriand | 2025-03-26 00:00:00 | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree. | OUI, je consens. | YES, I agree.\nName: 2025-03-26 15:06:13\nName: 2025-03-26 15:08:42\nName: 2025-03-26 00:00:00\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\nName: OUI, je consens. | YES, I agree.\n\n--- Sheet: Feuil1 ---",
+          "text_length": 25179,
+          "method": "password_aware_extraction",
+          "extracted_pii": {
+            "names": [
+              "Ann Boisbriand",
+              "De Ville",
+              "Bédard Marie-",
+              "Prénom First",
+              "Philippe Boisbriand",
+              "Lampron Benoît",
+              "Chouinard Frédérick",
+              "Mian Jay",
+              "Landry Frédérike",
+              "Ville Catherine",
+              "Issa Sébastien",
+              "Ferrari Kelly-",
+              "Catineau Guillaume",
+              "Restaurants Corporatifs",
+              "Grégoire Mathieu",
+              "Grasso Raffaela",
+              "Nom Nom",
+              "Bluteau Jean-",
+              "Thibault Philippe",
+              "Negue Eugenio-",
+              "Bélisle Maude",
+              "Desjardins Philippe",
+              "Habib Joseph",
+              "Brosseau Guylaine",
+              "Therrien Julien",
+              "Lemieux Camille",
+              "Gionet Daniel",
+              "Genevieve Lefebvre",
+              "Munoz Rommy-",
+              "Provost Frederic",
+              "Morin David",
+              "Dunn Lauriane",
+              "Cedric Boisbriand",
+              "Hilario Paulo",
+              "Richer Fannie",
+              "Rondeau Denis",
+              "Hutcheson Paul",
+              "Huo Tiffany",
+              "Canuel Stephane",
+              "Picard Alexandra",
+              "Ségeat Stéphane",
+              "Thimot Bettina",
+              "Morel Véronique",
+              "Deschênes Patrick",
+              "Lupien Jennifer"
+            ],
+            "dates": [
+              "2024-11-12",
+              "2025-03-24",
+              "2024-12-04",
+              "2024-06-18",
+              "2024-04-23",
+              "2025-01-21",
+              "2025-02-10",
+              "2024-05-14",
+              "2024-08-27",
+              "2024-03-26",
+              "2024-02-13",
+              "2024-06-04",
+              "2024-08-09",
+              "2024-05-30",
+              "2025-03-19",
+              "2024-04-29",
+              "2023-10-04",
+              "2024-06-21",
+              "2024-11-25",
+              "2023-09-29",
+              "2024-09-12",
+              "2024-09-11",
+              "2024-07-10",
+              "2025-01-08",
+              "2025-01-06",
+              "2024-08-28",
+              "2025-01-07",
+              "2025-01-29",
+              "2024-04-22",
+              "2024-04-30",
+              "2024-04-26",
+              "2024-02-21",
+              "2024-01-03",
+              "2025-03-14",
+              "2024-05-01",
+              "2024-06-12",
+              "2025-03-26",
+              "2024-04-24",
+              "2024-07-29",
+              "2024-08-21",
+              "2024-06-17",
+              "2024-08-05",
+              "2025-02-12",
+              "2024-01-05",
+              "2024-12-03",
+              "2024-05-02"
+            ],
+            "addresses": [
+              "1755 Bd Lionel Bertrand, Boisbriand"
+            ],
+            "postal_codes": [
+              "J7H 1N8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "file_name": "2023-07-07 -Formulaire Absence - Paternité.doc",
+      "file_path": "/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/2023-07-07 -Formulaire Absence - Paternité.doc",
+      "file_type": ".doc",
+      "file_size_kb": 298.5,
+      "processing_results": {
+        "office_extraction": {
+          "success": false,
+          "error": "Word processing failed: file '/Users/philippebeliveau/Desktop/Notebook/EZBI/GRAPLIX_GIT/data/2023-07-07 -Formulaire Absence - Paternité.doc' is not a Word file, content type is 'application/vnd.openxmlformats-officedocument.themeManager+xml'",
+          "note": "Document may be corrupted or use unsupported encryption"
+        }
+      }
+    }
+  ]
+}

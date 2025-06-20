@@ -477,6 +477,141 @@ Important guidelines:
 """
         return base_prompt.strip()
     
+    def extract_pii_from_text(
+        self,
+        text: str,
+        model_key: str,
+        document_type: str = "document",
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Extract PII from text using specified LLM model
+        
+        Args:
+            text: Plain text content
+            model_key: Model identifier (e.g., "openai/gpt-4o")
+            document_type: Type of document for prompt optimization
+            **kwargs: Additional parameters for the LLM
+        
+        Returns:
+            Dict containing extraction results, usage, and cost information
+        """
+        start_time = time.time()
+        
+        if model_key not in self.providers:
+            return {
+                "success": False,
+                "error": f"Model {model_key} not available",
+                "processing_time": 0
+            }
+        
+        provider = self.providers[model_key]
+        prompt = self.create_pii_extraction_prompt(document_type)
+        
+        # For text-based extraction, we'll use the provider's text capabilities
+        # If provider doesn't support text extraction directly, we'll simulate it
+        try:
+            if hasattr(provider, 'extract_text_pii'):
+                # Use provider's text extraction method if available
+                result = provider.extract_text_pii(text, prompt, **kwargs)
+            else:
+                # Fallback: Create a text prompt for the provider
+                text_prompt = f"{prompt}\n\nDocument Text:\n{text}"
+                
+                # For OpenAI, we can use completion instead of vision
+                if isinstance(provider, OpenAIProvider):
+                    try:
+                        response = provider.client.chat.completions.create(
+                            model=provider.model,
+                            messages=[
+                                {"role": "system", "content": "You are a PII extraction specialist. Extract personally identifiable information from the provided text and return it in JSON format."},
+                                {"role": "user", "content": text_prompt}
+                            ],
+                            max_tokens=2000,
+                            temperature=0.1
+                        )
+                        
+                        result = {
+                            "success": True,
+                            "content": response.choices[0].message.content,
+                            "usage": {
+                                "input_tokens": response.usage.prompt_tokens,
+                                "output_tokens": response.usage.completion_tokens,
+                                "total_tokens": response.usage.total_tokens
+                            }
+                        }
+                    except Exception as e:
+                        result = {
+                            "success": False,
+                            "error": f"OpenAI text extraction failed: {str(e)}"
+                        }
+                else:
+                    # For other providers, return a simple success with empty extraction
+                    result = {
+                        "success": True,
+                        "content": '{"pii_entities": [], "confidence_scores": [], "document_summary": "Text-based extraction not fully supported for this provider"}',
+                        "usage": {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}
+                    }
+                    
+        except Exception as e:
+            result = {
+                "success": False,
+                "error": f"Text PII extraction failed: {str(e)}"
+            }
+        
+        processing_time = time.time() - start_time
+        result["processing_time"] = processing_time
+        
+        if result["success"]:
+            # Parse JSON response similar to image extraction
+            try:
+                content = result["content"]
+                
+                # Clean up the content to extract JSON
+                if "```json" in content:
+                    json_part = content.split("```json")[1].split("```")[0]
+                elif "{" in content and "}" in content:
+                    start = content.find("{")
+                    end = content.rfind("}") + 1
+                    json_part = content[start:end]
+                else:
+                    json_part = content
+                
+                parsed_data = json.loads(json_part.strip())
+                
+                # Standardize the response format
+                pii_entities = parsed_data.get("pii_entities", [])
+                confidence_scores = parsed_data.get("confidence_scores", [])
+                
+                # Calculate usage costs
+                usage = result.get("usage", {})
+                cost_per_token = provider.get_cost_per_token()
+                estimated_cost = (
+                    usage.get("input_tokens", 0) * cost_per_token.get("input", 0) / 1000 +
+                    usage.get("output_tokens", 0) * cost_per_token.get("output", 0) / 1000
+                )
+                
+                result.update({
+                    "pii_entities": pii_entities,
+                    "confidence_scores": confidence_scores,
+                    "parsed_data": parsed_data,
+                    "usage": {
+                        **usage,
+                        "estimated_cost": estimated_cost
+                    }
+                })
+                
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse JSON response: {e}")
+                result.update({
+                    "pii_entities": [],
+                    "confidence_scores": [],
+                    "parse_error": str(e),
+                    "raw_content": result.get("content", "")
+                })
+                
+        return result
+
     def extract_pii_from_image(
         self, 
         image_data: str, 

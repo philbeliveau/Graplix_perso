@@ -295,25 +295,25 @@ def show_session_costs(summary):
     with col1:
         st.metric(
             "Total Requests",
-            stats.get('total_requests', 0)
+            stats.get('total_requests') or 0
         )
     
     with col2:
         st.metric(
             "Total Cost",
-            f"${stats.get('total_estimated_cost', 0):.4f}"
+            f"${(stats.get('total_estimated_cost') or 0):.4f}"
         )
     
     with col3:
         st.metric(
             "Total Tokens",
-            f"{stats.get('total_tokens', 0):,}"
+            f"{(stats.get('total_tokens') or 0):,}"
         )
     
     with col4:
         st.metric(
             "Success Rate",
-            f"{summary.get('success_rate', 0):.1f}%"
+            f"{(summary.get('success_rate') or 0):.1f}%"
         )
     
     # Provider breakdown
@@ -404,19 +404,19 @@ def show_detailed_analysis(analysis):
     with col1:
         st.metric(
             "Total Cost",
-            f"${analysis.get('total_cost', 0):.2f}"
+            f"${(analysis.get('total_cost') or 0):.2f}"
         )
     
     with col2:
         st.metric(
             "Total Requests",
-            f"{analysis.get('total_requests', 0):,}"
+            f"{(analysis.get('total_requests') or 0):,}"
         )
     
     with col3:
         st.metric(
             "Avg Cost per Request",
-            f"${analysis.get('avg_cost_per_request', 0):.4f}"
+            f"${(analysis.get('avg_cost_per_request') or 0):.4f}"
         )
     
     # Daily trends
@@ -527,9 +527,9 @@ def show_usage_limits():
         
         usage_data.append({
             'Provider': provider.upper(),
-            'Daily Usage': f"${limit_check.get('daily_usage', 0):.2f}",
+            'Daily Usage': f"${(limit_check.get('daily_usage') or 0):.2f}",
             'Daily Limit': f"${limit_check.get('daily_limit', 'Not Set')}" if limit_check.get('daily_limit') else 'Not Set',
-            'Monthly Usage': f"${limit_check.get('monthly_usage', 0):.2f}",
+            'Monthly Usage': f"${(limit_check.get('monthly_usage') or 0):.2f}",
             'Monthly Limit': f"${limit_check.get('monthly_limit', 'Not Set')}" if limit_check.get('monthly_limit') else 'Not Set',
             'Alerts': len(limit_check.get('alerts', []))
         })
@@ -620,16 +620,16 @@ def show_system_health():
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric("Requests", session_stats['total_requests'])
+            st.metric("Requests", session_stats.get('total_requests') or 0)
         
         with col2:
-            st.metric("Total Cost", f"${session_stats['total_cost']:.4f}")
+            st.metric("Total Cost", f"${(session_stats.get('total_cost') or 0):.4f}")
         
         with col3:
-            st.metric("Total Tokens", f"{session_stats['total_tokens']:,}")
+            st.metric("Total Tokens", f"{(session_stats.get('total_tokens') or 0):,}")
         
         with col4:
-            st.metric("Success Rate", f"{session_stats['success_rate']:.1f}%")
+            st.metric("Success Rate", f"{(session_stats.get('success_rate') or 0):.1f}%")
         
         # Recent activity
         if session_stats.get('recent_activity'):
@@ -638,12 +638,12 @@ def show_system_health():
             activity_data = []
             for activity in session_stats['recent_activity']:
                 activity_data.append({
-                    'Time': activity['timestamp'],
-                    'Provider': activity['provider'].upper(),
-                    'Model': activity['model'],
-                    'Cost': f"${activity['cost']:.4f}",
-                    'Tokens': f"{activity['tokens']:,}",
-                    'Status': '✅' if activity['success'] else '❌'
+                    'Time': activity.get('timestamp', 'Unknown'),
+                    'Provider': (activity.get('provider') or 'Unknown').upper(),
+                    'Model': activity.get('model', 'Unknown'),
+                    'Cost': f"${(activity.get('cost') or 0):.4f}",
+                    'Tokens': f"{(activity.get('tokens') or 0):,}",
+                    'Status': '✅' if activity.get('success') else '❌'
                 })
             
             activity_df = pd.DataFrame(activity_data)

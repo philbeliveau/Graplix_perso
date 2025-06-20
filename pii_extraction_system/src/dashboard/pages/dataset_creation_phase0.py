@@ -15,6 +15,8 @@ import numpy as np
 import json
 import base64
 import uuid
+import tempfile
+import os
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 from io import BytesIO
@@ -28,6 +30,7 @@ sys.path.insert(0, str(src_path))
 
 from dashboard.utils import session_state, ui_components, auth
 from llm.multimodal_llm_service import llm_service
+from utils.document_processor import DocumentProcessor
 from core.ground_truth_validation import ground_truth_validator
 
 # Dataset creation state management
@@ -112,9 +115,9 @@ def show_file_upload_interface():
     with col1:
         uploaded_files = st.file_uploader(
             "Choose document files",
-            type=['pdf', 'docx', 'doc', 'txt', 'png', 'jpg', 'jpeg', 'tiff'],
+            type=['pdf', 'docx', 'doc', 'txt', 'png', 'jpg', 'jpeg', 'tiff', 'xlsx', 'xls'],
             accept_multiple_files=True,
-            help="Supported formats: PDF, DOCX, DOC, TXT, PNG, JPG, JPEG, TIFF"
+            help="Supported formats: PDF, DOCX, DOC, TXT, PNG, JPG, JPEG, TIFF, XLSX, XLS"
         )
     
     with col2:
@@ -123,10 +126,18 @@ def show_file_upload_interface():
             auto_label = st.checkbox("Auto-label with GPT-4o", value=True)
             batch_size = st.slider("Batch Size", 1, 10, 5)
             priority = st.selectbox("Priority", ["High", "Medium", "Low"], index=1)
+            
+            # Password support for encrypted documents
+            password = st.text_input(
+                "Document Password (if required)",
+                type="password",
+                value="Hubert",
+                help="Password for encrypted documents (PDF, DOCX, Excel)"
+            )
     
     if uploaded_files:
         if st.button("Process Uploaded Files"):
-            process_uploaded_files(uploaded_files, auto_label, batch_size, priority)
+            process_uploaded_files(uploaded_files, auto_label, batch_size, priority, password)
     
     # Document queue display
     st.markdown("#### Document Queue")
@@ -144,6 +155,7 @@ def show_file_upload_interface():
         
         with col1:
             if st.button("Label All Unlabeled"):
+                st.info("💡 Using default password 'Hubert' for bulk operations. Use GPT-4o Labeling tab for custom passwords.")
                 label_all_unlabeled_documents()
         
         with col2:
@@ -156,7 +168,7 @@ def show_file_upload_interface():
             if st.button("Export Label Dataset", help="Export PII labels and metadata only (no document content)"):
                 export_current_dataset()
 
-def process_uploaded_files(uploaded_files, auto_label: bool, batch_size: int, priority: str):
+def process_uploaded_files(uploaded_files, auto_label: bool, batch_size: int, priority: str, password: str = ""):
     """Process uploaded files and add to dataset"""
     progress_bar = st.progress(0)
     status_text = st.empty()
@@ -196,7 +208,7 @@ def process_uploaded_files(uploaded_files, auto_label: bool, batch_size: int, pr
         # Auto-label if requested
         if auto_label:
             try:
-                gpt4o_labels = auto_label_document(doc_id)
+                gpt4o_labels = auto_label_document(doc_id, password)
                 document['gpt4o_labels'] = gpt4o_labels
                 document['labeled'] = True
                 document['validation_status'] = 'Auto-labeled'
@@ -217,6 +229,8 @@ def detect_document_type(filename: str) -> str:
         'docx': 'Word Document',
         'doc': 'Word Document',
         'txt': 'Text Document',
+        'xlsx': 'Excel Spreadsheet',
+        'xls': 'Excel Spreadsheet',
         'png': 'Image',
         'jpg': 'Image',
         'jpeg': 'Image',
@@ -225,8 +239,8 @@ def detect_document_type(filename: str) -> str:
     
     return type_mapping.get(extension, 'Unknown')
 
-def auto_label_document(doc_id: str) -> Dict[str, Any]:
-    """Auto-label document using GPT-4o"""
+def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
+    """Auto-label document using GPT-4o with password support for encrypted documents"""
     document = next((doc for doc in st.session_state.phase0_dataset if doc['id'] == doc_id), None)
     
     if not document:
@@ -252,23 +266,115 @@ def auto_label_document(doc_id: str) -> Dict[str, Any]:
         else:
             raise Exception(result.get('error', 'Unknown error'))
     
+    # For text-based documents (PDF, DOCX, TXT, Excel), use DocumentProcessor
     else:
-        # For text documents, would need OCR + LLM processing
-        # For now, return mock data
-        return {
-            'method': 'gpt4o_text',
-            'entities': [
-                {
-                    'type': 'PERSON',
-                    'text': 'John Smith',
-                    'confidence': 0.95,
-                    'source': 'gpt4o_extraction'
+        try:
+            # Decode the base64 content
+            file_content = base64.b64decode(document['content'])
+            
+            # Create a temporary file with the original extension
+            # Get file extension
+            file_extension = os.path.splitext(document['name'])[1]
+            
+            # Create temporary file with proper extension
+            with tempfile.NamedTemporaryFile(suffix=file_extension, delete=False) as temp_file:
+                temp_file.write(file_content)
+                temp_file_path = temp_file.name
+            
+            try:
+                # Initialize DocumentProcessor
+                doc_processor = DocumentProcessor()
+                
+                # Process the document with password support
+                processed_doc = doc_processor.process_document(
+                    temp_file_path, 
+                    password=password if password else None
+                )
+                
+                # DocumentProcessor returns a dict directly, no .success attribute
+                # Extract text content
+                text_content = processed_doc.get('raw_text', '')
+                
+                # Also try OCR text if raw text is empty
+                if not text_content or not text_content.strip():
+                    text_content = processed_doc.get('ocr_text', '')
+                
+                if not text_content or not text_content.strip():
+                    # For documents with no extractable text, return a minimal result
+                    return {
+                        'method': 'no_text_extracted',
+                        'entities': [],
+                        'confidence_score': 0.0,
+                        'processing_time': 0,
+                        'cost': 0,
+                        'extracted_text': '',
+                        'error': 'No text content could be extracted from this document'
+                    }
+                
+                # Use LLM service for text-based PII extraction
+                result = llm_service.extract_pii_from_text(
+                    text_content,
+                    'openai/gpt-4o',
+                    document_type=document['metadata']['document_type']
+                )
+                
+                if result['success']:
+                    return {
+                        'method': 'gpt4o_text',
+                        'entities': result.get('pii_entities', []),
+                        'confidence_score': calculate_confidence_score(result.get('pii_entities', [])),
+                        'processing_time': result.get('processing_time', 0),
+                        'cost': result.get('usage', {}).get('estimated_cost', 0),
+                        'extracted_text': text_content[:500] + "..." if len(text_content) > 500 else text_content,  # Store sample of extracted text
+                        'raw_response': result
+                    }
+                else:
+                    raise Exception(result.get('error', 'Text-based PII extraction failed'))
+                    
+            finally:
+                # Clean up temporary file
+                try:
+                    os.unlink(temp_file_path)
+                except OSError:
+                    pass  # Ignore cleanup errors
+                
+        except Exception as e:
+            # Handle specific error cases with helpful messages
+            error_message = str(e)
+            
+            if "Old .doc format not supported" in error_message:
+                st.warning(f"⚠️ {document['name']}: Old .doc format not supported. Please convert to .docx format.")
+                return {
+                    'method': 'unsupported_format',
+                    'entities': [],
+                    'confidence_score': 0.0,
+                    'processing_time': 0,
+                    'cost': 0,
+                    'error': 'Old .doc format not supported. Please convert to .docx format.',
+                    'suggestion': 'Convert document to .docx format and try again'
                 }
-            ],
-            'confidence_score': 0.95,
-            'processing_time': 2.5,
-            'cost': 0.002
-        }
+            elif "No text content extracted" in error_message:
+                st.info(f"ℹ️ {document['name']}: No extractable text found (may be image-only or encrypted)")
+                return {
+                    'method': 'no_text_content',
+                    'entities': [],
+                    'confidence_score': 0.0,
+                    'processing_time': 0,
+                    'cost': 0,
+                    'error': 'No text content could be extracted from document',
+                    'suggestion': 'Document may be image-only or require OCR processing'
+                }
+            else:
+                # Generic error handling
+                st.warning(f"Document processing failed for {document['name']}: {error_message}")
+                return {
+                    'method': 'failed',
+                    'entities': [],
+                    'confidence_score': 0.0,
+                    'processing_time': 0,
+                    'cost': 0,
+                    'error': error_message
+                }
 
 def calculate_confidence_score(entities: List[Dict]) -> float:
     """Calculate overall confidence score for entities"""
@@ -282,13 +388,31 @@ def display_document_queue():
     # Create dataframe for display
     queue_data = []
     for doc in st.session_state.phase0_dataset:
+        # Determine status with more granular information
+        if doc['labeled']:
+            labels = doc.get('gpt4o_labels', {})
+            if labels.get('method') == 'unsupported_format':
+                status = '⚠️ Unsupported Format'
+            elif labels.get('method') == 'no_text_content':
+                status = 'ℹ️ No Text Found'
+            elif labels.get('method') == 'no_text_extracted':
+                status = 'ℹ️ No Text Extracted'
+            elif labels.get('method') == 'failed':
+                status = '❌ Processing Failed'
+            elif labels.get('entities'):
+                status = f'✅ Labeled ({len(labels["entities"])} entities)'
+            else:
+                status = '✅ Labeled (0 entities)'
+        else:
+            status = '⏳ Pending'
+            
         queue_data.append({
             'ID': doc['id'][:8] + '...',
             'Name': doc['name'],
             'Type': doc['metadata']['document_type'],
             'Size': f"{doc['size'] / 1024:.1f} KB",
             'Priority': doc['priority'],
-            'Status': 'Labeled' if doc['labeled'] else 'Pending',
+            'Status': status,
             'Difficulty': doc['metadata']['difficulty_level'],
             'Domain': doc['metadata']['domain'],
             'Uploaded': doc['uploaded_at'][:19].replace('T', ' ')
@@ -300,10 +424,12 @@ def display_document_queue():
     col1, col2, col3 = st.columns(3)
     
     with col1:
+        # Get unique status values from the data
+        unique_statuses = df['Status'].unique().tolist()
         status_filter = st.multiselect(
             "Filter by Status",
-            ['Labeled', 'Pending'],
-            default=['Labeled', 'Pending']
+            unique_statuses,
+            default=unique_statuses
         )
     
     with col2:
@@ -356,7 +482,26 @@ def show_document_details(doc_name: str):
             st.write(f"Type: {document['metadata']['document_type']}")
             st.write(f"Size: {document['size'] / 1024:.1f} KB")
             st.write(f"Priority: {document['priority']}")
-            st.write(f"Status: {'Labeled' if document['labeled'] else 'Pending'}")
+            
+            # Enhanced status display
+            if document['labeled']:
+                labels = document.get('gpt4o_labels', {})
+                if labels.get('method') == 'unsupported_format':
+                    st.error(f"⚠️ Unsupported Format: {labels.get('error', '')}")
+                    if labels.get('suggestion'):
+                        st.info(f"💡 {labels['suggestion']}")
+                elif labels.get('method') == 'no_text_content':
+                    st.warning(f"ℹ️ No Text Found: {labels.get('error', '')}")
+                    if labels.get('suggestion'):
+                        st.info(f"💡 {labels['suggestion']}")
+                elif labels.get('method') == 'failed':
+                    st.error(f"❌ Processing Failed: {labels.get('error', '')}")
+                elif labels.get('entities'):
+                    st.success(f"✅ Successfully Labeled ({len(labels['entities'])} entities found)")
+                else:
+                    st.success("✅ Processed (no PII entities found)")
+            else:
+                st.info("⏳ Pending Processing")
         
         with col2:
             st.markdown("**Metadata**")
@@ -364,6 +509,16 @@ def show_document_details(doc_name: str):
             st.write(f"Domain: {document['metadata']['domain']}")
             st.write(f"Validation: {document['validation_status']}")
             st.write(f"Uploaded: {document['uploaded_at'][:19].replace('T', ' ')}")
+            
+            # Processing details
+            if document['labeled']:
+                labels = document.get('gpt4o_labels', {})
+                if labels.get('method'):
+                    st.write(f"Processing Method: {labels['method']}")
+                if labels.get('processing_time'):
+                    st.write(f"Processing Time: {labels['processing_time']:.2f}s")
+                if labels.get('cost'):
+                    st.write(f"Processing Cost: ${labels['cost']:.4f}")
         
         # Show labels if available
         if document.get('gpt4o_labels'):
@@ -398,8 +553,8 @@ def show_gpt4o_labeling_interface():
         st.error("GPT-4o models are not available. Please check your OpenAI API configuration.")
         return
     
-    # Model selection
-    col1, col2 = st.columns(2)
+    # Model selection and configuration
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         selected_model = st.selectbox(
@@ -412,6 +567,16 @@ def show_gpt4o_labeling_interface():
         # Model info
         model_info = llm_service.get_model_info(selected_model)
         st.info(f"Cost: $**{model_info.get('cost_per_1k_input_tokens', 0):.3f}**/1K input tokens")
+    
+    with col3:
+        # Password for encrypted documents
+        batch_password = st.text_input(
+            "Document Password",
+            type="password",
+            value="Hubert",
+            help="Password for encrypted documents (PDF, DOCX, Excel)",
+            key="batch_labeling_password"
+        )
     
     # Labeling queue management
     st.markdown("#### Labeling Queue")
@@ -471,12 +636,12 @@ def show_gpt4o_labeling_interface():
     
     with col1:
         if st.button("Label Next Batch", disabled=len(filtered_docs) == 0):
-            label_document_batch(filtered_docs[:batch_size], selected_model)
+            label_document_batch(filtered_docs[:batch_size], selected_model, batch_password)
     
     with col2:
         if st.button("Label All Filtered", disabled=len(filtered_docs) == 0):
             if st.confirm(f"Label all {len(filtered_docs)} documents? Estimated cost: ${estimate_labeling_cost(filtered_docs, selected_model):.3f}"):
-                label_document_batch(filtered_docs, selected_model)
+                label_document_batch(filtered_docs, selected_model, batch_password)
     
     with col3:
         if st.button("Preview Labeling"):
@@ -527,8 +692,8 @@ def filter_documents_for_labeling(
     
     return filtered
 
-def label_document_batch(documents: List[Dict], model_key: str):
-    """Label a batch of documents using GPT-4o"""
+def label_document_batch(documents: List[Dict], model_key: str, password: str = ""):
+    """Label a batch of documents using GPT-4o with password support"""
     progress_bar = st.progress(0)
     status_text = st.empty()
     
@@ -539,7 +704,7 @@ def label_document_batch(documents: List[Dict], model_key: str):
         status_text.text(f"Labeling {document['name']}... ({i+1}/{len(documents)})")
         
         try:
-            labels = auto_label_document(document['id'])
+            labels = auto_label_document(document['id'], password)
             document['gpt4o_labels'] = labels
             document['labeled'] = True
             document['validation_status'] = 'Auto-labeled'
@@ -912,7 +1077,8 @@ def label_all_unlabeled_documents():
     estimated_cost = estimate_labeling_cost(unlabeled_docs, selected_model)
     
     if st.confirm(f"Label {len(unlabeled_docs)} documents with {selected_model}? Estimated cost: ${estimated_cost:.3f}"):
-        label_document_batch(unlabeled_docs, selected_model)
+        # Use default password "Hubert" for bulk operations
+        label_document_batch(unlabeled_docs, selected_model, "Hubert")
 
 def export_current_dataset():
     """Export current dataset (labels only, without document content)"""
@@ -1206,7 +1372,8 @@ def save_manual_validation(
 def reprocess_document_with_gpt4o(doc_id: str):
     """Reprocess document with GPT-4o"""
     try:
-        labels = auto_label_document(doc_id)
+        # Use default password "Hubert" for reprocessing
+        labels = auto_label_document(doc_id, "Hubert")
         document = next((doc for doc in st.session_state.phase0_dataset if doc['id'] == doc_id), None)
         
         if document:

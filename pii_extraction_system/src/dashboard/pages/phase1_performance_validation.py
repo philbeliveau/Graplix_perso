@@ -28,8 +28,15 @@ sys.path.insert(0, str(src_path))
 
 from dashboard.utils import session_state, ui_components, auth
 from llm.multimodal_llm_service import MultimodalLLMService
+from core.logging_config import get_logger
 from llm.api_integration_wrapper import MultiLLMIntegrationWrapper
+from llm.api_key_manager import api_key_manager
+from llm.llm_config import LLMModelRegistry
 from extractors.evaluation import PIIEvaluator
+
+# Initialize logger
+logger = get_logger(__name__)
+
 # Import Phase 0's exact document processing functions
 from utils.variance_analysis import VarianceAnalyzer
 import tempfile
@@ -684,81 +691,144 @@ def show_multi_model_testing_panel():
 
 
 def get_available_llm_models() -> Dict[str, Dict]:
-    """Get available LLM models for testing - enhanced with vision support info"""
+    """Get available multimodal LLM models for testing - filtered by API key availability"""
     try:
-        # Get models from the actual LLM service
-        llm_service = MultimodalLLMService()
+        # Get available providers from API key manager
+        available_providers = api_key_manager.get_available_providers()
+        logger.info(f"Available providers with API keys: {available_providers}")
         
+        # Get all vision-capable models from the registry
+        vision_models = LLMModelRegistry.get_vision_models()
+        
+        # Filter models by available providers and create enhanced model info
         models = {}
-        for model_key in llm_service.get_available_models():
-            model_info = llm_service.get_model_info(model_key)
-            if model_info.get('available', False):
+        for model in vision_models:
+            if model.provider.value in available_providers:
+                # Create a standardized model key
+                model_key = f"{model.provider.value}/{model.model_name}"
+                
                 models[model_key] = {
-                    'display_name': model_key.replace('/', ' ').title(),
-                    'provider': model_info['provider'],
-                    'supports_vision': model_info.get('supports_images', False),
-                    'quality_score': 0.9 if 'gpt-4o' in model_key else 0.8,
-                    'speed_score': 0.9 if 'mini' in model_key or 'haiku' in model_key else 0.7,
-                    'input_cost': model_info.get('cost_per_1k_input_tokens', 0.001),
-                    'output_cost': model_info.get('cost_per_1k_output_tokens', 0.003),
-                    'description': f"{'Vision-capable' if model_info.get('supports_images') else 'Text-only'} {model_info['provider']} model"
+                    'display_name': model.display_name,
+                    'provider': model.provider.value,
+                    'supports_vision': model.supports_vision,
+                    'quality_score': model.quality_score,
+                    'speed_score': model.speed_score,
+                    'input_cost': model.input_cost_per_1k_tokens,
+                    'output_cost': model.output_cost_per_1k_tokens,
+                    'max_tokens': model.max_tokens,
+                    'description': model.description,
+                    'available': True
                 }
-        return models
-    except Exception as e:
-        st.warning(f"Could not load LLM models dynamically: {e}")
-        # Fallback to static models
-        return {
-            "openai/gpt-4o": {
-                'display_name': "GPT-4o",
-                'provider': "openai",
-                'supports_vision': True,
-                'quality_score': 0.95,
-                'speed_score': 0.8,
-                'input_cost': 0.0025,
-                'output_cost': 0.01,
-                'description': "Most capable OpenAI model"
-            },
-            "gpt-4o-mini": {
-                'display_name': "GPT-4o Mini",
-                'provider': "openai",
-                'supports_vision': True,
-                'quality_score': 0.88,
-                'speed_score': 0.85,
-                'input_cost': 0.00015,
-                'output_cost': 0.0006,
-                'description': "Cost-effective vision model"
-            },
-            "claude-3-haiku": {
-                'display_name': "Claude 3 Haiku",
-                'provider': "anthropic",
-                'supports_vision': True,
-                'quality_score': 0.82,
-                'speed_score': 0.95,
-                'input_cost': 0.00025,
-                'output_cost': 0.00125,
-                'description': "Ultra-fast and affordable"
-            },
-            "claude-3-sonnet": {
-                'display_name': "Claude 3 Sonnet",
-                'provider': "anthropic",
-                'supports_vision': True,
-                'quality_score': 0.92,
-                'speed_score': 0.8,
-                'input_cost': 0.003,
-                'output_cost': 0.015,
-                'description': "Balanced performance and cost"
-            },
-            "gemini-1.5-flash": {
-                'display_name': "Gemini 1.5 Flash",
-                'provider': "google",
-                'supports_vision': True,
-                'quality_score': 0.83,
-                'speed_score': 0.92,
-                'input_cost': 0.000075,
-                'output_cost': 0.0003,
-                'description': "Extremely cost-effective"
+        
+        # If no models from registry are available, try the LLM service
+        if not models:
+            try:
+                llm_service = MultimodalLLMService()
+                
+                for model_key in llm_service.get_available_models():
+                    model_info = llm_service.get_model_info(model_key)
+                    if model_info.get('available', False) and model_info.get('supports_images', False):
+                        # Check if provider has API key
+                        provider = model_info.get('provider', '')
+                        if provider in available_providers:
+                            models[model_key] = {
+                                'display_name': model_key.replace('/', ' ').title(),
+                                'provider': provider,
+                                'supports_vision': True,
+                                'quality_score': 0.9 if 'gpt-4o' in model_key else 0.8,
+                                'speed_score': 0.9 if 'mini' in model_key or 'haiku' in model_key else 0.7,
+                                'input_cost': model_info.get('cost_per_1k_input_tokens', 0.001),
+                                'output_cost': model_info.get('cost_per_1k_output_tokens', 0.003),
+                                'max_tokens': model_info.get('max_tokens', 4096),
+                                'description': f"Vision-capable {provider} model",
+                                'available': True
+                            }
+            except Exception as e:
+                logger.warning(f"Could not get models from LLM service: {e}")
+        
+        # Add provider-specific model variants based on available API keys
+        if 'openai' in available_providers:
+            # Ensure we have key OpenAI models if OpenAI is available
+            openai_models = {
+                "openai/gpt-4o": {
+                    'display_name': "GPT-4o (Omni)",
+                    'provider': "openai",
+                    'supports_vision': True,
+                    'quality_score': 0.95,
+                    'speed_score': 0.8,
+                    'input_cost': 0.0025,
+                    'output_cost': 0.01,
+                    'max_tokens': 128000,
+                    'description': "Most capable OpenAI multimodal model",
+                    'available': True
+                },
+                "openai/gpt-4o-mini": {
+                    'display_name': "GPT-4o Mini",
+                    'provider': "openai", 
+                    'supports_vision': True,
+                    'quality_score': 0.88,
+                    'speed_score': 0.85,
+                    'input_cost': 0.00015,
+                    'output_cost': 0.0006,
+                    'max_tokens': 128000,
+                    'description': "Cost-effective OpenAI vision model",
+                    'available': True
+                }
             }
-        }
+            models.update(openai_models)
+        
+        if 'deepseek' in available_providers:
+            # Add DeepSeek text model (though not multimodal, might be useful)
+            models["deepseek/deepseek-chat"] = {
+                'display_name': "DeepSeek Chat",
+                'provider': "deepseek",
+                'supports_vision': False,
+                'quality_score': 0.8,
+                'speed_score': 0.85,
+                'input_cost': 0.00014,
+                'output_cost': 0.00028,
+                'max_tokens': 4096,
+                'description': "Very affordable text processing model",
+                'available': True
+            }
+        
+        if 'nvidia' in available_providers:
+            # Add NVIDIA model 
+            models["nvidia/llama-3.1-nemotron-70b"] = {
+                'display_name': "Nemotron 70B",
+                'provider': "nvidia",
+                'supports_vision': False,
+                'quality_score': 0.87,
+                'speed_score': 0.8,
+                'input_cost': 0.0004,
+                'output_cost': 0.0004,
+                'max_tokens': 4096,
+                'description': "High-quality NVIDIA instruction following model",
+                'available': True
+            }
+        
+        if 'huggingface' in available_providers:
+            # Add placeholder for Hugging Face models
+            models["huggingface/blip-2"] = {
+                'display_name': "BLIP-2 Vision-Language",
+                'provider': "huggingface",
+                'supports_vision': True,
+                'quality_score': 0.75,
+                'speed_score': 0.7,
+                'input_cost': 0.0001,
+                'output_cost': 0.0001,
+                'max_tokens': 2048,
+                'description': "Hugging Face vision-language model",
+                'available': True
+            }
+        
+        return models
+        
+    except Exception as e:
+        logger.error(f"Error getting available LLM models: {e}")
+        st.error(f"Error loading models: {e}")
+        # Return empty dict if there's an error - no models available
+        return {}
 
 
 def estimate_testing_cost(models: List[str], documents: List[Dict]) -> float:
@@ -847,14 +917,29 @@ def process_model_real_testing(model_name: str, documents: List[Dict], threshold
         status_text.text(f"Processing {doc['name']} with {model_name}...")
         
         try:
-            # Get ground truth
+            # Get and validate ground truth
             ground_truth_labels = doc['info'].get('ground_truth_labels', {})
-            if not ground_truth_labels or not ground_truth_labels.get('entities'):
-                st.warning(f"Skipping {doc['name']} - No ground truth available")
+            if not ground_truth_labels:
+                st.warning(f"Skipping {doc['name']} - No ground truth labels available")
+                continue
+                
+            gt_entities = ground_truth_labels.get('entities', [])
+            if not gt_entities or not isinstance(gt_entities, list):
+                st.warning(f"Skipping {doc['name']} - No valid ground truth entities available")
                 continue
             
+            # Validate that entities are properly formatted dictionaries
+            valid_gt_entities = []
+            for entity in gt_entities:
+                if isinstance(entity, dict) and entity.get('type') and entity.get('text'):
+                    valid_gt_entities.append(entity)
+            
+            if not valid_gt_entities:
+                st.warning(f"Skipping {doc['name']} - No valid ground truth entities found")
+                continue
+            
+            gt_entities = valid_gt_entities
             valid_docs += 1
-            gt_entities = ground_truth_labels.get('entities', [])
             
             # Convert document content to images for processing
             file_content = doc.get('file_content')  # Base64 encoded content from Phase 0
@@ -958,10 +1043,19 @@ def process_model_real_testing(model_name: str, documents: List[Dict], threshold
                 
                 evaluation_result = DefaultEvaluation()
             
-            # Extract metrics
+            # Validate entities first before any calculations that use len()
+            extracted_entities = extracted_entities if extracted_entities is not None else []
+            gt_entities = gt_entities if gt_entities is not None else []
+            
+            # Extract metrics and validate them
             doc_precision = evaluation_result.precision
             doc_recall = evaluation_result.recall
             doc_f1 = evaluation_result.f1_score
+            
+            # Validate metrics and convert NaN to 0
+            doc_precision = 0.0 if (doc_precision is None or (isinstance(doc_precision, float) and np.isnan(doc_precision))) else float(doc_precision)
+            doc_recall = 0.0 if (doc_recall is None or (isinstance(doc_recall, float) and np.isnan(doc_recall))) else float(doc_recall)
+            doc_f1 = 0.0 if (doc_f1 is None or (isinstance(doc_f1, float) and np.isnan(doc_f1))) else float(doc_f1)
             
             # Get detailed metrics from the underlying metrics object
             try:
@@ -970,12 +1064,15 @@ def process_model_real_testing(model_name: str, documents: List[Dict], threshold
                 false_positives = getattr(detailed_metrics, 'total_false_positives', max(0, len(extracted_entities) - true_positives))
                 false_negatives = getattr(detailed_metrics, 'total_false_negatives', max(0, len(gt_entities) - true_positives))
             except:
-                # Fallback calculation
+                # Fallback calculation with validated entities
                 true_positives = min(len(extracted_entities), len(gt_entities))
                 false_positives = max(0, len(extracted_entities) - true_positives)
                 false_negatives = max(0, len(gt_entities) - true_positives)
             
-            # Store results
+            # Debug logging to help identify issues
+            st.info(f"✅ {doc['name']}: Found {len(extracted_entities)} entities, GT: {len(gt_entities)}, P: {doc_precision:.3f}, R: {doc_recall:.3f}, F1: {doc_f1:.3f}")
+            
+            # Store results with validated entity counts
             document_results.append({
                 "document": doc["name"],
                 "domain": doc.get('category', 'Unknown'),
@@ -990,8 +1087,8 @@ def process_model_real_testing(model_name: str, documents: List[Dict], threshold
                 "f1": doc_f1,
                 "cost": doc_cost,
                 "extracted_entities": extracted_entities,
-                "confidence_scores": [e.get('confidence', 0.5) for e in extracted_entities],
-                "expected_pii_types": list(set([e.get('type', 'unknown') for e in gt_entities]))
+                "confidence_scores": [e.get('confidence', 0.5) for e in extracted_entities if e is not None],
+                "expected_pii_types": list(set([e.get('type', 'unknown') for e in gt_entities if e is not None and isinstance(e, dict)]))
             })
             
             # Accumulate totals
@@ -3007,11 +3104,19 @@ def calculate_comprehensive_kpis(results: Dict, documents: List[Dict]) -> Dict:
         model_costs = []
         
         for doc_result in doc_results:
+            # Get metrics with proper validation
             precision = doc_result.get('precision', 0)
             recall = doc_result.get('recall', 0)
             f1 = doc_result.get('f1', 0)
             proc_time = doc_result.get('processing_time', 0)
             cost = doc_result.get('cost', 0)
+            
+            # Validate metrics and convert NaN/None to 0
+            precision = 0 if (precision is None or (isinstance(precision, float) and np.isnan(precision))) else float(precision)
+            recall = 0 if (recall is None or (isinstance(recall, float) and np.isnan(recall))) else float(recall)
+            f1 = 0 if (f1 is None or (isinstance(f1, float) and np.isnan(f1))) else float(f1)
+            proc_time = 0 if (proc_time is None or (isinstance(proc_time, float) and np.isnan(proc_time))) else float(proc_time)
+            cost = 0 if (cost is None or (isinstance(cost, float) and np.isnan(cost))) else float(cost)
             
             all_precision.append(precision)
             all_recall.append(recall)
@@ -3025,53 +3130,90 @@ def calculate_comprehensive_kpis(results: Dict, documents: List[Dict]) -> Dict:
             model_times.append(proc_time)
             model_costs.append(cost)
             
-            total_entities_found += doc_result.get('entities_found', 0)
-            total_ground_truth_entities += doc_result.get('ground_truth_entities', 0)
+            # Validate entity counts
+            entities_found = doc_result.get('entities_found', 0)
+            ground_truth_entities = doc_result.get('ground_truth_entities', 0)
+            
+            entities_found = 0 if (entities_found is None or (isinstance(entities_found, float) and np.isnan(entities_found))) else int(entities_found)
+            ground_truth_entities = 0 if (ground_truth_entities is None or (isinstance(ground_truth_entities, float) and np.isnan(ground_truth_entities))) else int(ground_truth_entities)
+            
+            total_entities_found += entities_found
+            total_ground_truth_entities += ground_truth_entities
         
         total_documents += len(doc_results)
         
-        # Model-specific stats
+        # Model-specific stats with NaN-safe calculations
+        def safe_mean(values):
+            """Calculate mean safely, handling NaN and empty arrays"""
+            if not values:
+                return 0.0
+            clean_values = [v for v in values if v is not None and not (isinstance(v, float) and np.isnan(v))]
+            return float(np.mean(clean_values)) if clean_values else 0.0
+        
         model_stats[model_name] = {
-            'avg_precision': np.mean(model_precision) if model_precision else 0,
-            'avg_recall': np.mean(model_recall) if model_recall else 0,
-            'avg_f1': np.mean(model_f1) if model_f1 else 0,
-            'avg_processing_time': np.mean(model_times) if model_times else 0,
+            'avg_precision': safe_mean(model_precision),
+            'avg_recall': safe_mean(model_recall),
+            'avg_f1': safe_mean(model_f1),
+            'avg_processing_time': safe_mean(model_times),
             'total_cost': sum(model_costs),
             'documents_processed': len(doc_results)
         }
     
-    # Overall metrics
+    # Define safe_mean function for overall calculations
+    def safe_mean(values):
+        """Calculate mean safely, handling NaN and empty arrays"""
+        if not values:
+            return 0.0
+        clean_values = [v for v in values if v is not None and not (isinstance(v, float) and np.isnan(v))]
+        return float(np.mean(clean_values)) if clean_values else 0.0
+    
+    # Overall metrics with NaN-safe calculations
     kpis['overall_metrics'] = {
-        'avg_precision': np.mean(all_precision) if all_precision else 0,
-        'avg_recall': np.mean(all_recall) if all_recall else 0,
-        'avg_f1': np.mean(all_f1) if all_f1 else 0,
+        'avg_precision': safe_mean(all_precision),
+        'avg_recall': safe_mean(all_recall),
+        'avg_f1': safe_mean(all_f1),
         'total_documents': total_documents,
         'total_entities_found': total_entities_found,
         'total_ground_truth_entities': total_ground_truth_entities,
-        'entity_detection_rate': (total_entities_found / total_ground_truth_entities) if total_ground_truth_entities > 0 else 0
+        'entity_detection_rate': (total_entities_found / total_ground_truth_entities) if total_ground_truth_entities > 0 else 0.0
     }
     
-    # Processing efficiency
+    # Processing efficiency with safe calculations
+    total_processing_time = sum(all_processing_times) if all_processing_times else 0
     kpis['processing_efficiency'] = {
-        'avg_processing_time': np.mean(all_processing_times) if all_processing_times else 0,
-        'total_processing_time': sum(all_processing_times),
-        'documents_per_hour': (total_documents / (sum(all_processing_times) / 3600)) if sum(all_processing_times) > 0 else 0
+        'avg_processing_time': safe_mean(all_processing_times),
+        'total_processing_time': total_processing_time,
+        'documents_per_hour': (total_documents / (total_processing_time / 3600)) if total_processing_time > 0 else 0.0
     }
     
-    # Cost efficiency
+    # Cost efficiency with safe calculations
+    total_cost = sum(all_costs) if all_costs else 0
+    avg_f1 = safe_mean(all_f1)
     kpis['cost_efficiency'] = {
-        'total_cost': sum(all_costs),
-        'avg_cost_per_document': np.mean(all_costs) if all_costs else 0,
-        'cost_per_entity_found': (sum(all_costs) / total_entities_found) if total_entities_found > 0 else 0,
-        'cost_per_f1_point': (sum(all_costs) / np.mean(all_f1)) if all_f1 and np.mean(all_f1) > 0 else 0
+        'total_cost': total_cost,
+        'avg_cost_per_document': safe_mean(all_costs),
+        'cost_per_entity_found': (total_cost / total_entities_found) if total_entities_found > 0 else 0.0,
+        'cost_per_f1_point': (total_cost / avg_f1) if avg_f1 > 0 else 0.0
     }
     
-    # Quality metrics
+    # Quality metrics with safe calculations
+    def safe_std(values):
+        """Calculate standard deviation safely, handling NaN and empty arrays"""
+        if not values:
+            return 0.0
+        clean_values = [v for v in values if v is not None and not (isinstance(v, float) and np.isnan(v))]
+        return float(np.std(clean_values)) if len(clean_values) > 1 else 0.0
+    
+    precision_std = safe_std(all_precision)
+    recall_std = safe_std(all_recall)
+    f1_std = safe_std(all_f1)
+    avg_f1 = safe_mean(all_f1)
+    
     kpis['quality_metrics'] = {
-        'precision_std': np.std(all_precision) if all_precision else 0,
-        'recall_std': np.std(all_recall) if all_recall else 0,
-        'f1_std': np.std(all_f1) if all_f1 else 0,
-        'consistency_score': 1 - (np.std(all_f1) / np.mean(all_f1)) if all_f1 and np.mean(all_f1) > 0 else 0
+        'precision_std': precision_std,
+        'recall_std': recall_std,
+        'f1_std': f1_std,
+        'consistency_score': 1 - (f1_std / avg_f1) if avg_f1 > 0 else 0.0
     }
     
     # Model comparison

@@ -545,15 +545,43 @@ def display_document_queue():
             show_document_details(selected_doc_name)
 
 def show_s3_batch_processing_interface():
-    """S3 batch processing interface for automated dataset creation"""
-    import asyncio
+    """Scalable S3 batch processing interface for 10k+ documents"""
     
     st.markdown("### 🗄️ S3 Batch Processing")
-    st.markdown("Process documents directly from S3 buckets for automated Phase 0 dataset creation.")
+    st.markdown("**Enterprise-scale processing**: Handle up to 10,000 documents with real-time progress tracking.")
     
     if not auth.has_permission('write'):
         st.warning("S3 batch processing requires write permissions.")
         return
+    
+    # Import scalable components
+    from database.document_store import get_document_db
+    from processing.background_processor import get_background_processor
+    
+    db = get_document_db()
+    processor = get_background_processor()
+    
+    # Main interface tabs
+    tab1, tab2, tab3 = st.tabs([
+        "🚀 New Batch",
+        "📊 Active Batches", 
+        "📜 Batch History"
+    ])
+    
+    with tab1:
+        show_new_batch_interface(db, processor)
+    
+    with tab2:
+        show_active_batches_interface(db, processor)
+    
+    with tab3:
+        show_batch_history_interface(db)
+
+
+def show_new_batch_interface(db, processor):
+    """Interface for creating new processing batches"""
+    
+    st.markdown("#### 🆕 Create New Processing Batch")
     
     # S3 Configuration Section
     with st.expander("📋 S3 Configuration", expanded=True):
@@ -576,11 +604,17 @@ def show_s3_batch_processing_interface():
             input_prefix = st.text_input(
                 "Input Prefix",
                 value="documents/",
-                help="S3 prefix where documents are stored (e.g., 'documents/', 'incoming/')"
+                help="S3 prefix where documents are stored"
             )
         
         with col2:
             st.markdown("**Processing Settings**")
+            batch_name = st.text_input(
+                "Batch Name",
+                value=f"S3_Batch_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                help="Descriptive name for this batch"
+            )
+            
             password = st.text_input(
                 "Document Password",
                 value="Hubert",
@@ -593,16 +627,7 @@ def show_s3_batch_processing_interface():
                 "Processing Model",
                 model_options,
                 index=0,
-                help="LLM model for PII extraction (gpt-4o-mini recommended for batch)"
-            )
-            
-            max_budget = st.number_input(
-                "Maximum Budget ($)",
-                value=50.0,
-                min_value=1.0,
-                max_value=1000.0,
-                step=5.0,
-                help="Maximum spend for this batch processing session"
+                help="LLM model for PII extraction"
             )
     
     # Advanced Settings
@@ -610,163 +635,366 @@ def show_s3_batch_processing_interface():
         col1, col2 = st.columns(2)
         
         with col1:
-            max_documents = st.slider(
+            max_documents = st.number_input(
                 "Maximum Documents",
                 min_value=10,
-                max_value=1000,
+                max_value=10000,
                 value=100,
-                help="Maximum number of documents to process in this batch"
+                step=10,
+                help="Maximum documents to process (up to 10,000)"
             )
             
-            max_concurrent = st.slider(
-                "Concurrent Processing",
-                min_value=1,
-                max_value=10,
-                value=5,
-                help="Number of documents to process simultaneously"
+            max_budget = st.number_input(
+                "Maximum Budget ($)",
+                min_value=1.0,
+                max_value=2000.0,
+                value=100.0,
+                step=10.0,
+                help="Maximum spend for this batch"
             )
         
         with col2:
+            max_concurrent = st.slider(
+                "Concurrent Processing",
+                min_value=1,
+                max_value=20,
+                value=8,
+                help="Parallel processing workers"
+            )
+            
             skip_processed = st.checkbox(
                 "Skip Already Processed",
                 value=True,
-                help="Skip documents that have been processed before"
-            )
-            
-            export_to_s3 = st.checkbox(
-                "Export Results to S3",
-                value=True,
-                help="Export the labeled dataset back to S3"
+                help="Skip documents with .processed markers"
             )
     
-    # Status and Statistics
-    st.markdown("### 📊 Processing Status")
+    # Cost Estimation
+    if max_documents > 0:
+        estimated_cost = max_documents * 0.03  # Conservative estimate
+        processing_time_hours = max_documents / (max_concurrent * 20)  # ~20 docs per worker per hour
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Estimated Cost", f"${estimated_cost:.2f}")
+        with col2:
+            st.metric("Est. Processing Time", f"{processing_time_hours:.1f}h")
+        with col3:
+            if estimated_cost > max_budget:
+                st.error(f"Cost exceeds budget!")
+            else:
+                st.success("✅ Within budget")
     
-    col1, col2, col3, col4 = st.columns(4)
-    
-    with col1:
-        if 's3_last_batch_result' in st.session_state:
-            st.metric("Last Batch Processed", st.session_state.s3_last_batch_result.get('documents_processed', 0))
-        else:
-            st.metric("Last Batch Processed", 0)
-    
-    with col2:
-        if 's3_last_batch_result' in st.session_state:
-            success_rate = st.session_state.s3_last_batch_result.get('success_rate', 0)
-            st.metric("Success Rate", f"{success_rate:.1%}")
-        else:
-            st.metric("Success Rate", "0%")
-    
-    with col3:
-        if 's3_last_batch_result' in st.session_state:
-            total_cost = st.session_state.s3_last_batch_result.get('total_cost', 0)
-            st.metric("Last Batch Cost", f"${total_cost:.2f}")
-        else:
-            st.metric("Last Batch Cost", "$0.00")
-    
-    with col4:
-        s3_dataset_count = sum(1 for doc in st.session_state.phase0_dataset if doc.get('metadata', {}).get('source') == 's3')
-        st.metric("S3 Documents in Dataset", s3_dataset_count)
-    
-    # Processing Actions
-    st.markdown("### 🚀 Processing Actions")
-    
-    col1, col2, col3 = st.columns(3)
+    # Document Discovery
+    col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("🔍 Discover Documents", help="Discover available documents in S3 bucket"):
+        if st.button("🔍 Discover Documents", help="Preview documents in S3 bucket"):
             if bucket_name:
-                discover_s3_documents(bucket_name, aws_region, input_prefix)
+                discover_s3_documents(bucket_name, aws_region, input_prefix, max_documents)
             else:
                 st.error("Please provide S3 bucket name")
     
     with col2:
-        start_processing = st.button(
-            "▶️ Start Batch Processing", 
-            help="Begin automated processing of S3 documents",
-            type="primary"
+        start_batch = st.button(
+            "▶️ Create & Start Batch", 
+            help="Create batch and start background processing",
+            type="primary",
+            disabled=not bucket_name or not batch_name
         )
+    
+    # Start Processing
+    if start_batch:
+        try:
+            # Pre-flight budget check
+            from llm.cost_tracker import cost_tracker
+            
+            if not cost_tracker.can_afford('openai', estimated_cost):
+                remaining = cost_tracker.get_remaining_budget('openai')
+                st.error(f"Insufficient budget. Estimated: ${estimated_cost:.2f}, Available: ${remaining:.2f}")
+                return
+            
+            # Discover documents to create batch
+            with st.spinner("🔍 Discovering S3 documents..."):
+                s3_processor = S3DocumentProcessor(bucket_name, aws_region)
+                s3_documents = s3_processor.discover_documents(
+                    prefix=input_prefix,
+                    max_documents=max_documents,
+                    skip_processed=skip_processed
+                )
+            
+            if not s3_documents:
+                st.warning("No documents found in S3 bucket")
+                return
+            
+            # Convert S3Documents to database format
+            doc_records = []
+            for s3_doc in s3_documents:
+                doc_records.append({
+                    'filename': s3_doc.filename,
+                    's3_key': s3_doc.key,
+                    'file_size': s3_doc.size,
+                    'document_type': s3_doc.extension,
+                    'metadata': {
+                        'bucket': s3_doc.bucket,
+                        'last_modified': s3_doc.last_modified.isoformat()
+                    }
+                })
+            
+            # Create batch in database
+            with st.spinner("📝 Creating processing batch..."):
+                batch_id = db.create_batch(
+                    name=batch_name,
+                    documents=doc_records,
+                    estimated_cost=estimated_cost
+                )
+            
+            # Start background processing
+            with st.spinner("🚀 Starting background processing..."):
+                job_id = processor.start_batch_processing(
+                    batch_id=batch_id,
+                    model_key=selected_model,
+                    password=password,
+                    max_budget=max_budget
+                )
+            
+            st.success(f"✅ Batch created and processing started!")
+            st.info(f"**Batch ID:** `{batch_id}`")
+            st.info(f"**Job ID:** `{job_id}`")
+            st.info(f"**Documents:** {len(doc_records)}")
+            
+            # Show progress tracking tip
+            st.markdown("💡 **Tip:** Switch to the 'Active Batches' tab to monitor real-time progress.")
+            
+        except Exception as e:
+            st.error(f"Failed to start batch processing: {str(e)}")
+            logger.error(f"Batch creation error: {e}")
+
+
+def show_active_batches_interface(db, processor):
+    """Interface for monitoring active batch processing"""
+    
+    st.markdown("#### 📊 Active Processing Batches")
+    
+    # Auto-refresh controls
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        auto_refresh = st.checkbox("🔄 Auto-refresh", value=True)
+    with col2:
+        refresh_interval = st.selectbox("Refresh Rate", [5, 10, 30, 60], index=1)
+    with col3:
+        if st.button("🔄 Refresh Now"):
+            st.rerun()
+    
+    # Get active batches
+    all_batches = db.get_all_batches(limit=50)
+    active_batches = [b for b in all_batches if b.status in ['pending', 'processing']]
+    
+    if not active_batches:
+        st.info("No active batches. Create a new batch to start processing.")
+        return
+    
+    # Display active batches
+    for batch in active_batches:
+        with st.expander(f"📦 {batch.name} ({batch.status.title()})", expanded=True):
+            
+            # Batch overview
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                progress = batch.processed_documents / max(batch.total_documents, 1)
+                st.metric("Progress", f"{progress:.1%}")
+                st.progress(progress)
+            
+            with col2:
+                st.metric("Documents", f"{batch.processed_documents + batch.failed_documents} / {batch.total_documents}")
+            
+            with col3:
+                st.metric("Cost", f"${batch.total_cost:.2f}")
+                if batch.estimated_cost > 0:
+                    cost_progress = batch.total_cost / batch.estimated_cost
+                    st.progress(min(cost_progress, 1.0))
+            
+            with col4:
+                if batch.status == 'processing':
+                    st.success("🟢 Processing")
+                elif batch.status == 'pending':
+                    st.info("🟡 Pending")
+            
+            # Detailed information
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("**Batch Details**")
+                st.text(f"ID: {batch.batch_id}")
+                st.text(f"Created: {batch.created_at}")
+                if batch.started_at:
+                    st.text(f"Started: {batch.started_at}")
+                
+                # Control buttons
+                if batch.status == 'processing':
+                    if st.button(f"🛑 Cancel", key=f"cancel_{batch.batch_id}"):
+                        if processor.cancel_job(f"job_{batch.batch_id}"):
+                            st.success("Batch cancelled")
+                            st.rerun()
+                        else:
+                            st.error("Failed to cancel batch")
+            
+            with col2:
+                st.markdown("**Recent Activity**")
+                recent_logs = db.get_recent_logs(batch.batch_id, limit=5)
+                
+                if recent_logs:
+                    for log in recent_logs:
+                        level_emoji = {"info": "ℹ️", "warning": "⚠️", "error": "❌"}.get(log['level'], "📝")
+                        timestamp = datetime.fromisoformat(log['timestamp']).strftime('%H:%M:%S')
+                        st.text(f"{level_emoji} {timestamp}: {log['message']}")
+                else:
+                    st.text("No recent activity")
+            
+            # Detailed document view
+            if st.checkbox(f"Show Document Details", key=f"details_{batch.batch_id}"):
+                show_batch_documents_paginated(db, batch.batch_id)
+    
+    # Auto-refresh
+    if auto_refresh and active_batches:
+        time.sleep(refresh_interval)
+        st.rerun()
+
+
+def show_batch_documents_paginated(db, batch_id: str):
+    """Show paginated document list for a batch"""
+    
+    # Pagination controls
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        page_size = st.selectbox("Docs per page", [25, 50, 100], index=1, key=f"page_size_{batch_id}")
+    
+    with col2:
+        status_filter = st.selectbox(
+            "Filter by status", 
+            ["All", "pending", "processing", "completed", "failed"],
+            key=f"status_filter_{batch_id}"
+        )
+    
+    # Get documents with pagination
+    status = None if status_filter == "All" else status_filter
+    documents, total_count = db.get_documents_paginated(
+        batch_id=batch_id,
+        offset=0,
+        limit=page_size,
+        status_filter=status
+    )
     
     with col3:
-        if st.button("📥 Import Existing Dataset", help="Import previously processed S3 dataset"):
-            show_s3_dataset_import_interface()
+        st.metric("Total Documents", total_count)
     
-    # Processing Logic
-    if start_processing:
-        if not bucket_name:
-            st.error("Please provide S3 bucket name")
-        else:
-            try:
-                # Pre-flight budget check
-                from llm.cost_tracker import cost_tracker
-                
-                # Check if we can afford the estimated cost
-                estimated_cost = max_documents * 0.02  # Rough estimate
-                if not cost_tracker.can_afford('openai', estimated_cost):
-                    remaining = cost_tracker.get_remaining_budget('openai')
-                    st.error(f"Insufficient budget. Estimated cost: ${estimated_cost:.2f}, Remaining: ${remaining:.2f}")
-                    return
-                
-                # Start processing
-                with st.spinner("🔄 Starting S3 batch processing..."):
-                    result = asyncio.run(process_s3_bucket_to_phase0(
-                        bucket_name=bucket_name,
-                        prefix=input_prefix,
-                        password=password,
-                        max_documents=max_documents,
-                        max_budget=max_budget
-                    ))
-                
-                # Store results
-                st.session_state.s3_last_batch_result = result
-                
-                if result.get('success'):
-                    st.success(f"✅ Batch processing completed!")
-                    
-                    # Show detailed results
-                    with st.expander("📊 Processing Results", expanded=True):
-                        col1, col2 = st.columns(2)
-                        
-                        with col1:
-                            st.metric("Documents Found", result.get('documents_found', 0))
-                            st.metric("Documents Processed", result.get('documents_processed', 0))
-                            st.metric("Success Rate", f"{result.get('success_rate', 0):.1%}")
-                        
-                        with col2:
-                            st.metric("Total Cost", f"${result.get('total_cost', 0):.2f}")
-                            if result.get('dataset_s3_key'):
-                                st.text_area("Dataset S3 Key", result['dataset_s3_key'], height=80)
-                    
-                    # Import into current session
-                    if st.button("📥 Import Results to Current Dataset"):
-                        import_s3_results_to_session(result)
-                        st.success("S3 processing results imported to current Phase 0 dataset!")
-                        st.rerun()
-                
-                else:
-                    st.error(f"❌ Batch processing failed: {result.get('error', 'Unknown error')}")
-                    
-            except Exception as e:
-                st.error(f"Processing error: {str(e)}")
-                logger.error(f"S3 batch processing error: {e}")
-    
-    # Recent Processing History
-    if 's3_processing_history' in st.session_state and st.session_state.s3_processing_history:
-        st.markdown("### 📜 Recent Processing History")
+    if documents:
+        # Create dataframe for display
+        doc_data = []
+        for doc in documents:
+            doc_data.append({
+                "Filename": doc.filename,
+                "Status": doc.status,
+                "Type": doc.document_type,
+                "Size (KB)": f"{doc.file_size / 1024:.1f}",
+                "Cost": f"${doc.cost:.3f}",
+                "Processing Time": f"{doc.processing_time:.1f}s" if doc.processing_time > 0 else "-"
+            })
         
-        history_df = pd.DataFrame(st.session_state.s3_processing_history)
-        st.dataframe(
-            history_df,
-            use_container_width=True,
-            column_config={
-                "timestamp": st.column_config.DatetimeColumn("Timestamp"),
-                "documents_processed": st.column_config.NumberColumn("Documents"),
-                "success_rate": st.column_config.ProgressColumn("Success Rate", min_value=0, max_value=1),
-                "total_cost": st.column_config.NumberColumn("Cost ($)", format="%.2f")
+        df = pd.DataFrame(doc_data)
+        
+        # Color-code status
+        def color_status(val):
+            colors = {
+                'completed': 'background-color: #d4edda',
+                'failed': 'background-color: #f8d7da',
+                'processing': 'background-color: #fff3cd',
+                'pending': 'background-color: #e2e3e5'
             }
-        )
+            return colors.get(val, '')
+        
+        styled_df = df.style.applymap(color_status, subset=['Status'])
+        st.dataframe(styled_df, use_container_width=True)
+    else:
+        st.info("No documents found for selected criteria")
 
-def discover_s3_documents(bucket_name: str, aws_region: str, input_prefix: str):
+
+def show_batch_history_interface(db):
+    """Interface for viewing batch processing history"""
+    
+    st.markdown("#### 📜 Processing History")
+    
+    # Get all batches
+    all_batches = db.get_all_batches(limit=100)
+    completed_batches = [b for b in all_batches if b.status in ['completed', 'completed_with_errors', 'failed', 'cancelled']]
+    
+    if not completed_batches:
+        st.info("No completed batches yet.")
+        return
+    
+    # Summary statistics
+    total_processed = sum(b.processed_documents for b in completed_batches)
+    total_cost = sum(b.total_cost for b in completed_batches)
+    success_rate = sum(b.processed_documents for b in completed_batches) / max(sum(b.total_documents for b in completed_batches), 1)
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Documents Processed", f"{total_processed:,}")
+    with col2:
+        st.metric("Total Cost", f"${total_cost:.2f}")
+    with col3:
+        st.metric("Overall Success Rate", f"{success_rate:.1%}")
+    
+    # Batch history table
+    if completed_batches:
+        history_data = []
+        for batch in completed_batches:
+            success_rate = batch.processed_documents / max(batch.total_documents, 1)
+            
+            history_data.append({
+                "Batch Name": batch.name,
+                "Status": batch.status,
+                "Documents": f"{batch.processed_documents} / {batch.total_documents}",
+                "Success Rate": f"{success_rate:.1%}",
+                "Cost": f"${batch.total_cost:.2f}",
+                "Created": batch.created_at,
+                "Completed": batch.completed_at or "-"
+            })
+        
+        df = pd.DataFrame(history_data)
+        
+        # Color-code status
+        def color_status(val):
+            colors = {
+                'completed': 'background-color: #d4edda',
+                'completed_with_errors': 'background-color: #fff3cd',
+                'failed': 'background-color: #f8d7da',
+                'cancelled': 'background-color: #e2e3e5'
+            }
+            return colors.get(val, '')
+        
+        styled_df = df.style.applymap(color_status, subset=['Status'])
+        st.dataframe(styled_df, use_container_width=True)
+    
+    # Cleanup options
+    with st.expander("🧹 Cleanup Options"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            days_old = st.number_input("Delete batches older than (days)", min_value=1, value=30)
+        
+        with col2:
+            if st.button("🗑️ Cleanup Old Batches"):
+                cleaned = db.cleanup_old_batches(days_old)
+                if cleaned > 0:
+                    st.success(f"Cleaned up {cleaned} old batches")
+                    st.rerun()
+                else:
+                    st.info("No old batches to clean up")
+
+
+def discover_s3_documents(bucket_name: str, aws_region: str, input_prefix: str, max_documents: int = 100):
     """Discover and preview S3 documents"""
     try:
         # Initialize S3 processor

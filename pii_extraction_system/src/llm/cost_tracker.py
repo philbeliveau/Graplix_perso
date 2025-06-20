@@ -854,3 +854,6 @@ class TokenUsageMonitor:
 # Global instances
 default_cost_tracker = CostTracker()
 token_monitor = TokenUsageMonitor(default_cost_tracker)
+
+# Alias for backward compatibility
+cost_tracker = default_cost_tracker

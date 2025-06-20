@@ -444,7 +444,7 @@ class MultimodalLLMService:
         }
     
     def create_pii_extraction_prompt(self, document_type: str = "document") -> str:
-        """Create optimized prompt for PII extraction"""
+        """Create optimized prompt for PII extraction with document classification"""
         
         base_prompt = f"""
 Please help me digitize this {document_type} by extracting visible information in a structured JSON format.
@@ -463,6 +463,11 @@ Return ONLY a valid JSON object with this exact structure:
     "identification_numbers": ["ID numbers, social insurance numbers, employee IDs, etc"],
     "organizations": ["company names, institutions"],
     "other_relevant_info": ["any other structured data like titles, positions, etc"]
+  }},
+  "document_classification": {{
+    "difficulty_level": "Easy|Medium|Hard",
+    "domain": "HR|Finance|Legal|Medical|Government|Education|Other",
+    "domain_detail": "specific subdomain or document type"
   }}
 }}
 
@@ -473,7 +478,21 @@ Important guidelines:
 - For addresses: Include complete addresses with city/province/postal codes
 - For dates: Use consistent format (YYYY-MM-DD when possible)
 - Be thorough but accurate - only extract what you can clearly see
-- Return valid JSON only, no other text or explanations
+
+For document classification:
+- Difficulty levels:
+  - Easy: Clear text, standard format, minimal PII
+  - Medium: Some formatting challenges, moderate PII density
+  - Hard: Poor quality, handwriting, complex layout, or dense PII
+- Domain examples:
+  - HR: Employment forms, absence requests, pay stubs
+  - Finance: Invoices, bank statements, tax documents
+  - Legal: Contracts, agreements, legal notices
+  - Medical: Medical forms, prescriptions, health records
+  - Government: ID documents, permits, official forms
+  - Education: Transcripts, enrollment forms, certificates
+
+Return valid JSON only, no other text or explanations
 """
         return base_prompt.strip()
     

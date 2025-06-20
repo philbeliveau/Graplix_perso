@@ -101,6 +101,17 @@ def main():
         .status-active { background-color: #28a745; }
         .status-warning { background-color: #ffc107; }
         .status-error { background-color: #dc3545; }
+        
+        /* Sidebar text styling */
+        .css-1d391kg, .css-1d391kg p, .css-1d391kg h3 {
+            color: black !important;
+        }
+        section[data-testid="stSidebar"] * {
+            color: black !important;
+        }
+        section[data-testid="stSidebar"] .stButton button {
+            color: black !important;
+        }
     </style>
     """, unsafe_allow_html=True)
     
@@ -162,9 +173,10 @@ def main():
                     "font-size": "16px",
                     "text-align": "left",
                     "margin": "0px",
+                    "color": "black",
                     "--hover-color": "#eee"
                 },
-                "nav-link-selected": {"background-color": "#1f77b4"},
+                "nav-link-selected": {"background-color": "#1f77b4", "color": "white"},
             }
         )
         

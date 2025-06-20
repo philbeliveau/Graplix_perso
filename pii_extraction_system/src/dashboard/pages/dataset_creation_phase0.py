@@ -24,6 +24,28 @@ from PIL import Image
 import sys
 from pathlib import Path
 
+# For PDF to image conversion
+try:
+    from pdf2image import convert_from_path
+    PDF2IMAGE_AVAILABLE = True
+except ImportError:
+    PDF2IMAGE_AVAILABLE = False
+
+# For password-protected documents
+try:
+    import msoffcrypto
+    MSOFFCRYPTO_AVAILABLE = True
+except ImportError:
+    MSOFFCRYPTO_AVAILABLE = False
+
+# For Office documents
+try:
+    from docx import Document
+    import openpyxl
+    OFFICE_AVAILABLE = True
+except ImportError:
+    OFFICE_AVAILABLE = False
+
 # Add src to path for imports
 src_path = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(src_path))
@@ -32,6 +54,10 @@ from dashboard.utils import session_state, ui_components, auth
 from llm.multimodal_llm_service import llm_service
 from utils.document_processor import DocumentProcessor
 from core.ground_truth_validation import ground_truth_validator
+from core.logging_config import get_logger
+
+# Initialize logger
+logger = get_logger(__name__)
 
 # Dataset creation state management
 if 'phase0_dataset' not in st.session_state:
@@ -239,142 +265,351 @@ def detect_document_type(filename: str) -> str:
     
     return type_mapping.get(extension, 'Unknown')
 
+def convert_document_to_images(file_content: bytes, file_extension: str, password: Optional[str] = None) -> List[str]:
+    """Convert document to base64-encoded images for vision processing"""
+    images = []
+    
+    # Create temporary file
+    with tempfile.NamedTemporaryFile(suffix=file_extension, delete=False) as temp_file:
+        temp_file.write(file_content)
+        temp_file_path = temp_file.name
+    
+    try:
+        # Handle password-protected files
+        processed_file_path = temp_file_path
+        
+        if password and file_extension.lower() in ['.pdf', '.docx', '.xlsx']:
+            # For password-protected files, try to decrypt first
+            if MSOFFCRYPTO_AVAILABLE and file_extension.lower() in ['.docx', '.xlsx']:
+                try:
+                    with open(temp_file_path, 'rb') as f:
+                        office_file = msoffcrypto.OfficeFile(f)
+                        office_file.load_key(password=password)
+                        
+                        # Create decrypted file
+                        decrypted_path = temp_file_path + '_decrypted' + file_extension
+                        with open(decrypted_path, 'wb') as decrypted_f:
+                            office_file.decrypt(decrypted_f)
+                        
+                        processed_file_path = decrypted_path
+                except Exception as e:
+                    logger.warning(f"Failed to decrypt Office document: {e}")
+        
+        # Convert based on file type
+        if file_extension.lower() == '.pdf':
+            if PDF2IMAGE_AVAILABLE:
+                try:
+                    # For password-protected PDFs, pdf2image can handle them directly
+                    kwargs = {'dpi': 200, 'fmt': 'PNG'}
+                    if password:
+                        kwargs['userpw'] = password
+                    
+                    # Convert PDF pages to images
+                    pdf_images = convert_from_path(
+                        processed_file_path,
+                        **kwargs
+                    )
+                    
+                    for img in pdf_images:
+                        # Convert PIL image to base64
+                        buffer = BytesIO()
+                        img.save(buffer, format='PNG')
+                        img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                        images.append(img_base64)
+                        
+                except Exception as e:
+                    logger.error(f"PDF to image conversion failed: {e}")
+                    # Try without password if it failed
+                    if password:
+                        try:
+                            logger.info("Retrying PDF conversion without password...")
+                            pdf_images = convert_from_path(
+                                processed_file_path,
+                                dpi=200,
+                                fmt='PNG'
+                            )
+                            for img in pdf_images:
+                                buffer = BytesIO()
+                                img.save(buffer, format='PNG')
+                                img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                                images.append(img_base64)
+                        except Exception as e2:
+                            logger.error(f"PDF conversion also failed without password: {e2}")
+            else:
+                logger.error("pdf2image not available for PDF conversion")
+        
+        elif file_extension.lower() in ['.docx', '.doc']:
+            # For Word documents
+            if file_extension.lower() == '.doc':
+                # Old .doc format not directly supported
+                logger.warning(f"Old .doc format detected. Consider converting to .docx for better support.")
+                # Create a placeholder image with instructions
+                text_content = (
+                    f"Document: {os.path.basename(temp_file_path)}\n\n"
+                    "⚠️ Old .doc format is not directly supported\n\n"
+                    "This is a legacy Microsoft Word format that cannot be\n"
+                    "processed directly. Please:\n\n"
+                    "1. Open the document in Microsoft Word\n"
+                    "2. Save it as .docx format (File → Save As → .docx)\n"
+                    "3. Re-upload the .docx version\n\n"
+                    "Alternatively, you can:\n"
+                    "- Export the document as PDF\n"
+                    "- Take screenshots of the document pages"
+                )
+                img = create_text_image(text_content)
+                buffer = BytesIO()
+                img.save(buffer, format='PNG')
+                img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                images.append(img_base64)
+            elif OFFICE_AVAILABLE:
+                try:
+                    doc = Document(processed_file_path)
+                    text_content = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
+                    
+                    # Create a simple text image
+                    img = create_text_image(text_content)
+                    buffer = BytesIO()
+                    img.save(buffer, format='PNG')
+                    img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                    images.append(img_base64)
+                except Exception as e:
+                    logger.error(f"Word document processing failed: {e}")
+        
+        elif file_extension.lower() in ['.xlsx', '.xls']:
+            # For Excel files, create a simple representation
+            if OFFICE_AVAILABLE:
+                try:
+                    workbook = openpyxl.load_workbook(processed_file_path)
+                    text_content = ''
+                    
+                    for sheet in workbook.worksheets:
+                        text_content += f"Sheet: {sheet.title}\n"
+                        for row in sheet.iter_rows(values_only=True):
+                            row_text = '\t'.join([str(cell) if cell is not None else '' for cell in row])
+                            text_content += row_text + '\n'
+                        text_content += '\n'
+                    
+                    # Create a text image
+                    img = create_text_image(text_content)
+                    buffer = BytesIO()
+                    img.save(buffer, format='PNG')
+                    img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                    images.append(img_base64)
+                except Exception as e:
+                    logger.error(f"Excel document processing failed: {e}")
+        
+        elif file_extension.lower() == '.txt':
+            # For text files, create a text image
+            try:
+                with open(processed_file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    text_content = f.read()
+                
+                img = create_text_image(text_content)
+                buffer = BytesIO()
+                img.save(buffer, format='PNG')
+                img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                images.append(img_base64)
+            except Exception as e:
+                logger.error(f"Text file processing failed: {e}")
+        
+        elif file_extension.lower() in ['.png', '.jpg', '.jpeg', '.tiff', '.bmp']:
+            # Already an image, just convert to base64
+            img_base64 = base64.b64encode(file_content).decode('utf-8')
+            images.append(img_base64)
+    
+    finally:
+        # Clean up temporary files
+        try:
+            os.unlink(temp_file_path)
+            if processed_file_path != temp_file_path:
+                os.unlink(processed_file_path)
+        except OSError:
+            pass
+    
+    return images
+
+def create_text_image(text: str, width: int = 800, font_size: int = 12) -> Image.Image:
+    """Create a PIL image from text content"""
+    from PIL import Image, ImageDraw, ImageFont
+    
+    # Split text into lines and estimate image height
+    lines = text.split('\n')
+    max_chars_per_line = width // (font_size // 2)
+    
+    # Wrap long lines
+    wrapped_lines = []
+    for line in lines:
+        if len(line) <= max_chars_per_line:
+            wrapped_lines.append(line)
+        else:
+            # Simple word wrapping
+            words = line.split(' ')
+            current_line = ''
+            for word in words:
+                if len(current_line + ' ' + word) <= max_chars_per_line:
+                    current_line += (' ' + word) if current_line else word
+                else:
+                    if current_line:
+                        wrapped_lines.append(current_line)
+                    current_line = word
+            if current_line:
+                wrapped_lines.append(current_line)
+    
+    # Calculate image height
+    line_height = font_size + 4
+    height = max(len(wrapped_lines) * line_height + 40, 400)
+    
+    # Create image
+    img = Image.new('RGB', (width, height), color='white')
+    draw = ImageDraw.Draw(img)
+    
+    # Try to use a default font
+    try:
+        font = ImageFont.truetype('/System/Library/Fonts/Arial.ttf', font_size)
+    except:
+        font = ImageFont.load_default()
+    
+    # Draw text
+    y_position = 20
+    for line in wrapped_lines[:100]:  # Limit to first 100 lines
+        draw.text((20, y_position), line, fill='black', font=font)
+        y_position += line_height
+    
+    return img
+
 def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
-    """Auto-label document using GPT-4o with password support for encrypted documents"""
+    """Auto-label document using GPT-4o vision - direct image processing approach"""
     document = next((doc for doc in st.session_state.phase0_dataset if doc['id'] == doc_id), None)
     
     if not document:
         raise ValueError("Document not found")
     
-    # For image files, use LLM directly
-    if document['type'].startswith('image/') or document['name'].lower().endswith(('.png', '.jpg', '.jpeg', '.tiff')):
-        result = llm_service.extract_pii_from_image(
-            document['content'],
-            'openai/gpt-4o',
-            document_type=document['metadata']['document_type']
-        )
+    try:
+        # Decode the base64 content
+        file_content = base64.b64decode(document['content'])
+        file_extension = os.path.splitext(document['name'])[1]
         
-        if result['success']:
+        st.info(f"🔄 Processing {document['name']} using vision-based approach...")
+        
+        # Convert document to images for vision processing
+        images = convert_document_to_images(file_content, file_extension, password)
+        
+        if not images:
+            st.warning(f"⚠️ Could not convert {document['name']} to images for processing")
             return {
-                'method': 'gpt4o_vision',
-                'entities': result.get('pii_entities', []),
-                'confidence_score': calculate_confidence_score(result.get('pii_entities', [])),
-                'processing_time': result.get('processing_time', 0),
-                'cost': result.get('usage', {}).get('estimated_cost', 0),
-                'raw_response': result
+                'method': 'conversion_failed',
+                'entities': [],
+                'confidence_score': 0.0,
+                'processing_time': 0,
+                'cost': 0,
+                'error': 'Document could not be converted to images'
             }
-        else:
-            raise Exception(result.get('error', 'Unknown error'))
-    
-    # For text-based documents (PDF, DOCX, TXT, Excel), use DocumentProcessor
-    else:
-        try:
-            # Decode the base64 content
-            file_content = base64.b64decode(document['content'])
+        
+        st.info(f"📄 Converted to {len(images)} image(s), processing with GPT-4o vision...")
+        
+        # Process all images and combine results
+        all_entities = []
+        total_cost = 0.0
+        total_time = 0.0
+        all_transcribed_text = []
+        document_classification = None
+        
+        for i, image_data in enumerate(images):
+            page_info = f"(page {i+1}/{len(images)})" if len(images) > 1 else ""
+            st.info(f"🔍 Analyzing image {i+1}/{len(images)} {page_info}...")
             
-            # Create a temporary file with the original extension
-            # Get file extension
-            file_extension = os.path.splitext(document['name'])[1]
+            # Extract PII using vision
+            result = llm_service.extract_pii_from_image(
+                image_data,
+                'openai/gpt-4o',
+                document_type=document['metadata']['document_type']
+            )
             
-            # Create temporary file with proper extension
-            with tempfile.NamedTemporaryFile(suffix=file_extension, delete=False) as temp_file:
-                temp_file.write(file_content)
-                temp_file_path = temp_file.name
-            
-            try:
-                # Initialize DocumentProcessor
-                doc_processor = DocumentProcessor()
+            if result.get('success'):
+                # Add page information to entities
+                page_entities = result.get('pii_entities', [])
+                for entity in page_entities:
+                    entity['page'] = i + 1
+                    entity['source'] = 'gpt4o_vision'
                 
-                # Process the document with password support
-                processed_doc = doc_processor.process_document(
-                    temp_file_path, 
-                    password=password if password else None
-                )
+                all_entities.extend(page_entities)
+                total_cost += result.get('usage', {}).get('estimated_cost', 0)
+                total_time += result.get('processing_time', 0)
                 
-                # DocumentProcessor returns a dict directly, no .success attribute
-                # Extract text content
-                text_content = processed_doc.get('raw_text', '')
+                # Collect transcribed text
+                if result.get('transcribed_text'):
+                    page_text = f"Page {i+1}:\n{result['transcribed_text']}"
+                    all_transcribed_text.append(page_text)
                 
-                # Also try OCR text if raw text is empty
-                if not text_content or not text_content.strip():
-                    text_content = processed_doc.get('ocr_text', '')
+                # Extract document classification from first page
+                if i == 0 and result.get('structured_data'):
+                    classification = result['structured_data'].get('document_classification')
+                    if classification:
+                        document_classification = classification
+                        st.info(f"📊 Document classified as: {classification.get('domain', 'Unknown')} - {classification.get('difficulty_level', 'Unknown')} difficulty")
                 
-                if not text_content or not text_content.strip():
-                    # For documents with no extractable text, return a minimal result
-                    return {
-                        'method': 'no_text_extracted',
-                        'entities': [],
-                        'confidence_score': 0.0,
-                        'processing_time': 0,
-                        'cost': 0,
-                        'extracted_text': '',
-                        'error': 'No text content could be extracted from this document'
-                    }
-                
-                # Use LLM service for text-based PII extraction
-                result = llm_service.extract_pii_from_text(
-                    text_content,
-                    'openai/gpt-4o',
-                    document_type=document['metadata']['document_type']
-                )
-                
-                if result['success']:
-                    return {
-                        'method': 'gpt4o_text',
-                        'entities': result.get('pii_entities', []),
-                        'confidence_score': calculate_confidence_score(result.get('pii_entities', [])),
-                        'processing_time': result.get('processing_time', 0),
-                        'cost': result.get('usage', {}).get('estimated_cost', 0),
-                        'extracted_text': text_content[:500] + "..." if len(text_content) > 500 else text_content,  # Store sample of extracted text
-                        'raw_response': result
-                    }
-                else:
-                    raise Exception(result.get('error', 'Text-based PII extraction failed'))
-                    
-            finally:
-                # Clean up temporary file
-                try:
-                    os.unlink(temp_file_path)
-                except OSError:
-                    pass  # Ignore cleanup errors
-                
-        except Exception as e:
-            # Handle specific error cases with helpful messages
-            error_message = str(e)
-            
-            if "Old .doc format not supported" in error_message:
-                st.warning(f"⚠️ {document['name']}: Old .doc format not supported. Please convert to .docx format.")
-                return {
-                    'method': 'unsupported_format',
-                    'entities': [],
-                    'confidence_score': 0.0,
-                    'processing_time': 0,
-                    'cost': 0,
-                    'error': 'Old .doc format not supported. Please convert to .docx format.',
-                    'suggestion': 'Convert document to .docx format and try again'
-                }
-            elif "No text content extracted" in error_message:
-                st.info(f"ℹ️ {document['name']}: No extractable text found (may be image-only or encrypted)")
-                return {
-                    'method': 'no_text_content',
-                    'entities': [],
-                    'confidence_score': 0.0,
-                    'processing_time': 0,
-                    'cost': 0,
-                    'error': 'No text content could be extracted from document',
-                    'suggestion': 'Document may be image-only or require OCR processing'
-                }
+                st.success(f"✅ Page {i+1}: Found {len(page_entities)} PII entities")
             else:
-                # Generic error handling
-                st.warning(f"Document processing failed for {document['name']}: {error_message}")
-                return {
-                    'method': 'failed',
-                    'entities': [],
-                    'confidence_score': 0.0,
-                    'processing_time': 0,
-                    'cost': 0,
-                    'error': error_message
-                }
+                st.warning(f"⚠️ Page {i+1}: Processing failed - {result.get('error', 'Unknown error')}")
+        
+        # Combine results
+        combined_text = '\n\n'.join(all_transcribed_text)
+        
+        # Debug logging
+        st.info(f"📊 Processing complete for {document['name']}:")
+        st.info(f"   • Total entities found: {len(all_entities)}")
+        st.info(f"   • Total cost: ${total_cost:.4f}")
+        st.info(f"   • Processing time: {total_time:.2f}s")
+        
+        if all_entities:
+            entity_types = [entity.get('type', 'unknown') for entity in all_entities]
+            unique_types = set(entity_types)
+            st.info(f"   • Entity types: {', '.join(unique_types)}")
+            
+            # Show first few entities as preview
+            preview_entities = all_entities[:3]
+            for entity in preview_entities:
+                page_info = f" (page {entity.get('page', '?')})" if entity.get('page') else ""
+                st.info(f"   • {entity.get('type', 'UNKNOWN')}: {entity.get('text', 'N/A')}{page_info}")
+        
+        # Update document metadata with classification
+        if document_classification:
+            document['metadata']['difficulty_level'] = document_classification.get('difficulty_level', 'Unknown')
+            document['metadata']['domain'] = document_classification.get('domain', 'Unknown')
+            document['metadata']['domain_detail'] = document_classification.get('domain_detail', '')
+            
+            # Update in session state
+            for doc in st.session_state.phase0_dataset:
+                if doc['id'] == doc_id:
+                    doc['metadata'].update(document['metadata'])
+                    break
+        
+        return {
+            'method': 'gpt4o_vision_direct',
+            'entities': all_entities,
+            'confidence_score': calculate_confidence_score(all_entities),
+            'processing_time': total_time,
+            'cost': total_cost,
+            'pages_processed': len(images),
+            'extracted_text': combined_text[:500] + "..." if len(combined_text) > 500 else combined_text,
+            'full_transcribed_text': combined_text,
+            'approach': 'Direct vision processing - no text extraction step',
+            'document_classification': document_classification
+        }
+    
+    except Exception as e:
+        error_message = str(e)
+        st.error(f"❌ Vision processing failed for {document['name']}: {error_message}")
+        
+        return {
+            'method': 'vision_processing_failed',
+            'entities': [],
+            'confidence_score': 0.0,
+            'processing_time': 0,
+            'cost': 0,
+            'error': f'Vision processing failed: {error_message}',
+            'suggestion': 'Check document format and password, or try re-uploading'
+        }
 
 def calculate_confidence_score(entities: List[Dict]) -> float:
     """Calculate overall confidence score for entities"""
@@ -507,6 +742,8 @@ def show_document_details(doc_name: str):
             st.markdown("**Metadata**")
             st.write(f"Difficulty: {document['metadata']['difficulty_level']}")
             st.write(f"Domain: {document['metadata']['domain']}")
+            if document['metadata'].get('domain_detail'):
+                st.write(f"Domain Detail: {document['metadata']['domain_detail']}")
             st.write(f"Validation: {document['validation_status']}")
             st.write(f"Uploaded: {document['uploaded_at'][:19].replace('T', ' ')}")
             
@@ -544,6 +781,23 @@ def show_gpt4o_labeling_interface():
     if not auth.has_permission('write'):
         st.warning("GPT-4o labeling requires write permissions.")
         return
+    
+    # Add troubleshooting tips for password-protected documents
+    with st.expander("🔐 Troubleshooting Password-Protected Documents"):
+        st.markdown("""
+        **If password-protected documents show 0 entities:**
+        
+        1. **Verify Password**: Ensure the password is exactly "Hubert" (case-sensitive)
+        2. **Document Type**: Some PDFs are scanned images requiring OCR
+        3. **OCR Settings**: Enable LLM OCR in Configuration for better results
+        4. **Processing Time**: OCR can take 30-60 seconds per page
+        5. **Check Logs**: Look for debug messages during processing
+        
+        **Common Issues:**
+        - Scanned PDFs need OCR processing which may take longer
+        - Some PDFs have text layers but are actually images
+        - Ensure sufficient processing time for large documents
+        """)
     
     # GPT-4o availability check
     available_models = llm_service.get_available_models()
@@ -867,13 +1121,13 @@ def show_metadata_tagging_interface():
     with col1:
         bulk_difficulty = st.selectbox(
             "Apply difficulty to filtered:",
-            ['No change', 'High', 'Medium', 'Low']
+            ['No change', 'Easy', 'Medium', 'Hard']
         )
     
     with col2:
         bulk_domain = st.selectbox(
             "Apply domain to filtered:",
-            ['No change', 'Finance', 'Healthcare', 'Legal', 'HR', 'General']
+            ['No change', 'HR', 'Finance', 'Legal', 'Medical', 'Government', 'Education', 'Other']
         )
     
     with col3:
@@ -922,16 +1176,24 @@ def show_document_tagging_interface(doc_name: str):
         with col1:
             new_difficulty = st.selectbox(
                 "Difficulty Level",
-                ['High', 'Medium', 'Low'],
-                index=['High', 'Medium', 'Low'].index(document['metadata']['difficulty_level'])
-                if document['metadata']['difficulty_level'] in ['High', 'Medium', 'Low'] else 1
+                ['Easy', 'Medium', 'Hard'],
+                index=['Easy', 'Medium', 'Hard'].index(document['metadata']['difficulty_level'])
+                if document['metadata']['difficulty_level'] in ['Easy', 'Medium', 'Hard'] else 1
             )
             
+            domain_options = ['HR', 'Finance', 'Legal', 'Medical', 'Government', 'Education', 'Other']
             new_domain = st.selectbox(
                 "Domain",
-                ['Finance', 'Healthcare', 'Legal', 'HR', 'General'],
-                index=['Finance', 'Healthcare', 'Legal', 'HR', 'General'].index(document['metadata']['domain'])
-                if document['metadata']['domain'] in ['Finance', 'Healthcare', 'Legal', 'HR', 'General'] else 4
+                domain_options,
+                index=domain_options.index(document['metadata']['domain'])
+                if document['metadata']['domain'] in domain_options else 6  # Default to 'Other'
+            )
+            
+            # Domain detail for additional context
+            domain_detail = st.text_input(
+                "Domain Detail (optional)",
+                value=document['metadata'].get('domain_detail', ''),
+                help="Specific subdomain or document type (e.g., 'Absence Request Form', 'Pay Stub', 'Tax Document')"
             )
         
         with col2:
@@ -967,6 +1229,7 @@ def show_document_tagging_interface(doc_name: str):
                     document['id'],
                     new_difficulty,
                     new_domain,
+                    domain_detail,
                     complexity_score,
                     contains_sensitive,
                     requires_review,
@@ -983,6 +1246,7 @@ def update_document_metadata(
     doc_id: str,
     difficulty: str,
     domain: str,
+    domain_detail: str,
     complexity_score: int,
     contains_sensitive: bool,
     requires_review: bool,
@@ -995,6 +1259,7 @@ def update_document_metadata(
         document['metadata'].update({
             'difficulty_level': difficulty,
             'domain': domain,
+            'domain_detail': domain_detail,
             'complexity_score': complexity_score,
             'contains_sensitive': contains_sensitive,
             'requires_review': requires_review,
@@ -1487,6 +1752,72 @@ def show_dataset_export_interface():
         completion_rate = labeled_count / len(st.session_state.phase0_dataset) if st.session_state.phase0_dataset else 0
         st.metric("Completion Rate", f"{completion_rate:.1%}")
     
+    # Dataset distribution analysis
+    st.markdown("#### 📊 Dataset Distribution")
+    
+    # Calculate distributions
+    difficulty_dist = {}
+    domain_dist = {}
+    
+    for doc in st.session_state.phase0_dataset:
+        if doc['labeled']:
+            difficulty = doc['metadata']['difficulty_level']
+            domain = doc['metadata']['domain']
+            
+            difficulty_dist[difficulty] = difficulty_dist.get(difficulty, 0) + 1
+            domain_dist[domain] = domain_dist.get(domain, 0) + 1
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("**Distribution by Difficulty:**")
+        if difficulty_dist:
+            for level in ['Easy', 'Medium', 'Hard', 'Unknown']:
+                if level in difficulty_dist:
+                    percentage = (difficulty_dist[level] / labeled_count) * 100
+                    st.write(f"- {level}: {difficulty_dist[level]} documents ({percentage:.1f}%)")
+        else:
+            st.info("No labeled documents to analyze")
+    
+    with col2:
+        st.markdown("**Distribution by Domain:**")
+        if domain_dist:
+            # Sort by count descending
+            sorted_domains = sorted(domain_dist.items(), key=lambda x: x[1], reverse=True)
+            for domain, count in sorted_domains[:5]:  # Show top 5
+                percentage = (count / labeled_count) * 100
+                st.write(f"- {domain}: {count} documents ({percentage:.1f}%)")
+            if len(sorted_domains) > 5:
+                others_count = sum(count for domain, count in sorted_domains[5:])
+                others_percentage = (others_count / labeled_count) * 100
+                st.write(f"- Others: {others_count} documents ({others_percentage:.1f}%)")
+        else:
+            st.info("No labeled documents to analyze")
+    
+    # Average entities by difficulty
+    if labeled_count > 0:
+        st.markdown("**Average PII Entities by Difficulty:**")
+        
+        difficulty_entities = {}
+        for doc in st.session_state.phase0_dataset:
+            if doc['labeled'] and doc.get('gpt4o_labels'):
+                difficulty = doc['metadata']['difficulty_level']
+                entities_count = len(doc['gpt4o_labels'].get('entities', []))
+                
+                if difficulty not in difficulty_entities:
+                    difficulty_entities[difficulty] = []
+                difficulty_entities[difficulty].append(entities_count)
+        
+        col1, col2, col3 = st.columns(3)
+        
+        for i, (level, col) in enumerate(zip(['Easy', 'Medium', 'Hard'], [col1, col2, col3])):
+            with col:
+                if level in difficulty_entities and difficulty_entities[level]:
+                    avg_entities = sum(difficulty_entities[level]) / len(difficulty_entities[level])
+                    st.metric(f"{level} Avg. Entities", f"{avg_entities:.1f}")
+                else:
+                    st.metric(f"{level} Avg. Entities", "N/A")
+    
     # Export options
     st.markdown("#### Export Options")
     
@@ -1510,7 +1841,7 @@ def show_dataset_export_interface():
         if export_filter == 'By domain':
             selected_domain = st.selectbox(
                 "Select domain",
-                ['Finance', 'Healthcare', 'Legal', 'HR', 'General']
+                ['HR', 'Finance', 'Legal', 'Medical', 'Government', 'Education', 'Other']
             )
     
     # Export preview

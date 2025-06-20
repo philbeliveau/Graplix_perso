@@ -2148,10 +2148,17 @@ def show_document_visualization():
                         confidence = entity.get('confidence', 0.5)
                         confidence_color = "green" if confidence > 0.8 else "orange" if confidence > 0.6 else "red"
                         
+                        # Get entity value with fallback for different field names
+                        entity_value = (entity.get('text') or 
+                                      entity.get('value') or 
+                                      entity.get('content') or 
+                                      entity.get('entity_text') or 
+                                      'N/A')
+                        
                         st.markdown(f"""
                         **Entity {idx+1}:**
                         - **Type:** {entity.get('type', 'Unknown')}
-                        - **Value:** `{entity.get('value', 'N/A')}`
+                        - **Value:** `{entity_value}`
                         - **Confidence:** <span style="color:{confidence_color}">{confidence:.2%}</span>
                         """, unsafe_allow_html=True)
                         
@@ -2186,10 +2193,17 @@ def show_document_visualization():
             gt_entities = selected_doc['info']['ground_truth_labels'].get('entities', [])
             
             for idx, entity in enumerate(gt_entities):
+                # Get entity value with fallback for different field names  
+                gt_entity_value = (entity.get('text') or 
+                                 entity.get('value') or 
+                                 entity.get('content') or 
+                                 entity.get('entity_text') or 
+                                 'N/A')
+                
                 st.markdown(f"""
                 **GT Entity {idx+1}:**
                 - **Type:** {entity.get('type', 'Unknown')}
-                - **Value:** `{entity.get('value', 'N/A')}`
+                - **Value:** `{gt_entity_value}`
                 """)
 
 

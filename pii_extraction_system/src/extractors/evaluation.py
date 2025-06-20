@@ -101,6 +101,57 @@ class EvaluationMetrics:
         }
 
 
+class EvaluationResultWrapper:
+    """
+    Wrapper class to provide backward compatibility for evaluation results.
+    
+    This class wraps EvaluationMetrics to provide the expected interface
+    with precision, recall, and f1_score attributes.
+    """
+    
+    def __init__(self, metrics: EvaluationMetrics):
+        """
+        Initialize wrapper with evaluation metrics.
+        
+        Args:
+            metrics: EvaluationMetrics object from evaluate_extraction_result
+        """
+        self._metrics = metrics
+    
+    @property
+    def precision(self) -> float:
+        """Overall precision score."""
+        return self._metrics.overall_precision
+    
+    @property
+    def recall(self) -> float:
+        """Overall recall score."""
+        return self._metrics.overall_recall
+    
+    @property
+    def f1_score(self) -> float:
+        """Overall F1 score."""
+        return self._metrics.overall_f1_score
+    
+    @property
+    def accuracy(self) -> float:
+        """Overall accuracy score."""
+        return self._metrics.accuracy
+    
+    @property
+    def metrics(self) -> EvaluationMetrics:
+        """Access to underlying metrics object."""
+        return self._metrics
+    
+    def __str__(self) -> str:
+        """String representation."""
+        return f"EvaluationResult(precision={self.precision:.3f}, recall={self.recall:.3f}, f1_score={self.f1_score:.3f})"
+    
+    def __repr__(self) -> str:
+        """String representation."""
+        return self.__str__()
+
+
 class PIIEvaluator:
     """Evaluator for comparing PII extraction results against ground truth."""
     
@@ -128,6 +179,194 @@ class PIIEvaluator:
         }
         
         logger.info("PII Evaluator initialized")
+    
+    def evaluate(self, 
+                predicted_entities: List[Any],
+                ground_truth_entities: List[Any], 
+                threshold: Optional[float] = None) -> 'EvaluationResultWrapper':
+        """
+        Compatibility wrapper for the evaluate method.
+        
+        This method provides backward compatibility by converting the input parameters
+        to the format expected by evaluate_extraction_result() and wrapping the result.
+        
+        Args:
+            predicted_entities: List of predicted entities (from LLM extraction)
+            ground_truth_entities: List of ground truth entities  
+            threshold: Optional threshold for matching (updates text_similarity_threshold)
+            
+        Returns:
+            EvaluationResultWrapper with precision, recall, f1_score attributes
+        """
+        try:
+            logger.info(f"evaluate() called with {len(predicted_entities)} predicted and {len(ground_truth_entities)} ground truth entities")
+            
+            # Update threshold if provided
+            if threshold is not None:
+                original_threshold = self.text_similarity_threshold
+                self.text_similarity_threshold = threshold
+            else:
+                original_threshold = None
+            
+            # Convert predicted entities to PIIEntity objects
+            pii_entities = self._convert_to_pii_entities(predicted_entities)
+            
+            # Convert ground truth entities to GroundTruthEntity objects  
+            gt_entities = self._convert_to_ground_truth_entities(ground_truth_entities)
+            
+            # Create a PIIExtractionResult wrapper
+            predicted_result = PIIExtractionResult(
+                pii_entities=pii_entities,
+                confidence_scores={},
+                processing_time=0.0,
+                metadata={}
+            )
+            
+            # Call the existing evaluation method
+            metrics = self.evaluate_extraction_result(predicted_result, gt_entities)
+            
+            # Restore original threshold if it was changed
+            if original_threshold is not None:
+                self.text_similarity_threshold = original_threshold
+            
+            # Return wrapped result for compatibility
+            return EvaluationResultWrapper(metrics)
+            
+        except Exception as e:
+            logger.error(f"Error in evaluate() method: {e}")
+            # Return default metrics on error
+            default_metrics = EvaluationMetrics()
+            return EvaluationResultWrapper(default_metrics)
+    
+    def _convert_to_pii_entities(self, entities: List[Any]) -> List[PIIEntity]:
+        """
+        Convert various entity formats to PIIEntity objects.
+        
+        Args:
+            entities: List of entities in various formats (dict, PIIEntity, etc.)
+            
+        Returns:
+            List of PIIEntity objects
+        """
+        pii_entities = []
+        
+        for entity in entities:
+            try:
+                if isinstance(entity, PIIEntity):
+                    # Already a PIIEntity
+                    pii_entities.append(entity)
+                elif isinstance(entity, dict):
+                    # Convert from dictionary format
+                    pii_entity = PIIEntity(
+                        text=str(entity.get('text', entity.get('value', ''))),
+                        pii_type=str(entity.get('type', entity.get('pii_type', entity.get('label', 'unknown')))),
+                        start_pos=int(entity.get('start_pos', entity.get('start', 0))),
+                        end_pos=int(entity.get('end_pos', entity.get('end', 0))),
+                        confidence=float(entity.get('confidence', entity.get('score', 1.0))),
+                        context=str(entity.get('context', '')),
+                        metadata=entity.get('metadata', {})
+                    )
+                    pii_entities.append(pii_entity)
+                else:
+                    # Try to extract from object attributes
+                    text = getattr(entity, 'text', getattr(entity, 'value', ''))
+                    pii_type = getattr(entity, 'type', getattr(entity, 'pii_type', getattr(entity, 'label', 'unknown')))
+                    start_pos = getattr(entity, 'start_pos', getattr(entity, 'start', 0))
+                    end_pos = getattr(entity, 'end_pos', getattr(entity, 'end', 0))
+                    confidence = getattr(entity, 'confidence', getattr(entity, 'score', 1.0))
+                    context = getattr(entity, 'context', '')
+                    metadata = getattr(entity, 'metadata', {})
+                    
+                    pii_entity = PIIEntity(
+                        text=str(text),
+                        pii_type=str(pii_type),
+                        start_pos=int(start_pos),
+                        end_pos=int(end_pos),
+                        confidence=float(confidence),
+                        context=str(context),
+                        metadata=metadata
+                    )
+                    pii_entities.append(pii_entity)
+                    
+            except Exception as e:
+                logger.warning(f"Failed to convert entity to PIIEntity: {entity}, error: {e}")
+                # Create a default entity
+                pii_entity = PIIEntity(
+                    text=str(entity) if not isinstance(entity, dict) else str(entity.get('text', 'unknown')),
+                    pii_type='unknown',
+                    start_pos=0,
+                    end_pos=0,
+                    confidence=0.0,
+                    context='',
+                    metadata={}
+                )
+                pii_entities.append(pii_entity)
+        
+        logger.info(f"Converted {len(entities)} entities to {len(pii_entities)} PIIEntity objects")
+        return pii_entities
+    
+    def _convert_to_ground_truth_entities(self, entities: List[Any]) -> List[GroundTruthEntity]:
+        """
+        Convert various entity formats to GroundTruthEntity objects.
+        
+        Args:
+            entities: List of entities in various formats (dict, GroundTruthEntity, etc.)
+            
+        Returns:
+            List of GroundTruthEntity objects
+        """
+        gt_entities = []
+        
+        for entity in entities:
+            try:
+                if isinstance(entity, GroundTruthEntity):
+                    # Already a GroundTruthEntity
+                    gt_entities.append(entity)
+                elif isinstance(entity, dict):
+                    # Convert from dictionary format
+                    gt_entity = GroundTruthEntity(
+                        text=str(entity.get('text', entity.get('value', ''))),
+                        pii_type=str(entity.get('type', entity.get('pii_type', entity.get('label', 'unknown')))),
+                        start_pos=int(entity.get('start_pos', entity.get('start', 0))),
+                        end_pos=int(entity.get('end_pos', entity.get('end', 0))),
+                        context=str(entity.get('context', '')),
+                        metadata=entity.get('metadata', {})
+                    )
+                    gt_entities.append(gt_entity)
+                else:
+                    # Try to extract from object attributes
+                    text = getattr(entity, 'text', getattr(entity, 'value', ''))
+                    pii_type = getattr(entity, 'type', getattr(entity, 'pii_type', getattr(entity, 'label', 'unknown')))
+                    start_pos = getattr(entity, 'start_pos', getattr(entity, 'start', 0))
+                    end_pos = getattr(entity, 'end_pos', getattr(entity, 'end', 0))
+                    context = getattr(entity, 'context', '')
+                    metadata = getattr(entity, 'metadata', {})
+                    
+                    gt_entity = GroundTruthEntity(
+                        text=str(text),
+                        pii_type=str(pii_type),
+                        start_pos=int(start_pos),
+                        end_pos=int(end_pos),
+                        context=str(context),
+                        metadata=metadata
+                    )
+                    gt_entities.append(gt_entity)
+                    
+            except Exception as e:
+                logger.warning(f"Failed to convert entity to GroundTruthEntity: {entity}, error: {e}")
+                # Create a default entity
+                gt_entity = GroundTruthEntity(
+                    text=str(entity) if not isinstance(entity, dict) else str(entity.get('text', 'unknown')),
+                    pii_type='unknown',
+                    start_pos=0,
+                    end_pos=0,
+                    context='',
+                    metadata={}
+                )
+                gt_entities.append(gt_entity)
+        
+        logger.info(f"Converted {len(entities)} entities to {len(gt_entities)} GroundTruthEntity objects")
+        return gt_entities
     
     def evaluate_extraction_result(self,
                                  predicted_result: PIIExtractionResult,

@@ -15,8 +15,10 @@ import numpy as np
 import json
 import base64
 import uuid
+import logging
 import tempfile
 import os
+import time
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 from io import BytesIO
@@ -56,8 +58,23 @@ from utils.document_processor import DocumentProcessor
 from core.ground_truth_validation import ground_truth_validator
 from core.logging_config import get_logger
 
-# Initialize logger
+# Initialize logger with appropriate level for batch processing
 logger = get_logger(__name__)
+
+# Context manager for suppressing verbose logs during batch operations
+class SuppressVerboseLogs:
+    """Context manager to reduce verbose output during batch processing"""
+    def __init__(self):
+        self.suppressed = False
+        
+    def __enter__(self):
+        # For batch processing, we'll rely on the simplified UI updates
+        # rather than trying to modify logger levels directly
+        self.suppressed = True
+        return self
+        
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.suppressed = False
 
 # Dataset creation state management
 if 'phase0_dataset' not in st.session_state:
@@ -489,8 +506,6 @@ def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
         file_content = base64.b64decode(document['content'])
         file_extension = os.path.splitext(document['name'])[1]
         
-        st.info(f"🔄 Processing {document['name']} using vision-based approach...")
-        
         # Convert document to images for vision processing
         images = convert_document_to_images(file_content, file_extension, password)
         
@@ -505,8 +520,6 @@ def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
                 'error': 'Document could not be converted to images'
             }
         
-        st.info(f"📄 Converted to {len(images)} image(s), processing with GPT-4o vision...")
-        
         # Process all images and combine results
         all_entities = []
         total_cost = 0.0
@@ -514,9 +527,13 @@ def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
         all_transcribed_text = []
         document_classification = None
         
+        # Create progress placeholder for multi-page documents
+        progress_placeholder = st.empty() if len(images) > 1 else None
+        
         for i, image_data in enumerate(images):
-            page_info = f"(page {i+1}/{len(images)})" if len(images) > 1 else ""
-            st.info(f"🔍 Analyzing image {i+1}/{len(images)} {page_info}...")
+            # Show progress for multi-page documents only
+            if progress_placeholder:
+                progress_placeholder.text(f"Processing page {i+1}/{len(images)}...")
             
             # Extract PII using vision
             result = llm_service.extract_pii_from_image(
@@ -546,31 +563,36 @@ def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
                     classification = result['structured_data'].get('document_classification')
                     if classification:
                         document_classification = classification
-                        st.info(f"📊 Document classified as: {classification.get('domain', 'Unknown')} - {classification.get('difficulty_level', 'Unknown')} difficulty")
-                
-                st.success(f"✅ Page {i+1}: Found {len(page_entities)} PII entities")
             else:
-                st.warning(f"⚠️ Page {i+1}: Processing failed - {result.get('error', 'Unknown error')}")
+                # Only log errors and warnings, not individual page status
+                logger.warning(f"Failed to process page {i+1} of {document['name']}: {result.get('error', 'Unknown error')}")
+                if len(images) == 1:  # Show warning only for single-page documents
+                    st.warning(f"⚠️ Processing failed: {result.get('error', 'Unknown error')}")
+        
+        # Clear progress placeholder
+        if progress_placeholder:
+            progress_placeholder.empty()
         
         # Combine results
         combined_text = '\n\n'.join(all_transcribed_text)
         
-        # Debug logging
-        st.info(f"📊 Processing complete for {document['name']}:")
-        st.info(f"   • Total entities found: {len(all_entities)}")
-        st.info(f"   • Total cost: ${total_cost:.4f}")
-        st.info(f"   • Processing time: {total_time:.2f}s")
-        
+        # Show concise summary only - no verbose details
         if all_entities:
             entity_types = [entity.get('type', 'unknown') for entity in all_entities]
-            unique_types = set(entity_types)
-            st.info(f"   • Entity types: {', '.join(unique_types)}")
+            unique_types = list(set(entity_types))[:3]  # Show first 3 types
+            types_display = ', '.join(unique_types)
+            if len(set(entity_types)) > 3:
+                types_display += '...'
             
-            # Show first few entities as preview
-            preview_entities = all_entities[:3]
-            for entity in preview_entities:
-                page_info = f" (page {entity.get('page', '?')})" if entity.get('page') else ""
-                st.info(f"   • {entity.get('type', 'UNKNOWN')}: {entity.get('text', 'N/A')}{page_info}")
+            classification_info = ""
+            if document_classification:
+                domain = document_classification.get('domain', 'Unknown')
+                difficulty = document_classification.get('difficulty_level', 'Unknown')
+                classification_info = f" | {domain}/{difficulty}"
+            
+            st.success(f"✅ Found {len(all_entities)} entities ({types_display}) - ${total_cost:.4f}{classification_info}")
+        else:
+            st.info(f"ℹ️ No PII entities found - ${total_cost:.4f}")
         
         # Update document metadata with classification
         if document_classification:
@@ -599,7 +621,30 @@ def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
     
     except Exception as e:
         error_message = str(e)
-        st.error(f"❌ Vision processing failed for {document['name']}: {error_message}")
+        
+        # Provide more specific error messages based on the error type
+        if "pdf2image" in error_message.lower():
+            user_error = "PDF processing failed. Install pdf2image: pip install pdf2image"
+            suggestion = "Install required dependency or convert PDF to images manually"
+        elif "password" in error_message.lower() or "incorrect" in error_message.lower():
+            user_error = f"Password-protected document failed. Verify password 'Hubert' is correct."
+            suggestion = "Check password spelling, try different password, or decrypt document manually"
+        elif "no such file" in error_message.lower() or "not found" in error_message.lower():
+            user_error = "File not found or corrupted during processing."
+            suggestion = "Re-upload the document or check file integrity"
+        elif "msoffcrypto" in error_message.lower():
+            user_error = "Office document decryption failed. Install msoffcrypto: pip install msoffcrypto-tool"
+            suggestion = "Install required dependency for Office document processing"
+        elif "unsupported" in error_message.lower() or ".doc" in error_message.lower():
+            user_error = "Unsupported file format. Convert .doc files to .docx format."
+            suggestion = "Use Microsoft Word to save as .docx, or convert to PDF format"
+        else:
+            user_error = f"Processing error: {error_message}"
+            suggestion = "Check document format and try re-uploading"
+        
+        st.error(f"❌ {user_error}")
+        if suggestion:
+            st.info(f"💡 {suggestion}")
         
         return {
             'method': 'vision_processing_failed',
@@ -607,8 +652,13 @@ def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
             'confidence_score': 0.0,
             'processing_time': 0,
             'cost': 0,
-            'error': f'Vision processing failed: {error_message}',
-            'suggestion': 'Check document format and password, or try re-uploading'
+            'error': user_error,
+            'suggestion': suggestion,
+            'processing_details': {
+                'file_extension': os.path.splitext(document['name'])[1],
+                'password_provided': bool(password),
+                'error_type': 'vision_processing_failed'
+            }
         }
 
 def calculate_confidence_score(entities: List[Dict]) -> float:
@@ -947,32 +997,76 @@ def filter_documents_for_labeling(
     return filtered
 
 def label_document_batch(documents: List[Dict], model_key: str, password: str = ""):
-    """Label a batch of documents using GPT-4o with password support"""
+    """Label a batch of documents with optimized logging for large volumes"""
+    if not documents:
+        return
+    
+    # Initialize tracking
     progress_bar = st.progress(0)
-    status_text = st.empty()
+    status_container = st.empty()
+    error_container = st.empty()
     
     total_cost = 0
     successful_labels = 0
+    error_count = 0
+    start_time = time.time()
     
-    for i, document in enumerate(documents):
-        status_text.text(f"Labeling {document['name']}... ({i+1}/{len(documents)})")
-        
-        try:
-            labels = auto_label_document(document['id'], password)
-            document['gpt4o_labels'] = labels
-            document['labeled'] = True
-            document['validation_status'] = 'Auto-labeled'
-            
-            total_cost += labels.get('cost', 0)
-            successful_labels += 1
-            
-        except Exception as e:
-            st.error(f"Failed to label {document['name']}: {e}")
-        
-        progress_bar.progress((i + 1) / len(documents))
+    # Batch processing to prevent UI blocking
+    batch_size = min(20, len(documents))  # Process in chunks
     
-    status_text.text(f"Completed! Successfully labeled {successful_labels}/{len(documents)} documents.")
-    st.success(f"Labeling complete! Total cost: ${total_cost:.4f}")
+    for batch_start in range(0, len(documents), batch_size):
+        batch_end = min(batch_start + batch_size, len(documents))
+        batch_docs = documents[batch_start:batch_end]
+        
+        for i, document in enumerate(batch_docs):
+            overall_index = batch_start + i
+            
+            try:
+                # Suppress individual document logs during batch processing
+                labels = auto_label_document(document['id'], password)
+                document['gpt4o_labels'] = labels
+                document['labeled'] = True
+                document['validation_status'] = 'Auto-labeled'
+                
+                total_cost += labels.get('cost', 0)
+                successful_labels += 1
+                
+            except Exception as e:
+                error_count += 1
+                # Log only critical errors to prevent log spam
+                logger.error(f"Failed to label {document['name']}: {str(e)}")
+            
+            # Update progress
+            progress = (overall_index + 1) / len(documents)
+            progress_bar.progress(progress)
+            
+            # Update status every 10 documents or at completion
+            if (overall_index + 1) % 10 == 0 or overall_index == len(documents) - 1:
+                elapsed = time.time() - start_time
+                rate = (overall_index + 1) / elapsed if elapsed > 0 else 0
+                eta = (len(documents) - overall_index - 1) / rate if rate > 0 else 0
+                
+                status_container.text(
+                    f"Processing: {overall_index + 1}/{len(documents)} "
+                    f"({rate:.1f} docs/sec, ETA: {eta:.0f}s, Cost: ${total_cost:.4f})"
+                )
+    
+    # Final summary
+    total_time = time.time() - start_time
+    status_container.text(
+        f"Complete: {successful_labels} labeled, {error_count} errors, "
+        f"${total_cost:.4f} cost, {total_time:.1f}s ({len(documents)/total_time:.1f} docs/sec)"
+    )
+    
+    # Show errors summary if any
+    if error_count > 0:
+        error_container.warning(
+            f"⚠️ {error_count}/{len(documents)} documents failed. "
+            f"Check application logs for details."
+        )
+    
+    if successful_labels > 0:
+        st.success(f"✅ Batch complete: {successful_labels}/{len(documents)} documents labeled successfully.")
 
 def show_labeling_preview(documents: List[Dict], model_key: str):
     """Show preview of what would be labeled"""

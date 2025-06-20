@@ -360,11 +360,108 @@ class MistralProvider(LLMProvider):
     def is_available(self) -> bool:
         return bool(self.api_key and self.client)
 
+class DeepSeekProvider(LLMProvider):
+    """DeepSeek AI provider"""
+    
+    def __init__(self, model: str = "deepseek-chat"):
+        self.model = model
+        # Check multiple possible API key environment variables
+        self.api_key = os.getenv('DEEPSEEK_API_KEY') or os.getenv('DEEPSEEK_API')
+        self.client = None
+        
+        if self.api_key:
+            try:
+                import openai
+                # DeepSeek uses OpenAI-compatible API
+                self.client = openai.OpenAI(
+                    api_key=self.api_key,
+                    base_url="https://api.deepseek.com/v1"
+                )
+            except ImportError:
+                logger.warning("OpenAI library not installed (required for DeepSeek)")
+            except Exception as e:
+                logger.warning(f"Failed to initialize DeepSeek client: {e}")
+    
+    def extract_pii(self, image_data: str, prompt: str, **kwargs) -> Dict[str, Any]:
+        """
+        Note: DeepSeek doesn't currently support vision models for images,
+        so this method will return an error for image processing.
+        This is included for text-based PII extraction compatibility.
+        """
+        if not self.is_available():
+            raise ValueError("DeepSeek API key not configured or library not installed")
+        
+        # DeepSeek doesn't support vision yet, so we return an informative error
+        return {
+            "success": False,
+            "error": "DeepSeek models do not currently support image processing. Use for text-based PII extraction only.",
+            "model": self.model,
+            "provider": "deepseek",
+            "supports_vision": False
+        }
+    
+    def extract_text_pii(self, text: str, prompt: str, **kwargs) -> Dict[str, Any]:
+        """Extract PII from text using DeepSeek"""
+        if not self.is_available():
+            raise ValueError("DeepSeek API key not configured or library not installed")
+        
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a PII extraction specialist. Extract personally identifiable information from the provided text and return it in JSON format."},
+                    {"role": "user", "content": f"{prompt}\n\nText to analyze:\n{text}"}
+                ],
+                max_tokens=kwargs.get('max_tokens', 4000),
+                temperature=kwargs.get('temperature', 0.0)
+            )
+            
+            content = response.choices[0].message.content
+            usage = response.usage
+            
+            # Calculate cost
+            cost_per_token = self.get_cost_per_token()
+            total_cost = (usage.prompt_tokens * cost_per_token['input'] + 
+                         usage.completion_tokens * cost_per_token['output'])
+            
+            return {
+                "success": True,
+                "content": content,
+                "usage": {
+                    "prompt_tokens": usage.prompt_tokens,
+                    "completion_tokens": usage.completion_tokens,
+                    "total_tokens": usage.total_tokens,
+                    "estimated_cost": total_cost
+                },
+                "model": self.model,
+                "provider": "deepseek"
+            }
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "model": self.model,
+                "provider": "deepseek"
+            }
+    
+    def get_cost_per_token(self) -> Dict[str, float]:
+        costs = {
+            "deepseek-chat": {"input": 0.00014 / 1000, "output": 0.00028 / 1000},
+            "deepseek-coder": {"input": 0.00014 / 1000, "output": 0.00028 / 1000}
+        }
+        return costs.get(self.model, costs["deepseek-chat"])
+    
+    def is_available(self) -> bool:
+        return bool(self.api_key and self.client)
+
 class MultimodalLLMService:
     """Main service for multimodal LLM operations"""
     
-    def __init__(self):
+    def __init__(self, cost_tracker=None, budget_config=None):
         self.providers = {}
+        self.cost_tracker = cost_tracker
+        self.budget_config = budget_config
         self._initialize_providers()
     
     def _initialize_providers(self):
@@ -419,29 +516,210 @@ class MultimodalLLMService:
             except Exception as e:
                 logger.warning(f"Failed to initialize Mistral provider {model}: {e}")
         
+        # DeepSeek models (text-only for now)
+        deepseek_models = ["deepseek-chat", "deepseek-coder"]
+        for model in deepseek_models:
+            try:
+                provider = DeepSeekProvider(model)
+                if provider.is_available():
+                    self.providers[f"deepseek/{model}"] = provider
+                    logger.info(f"Initialized DeepSeek provider: {model} (text-only)")
+            except Exception as e:
+                logger.warning(f"Failed to initialize DeepSeek provider {model}: {e}")
+        
         logger.info(f"LLM service initialized with {len(self.providers)} available models: {list(self.providers.keys())}")
     
     def get_available_models(self) -> List[str]:
         """Get list of available models"""
         return list(self.providers.keys())
     
+    def normalize_model_key(self, model_key: str) -> str:
+        """
+        Normalize model key to provider/model format.
+        Handles cases where users provide just the model name.
+        """
+        # If already in provider/model format, return as-is
+        if '/' in model_key:
+            return model_key
+        
+        # Try to map common model names to their provider/model format
+        model_mappings = {
+            # OpenAI models
+            "gpt-4o": "openai/gpt-4o",
+            "gpt-4o-mini": "openai/gpt-4o-mini",
+            "gpt-4-turbo": "openai/gpt-4-turbo",
+            "gpt-4": "openai/gpt-4",
+            
+            # Anthropic models
+            "claude-3-5-sonnet-20241022": "anthropic/claude-3-5-sonnet-20241022",
+            "claude-3-5-haiku-20241022": "anthropic/claude-3-5-haiku-20241022",
+            "claude-3-opus-20240229": "anthropic/claude-3-opus-20240229",
+            
+            # Google models
+            "gemini-1.5-pro": "google/gemini-1.5-pro",
+            "gemini-1.5-flash": "google/gemini-1.5-flash",
+            
+            # Mistral models
+            "mistral-large": "mistral/mistral-large",
+            "mistral-medium": "mistral/mistral-medium",
+            "mistral-small": "mistral/mistral-small",
+            "mistral-tiny": "mistral/mistral-tiny",
+            
+            # DeepSeek models
+            "deepseek-chat": "deepseek/deepseek-chat",
+            "deepseek-coder": "deepseek/deepseek-coder"
+        }
+        
+        normalized = model_mappings.get(model_key)
+        if normalized:
+            logger.debug(f"Normalized model key '{model_key}' to '{normalized}'")
+            return normalized
+        
+        # If no mapping found, return as-is and let the caller handle the error
+        logger.warning(f"No provider mapping found for model '{model_key}'. Available models: {list(self.providers.keys())}")
+        return model_key
+    
     def get_model_info(self, model_key: str) -> Dict[str, Any]:
         """Get information about a specific model"""
-        if model_key not in self.providers:
-            return {"available": False}
+        # Normalize the model key first
+        normalized_key = self.normalize_model_key(model_key)
         
-        provider = self.providers[model_key]
+        if normalized_key not in self.providers:
+            available_models = list(self.providers.keys())
+            return {
+                "available": False,
+                "error": f"Model '{model_key}' not available",
+                "normalized_key": normalized_key,
+                "available_models": available_models,
+                "suggestion": self._suggest_similar_model(model_key, available_models)
+            }
+        
+        provider = self.providers[normalized_key]
         cost_info = provider.get_cost_per_token()
+        
+        # Check if this provider supports vision
+        supports_images = hasattr(provider, 'extract_pii') and not isinstance(provider, (MistralProvider, DeepSeekProvider))
         
         return {
             "available": True,
-            "provider": model_key.split('/')[0],
-            "model": model_key.split('/')[1],
+            "provider": normalized_key.split('/')[0],
+            "model": normalized_key.split('/')[1],
+            "normalized_key": normalized_key,
             "cost_per_1k_input_tokens": cost_info['input'] * 1000,
             "cost_per_1k_output_tokens": cost_info['output'] * 1000,
-            "supports_images": True,
+            "supports_images": supports_images,
             "supports_json": True
         }
+    
+    def _suggest_similar_model(self, requested_model: str, available_models: List[str]) -> Optional[str]:
+        """Suggest a similar available model based on the requested model name"""
+        requested_lower = requested_model.lower()
+        
+        # Simple similarity matching
+        best_match = None
+        best_score = 0
+        
+        for available in available_models:
+            model_name = available.split('/')[-1].lower()
+            provider_name = available.split('/')[0].lower()
+            
+            # Check for exact matches in model name
+            if requested_lower in model_name or model_name in requested_lower:
+                score = len(set(requested_lower) & set(model_name))
+                if score > best_score:
+                    best_score = score
+                    best_match = available
+            
+            # Check for provider matches (e.g., if someone asks for "gpt-4" suggest openai models)
+            elif any(provider in requested_lower for provider in ["gpt", "openai"]) and provider_name == "openai":
+                if not best_match:
+                    best_match = available
+        
+        return best_match
+    
+    def debug_model_availability(self) -> Dict[str, Any]:
+        """
+        Comprehensive debug information about model availability
+        """
+        debug_info = {
+            "total_providers_initialized": len(self.providers),
+            "available_models": list(self.providers.keys()),
+            "provider_breakdown": {},
+            "api_key_status": {},
+            "model_capabilities": {},
+            "initialization_warnings": []
+        }
+        
+        # Check API key status
+        api_keys = {
+            "OPENAI_API_KEY": bool(os.getenv('OPENAI_API_KEY')),
+            "ANTHROPIC_API_KEY": bool(os.getenv('ANTHROPIC_API_KEY')),
+            "GOOGLE_API_KEY": bool(os.getenv('GOOGLE_API_KEY')),
+            "MISTRAL_API_KEY": bool(os.getenv('MISTRAL_API_KEY')),
+            "DEEPSEEK_API_KEY": bool(os.getenv('DEEPSEEK_API_KEY')),
+            "DEEPSEEK_API": bool(os.getenv('DEEPSEEK_API'))
+        }
+        debug_info["api_key_status"] = api_keys
+        
+        # Analyze available models by provider
+        for model_key, provider in self.providers.items():
+            provider_name = model_key.split('/')[0]
+            if provider_name not in debug_info["provider_breakdown"]:
+                debug_info["provider_breakdown"][provider_name] = []
+            
+            debug_info["provider_breakdown"][provider_name].append(model_key.split('/')[1])
+            
+            # Get model capabilities
+            debug_info["model_capabilities"][model_key] = {
+                "supports_vision": hasattr(provider, 'extract_pii') and not isinstance(provider, (MistralProvider, DeepSeekProvider)),
+                "supports_text": hasattr(provider, 'extract_text_pii') or hasattr(provider, 'extract_pii'),
+                "cost_per_1k_input": provider.get_cost_per_token().get('input', 0) * 1000,
+                "cost_per_1k_output": provider.get_cost_per_token().get('output', 0) * 1000,
+                "provider_class": provider.__class__.__name__
+            }
+        
+        # Log detailed debug information
+        logger.info("=== LLM Service Debug Information ===")
+        logger.info(f"Total models available: {len(self.providers)}")
+        for provider, models in debug_info["provider_breakdown"].items():
+            logger.info(f"{provider}: {models}")
+        
+        logger.info("API Key Status:")
+        for key, status in api_keys.items():
+            logger.info(f"  {key}: {'✅ Set' if status else '❌ Not set'}")
+        
+        return debug_info
+    
+    def test_model_access(self, model_key: str) -> Dict[str, Any]:
+        """
+        Test if a specific model can be accessed and provide detailed diagnostics
+        """
+        test_result = {
+            "model_requested": model_key,
+            "normalized_key": self.normalize_model_key(model_key),
+            "available": False,
+            "error": None,
+            "provider_info": None,
+            "suggestions": []
+        }
+        
+        normalized_key = test_result["normalized_key"]
+        
+        if normalized_key in self.providers:
+            test_result["available"] = True
+            test_result["provider_info"] = self.get_model_info(model_key)
+            logger.info(f"✅ Model '{model_key}' is available as '{normalized_key}'")
+        else:
+            test_result["error"] = f"Model '{model_key}' (normalized: '{normalized_key}') not found"
+            test_result["suggestions"] = [
+                self._suggest_similar_model(model_key, list(self.providers.keys()))
+            ]
+            logger.warning(f"❌ Model '{model_key}' not available")
+            logger.info(f"Available models: {list(self.providers.keys())}")
+            if test_result["suggestions"][0]:
+                logger.info(f"Suggested alternative: {test_result['suggestions'][0]}")
+        
+        return test_result
     
     def create_pii_extraction_prompt(self, document_type: str = "document") -> str:
         """Create optimized prompt for PII extraction with document classification"""
@@ -496,6 +774,80 @@ Return valid JSON only, no other text or explanations
 """
         return base_prompt.strip()
     
+    def _check_budget_before_call(
+        self,
+        model_key: str,
+        estimated_input_tokens: Optional[int] = None,
+        estimated_output_tokens: Optional[int] = None,
+        enforce_strict_limits: Optional[bool] = None
+    ) -> Dict[str, Any]:
+        """
+        Check budget constraints before making an API call
+        
+        Args:
+            model_key: Model identifier (e.g., "openai/gpt-4o")
+            estimated_input_tokens: Estimated input tokens
+            estimated_output_tokens: Estimated output tokens
+            enforce_strict_limits: Override for strict enforcement
+        
+        Returns:
+            Dict with 'allowed' boolean and budget information
+        """
+        # If no cost tracker or budget config, allow the call
+        if not self.cost_tracker or not self.budget_config:
+            return {
+                'allowed': True,
+                'reason': 'Budget tracking not configured',
+                'budget_info': None
+            }
+        
+        # Parse model key
+        try:
+            provider, model = model_key.split('/', 1)
+        except ValueError:
+            return {
+                'allowed': False,
+                'reason': f'Invalid model key format: {model_key}',
+                'budget_info': None
+            }
+        
+        # Check emergency stop first
+        if self.cost_tracker.check_emergency_stop(provider, self.budget_config):
+            return {
+                'allowed': False,
+                'reason': f'Emergency stop activated for {provider} due to critical budget overrun',
+                'budget_info': None
+            }
+        
+        # Determine enforcement mode
+        if enforce_strict_limits is None:
+            enforce_strict_limits = getattr(self.budget_config, 'strict_budget_enforcement', True)
+        
+        # Estimate cost for this call
+        estimated_cost = self.cost_tracker.estimate_cost_before_call(
+            provider=provider,
+            model=model,
+            estimated_input_tokens=estimated_input_tokens,
+            estimated_output_tokens=estimated_output_tokens,
+            safety_margin=getattr(self.budget_config, 'safety_margin_multiplier', 1.1)
+        )
+        
+        # Check if we can afford this call
+        budget_check = self.cost_tracker.can_afford(
+            provider=provider,
+            estimated_cost=estimated_cost,
+            budget_config=self.budget_config,
+            enforce_limits=enforce_strict_limits
+        )
+        
+        # Return result
+        return {
+            'allowed': budget_check.can_afford,
+            'reason': budget_check.blocking_reason or 'Budget check passed',
+            'budget_info': budget_check,
+            'warnings': budget_check.warning_messages
+        }
+    
     def extract_pii_from_text(
         self,
         text: str,
@@ -508,7 +860,7 @@ Return valid JSON only, no other text or explanations
         
         Args:
             text: Plain text content
-            model_key: Model identifier (e.g., "openai/gpt-4o")
+            model_key: Model identifier (e.g., "openai/gpt-4o" or just "gpt-4o-mini")
             document_type: Type of document for prompt optimization
             **kwargs: Additional parameters for the LLM
         
@@ -517,14 +869,35 @@ Return valid JSON only, no other text or explanations
         """
         start_time = time.time()
         
-        if model_key not in self.providers:
+        # Normalize the model key
+        normalized_key = self.normalize_model_key(model_key)
+        
+        if normalized_key not in self.providers:
+            model_info = self.get_model_info(model_key)
             return {
                 "success": False,
-                "error": f"Model {model_key} not available",
-                "processing_time": 0
+                "error": f"Model '{model_key}' not available. {model_info.get('error', '')}",
+                "suggestion": model_info.get('suggestion'),
+                "available_models": model_info.get('available_models', []),
+                "processing_time": time.time() - start_time
             }
         
-        provider = self.providers[model_key]
+        # Pre-flight budget check
+        budget_check = self._check_budget_before_call(
+            model_key=normalized_key,
+            estimated_input_tokens=len(text.split()) * 1.3,  # Rough estimate
+            estimated_output_tokens=kwargs.get('fallback_token_estimate', 500)
+        )
+        
+        if not budget_check['allowed']:
+            return {
+                "success": False,
+                "error": f"Budget limit exceeded: {budget_check['reason']}",
+                "budget_check": budget_check,
+                "processing_time": time.time() - start_time
+            }
+        
+        provider = self.providers[normalized_key]
         prompt = self.create_pii_extraction_prompt(document_type)
         
         # For text-based extraction, we'll use the provider's text capabilities
@@ -580,6 +953,10 @@ Return valid JSON only, no other text or explanations
         
         processing_time = time.time() - start_time
         result["processing_time"] = processing_time
+        
+        # Add budget warnings if available
+        if budget_check.get('warnings'):
+            result["budget_warnings"] = budget_check['warnings']
         
         if result["success"]:
             # Parse JSON response similar to image extraction
@@ -643,7 +1020,7 @@ Return valid JSON only, no other text or explanations
         
         Args:
             image_data: Base64 encoded image
-            model_key: Model identifier (e.g., "openai/gpt-4o")
+            model_key: Model identifier (e.g., "openai/gpt-4o" or just "gpt-4o-mini")
             document_type: Type of document for prompt optimization
             **kwargs: Additional parameters for the LLM
         
@@ -652,14 +1029,35 @@ Return valid JSON only, no other text or explanations
         """
         start_time = time.time()
         
-        if model_key not in self.providers:
+        # Normalize the model key
+        normalized_key = self.normalize_model_key(model_key)
+        
+        if normalized_key not in self.providers:
+            model_info = self.get_model_info(model_key)
             return {
                 "success": False,
-                "error": f"Model {model_key} not available",
-                "processing_time": 0
+                "error": f"Model '{model_key}' not available. {model_info.get('error', '')}",
+                "suggestion": model_info.get('suggestion'),
+                "available_models": model_info.get('available_models', []),
+                "processing_time": time.time() - start_time
             }
         
-        provider = self.providers[model_key]
+        # Pre-flight budget check
+        budget_check = self._check_budget_before_call(
+            model_key=normalized_key,
+            estimated_input_tokens=kwargs.get('estimated_input_tokens', 1000),  # Images typically use more tokens
+            estimated_output_tokens=kwargs.get('estimated_output_tokens', 500)
+        )
+        
+        if not budget_check['allowed']:
+            return {
+                "success": False,
+                "error": f"Budget limit exceeded: {budget_check['reason']}",
+                "budget_check": budget_check,
+                "processing_time": time.time() - start_time
+            }
+        
+        provider = self.providers[normalized_key]
         prompt = self.create_pii_extraction_prompt(document_type)
         
         # Extract with LLM
@@ -667,6 +1065,10 @@ Return valid JSON only, no other text or explanations
         
         processing_time = time.time() - start_time
         result["processing_time"] = processing_time
+        
+        # Add budget warnings if available
+        if budget_check.get('warnings'):
+            result["budget_warnings"] = budget_check['warnings']
         
         if result["success"]:
             # Try to parse the JSON response
@@ -846,8 +1248,21 @@ Return valid JSON only, no other text or explanations
 
 # Global instance with error handling
 try:
-    llm_service = MultimodalLLMService()
+    # Import cost tracker and config
+    from .cost_tracker import default_cost_tracker
+    try:
+        from ..core.config import settings
+        budget_config = settings.budget
+    except ImportError:
+        budget_config = None
+        logger.warning("Budget configuration not available")
+    
+    llm_service = MultimodalLLMService(
+        cost_tracker=default_cost_tracker,
+        budget_config=budget_config
+    )
     logger.info(f"LLM service initialized with {len(llm_service.get_available_models())} available models")
+    logger.info(f"Budget enforcement: {'enabled' if budget_config else 'disabled'}")
 except Exception as e:
     logger.error(f"Failed to initialize LLM service: {e}")
     # Create a dummy service that shows errors
@@ -857,6 +1272,8 @@ except Exception as e:
         def get_model_info(self, model_key):
             return {"available": False, "error": "LLM service initialization failed"}
         def extract_pii_from_image(self, *args, **kwargs):
+            return {"success": False, "error": f"LLM service not available: {e}"}
+        def extract_pii_from_text(self, *args, **kwargs):
             return {"success": False, "error": f"LLM service not available: {e}"}
     
     llm_service = DummyLLMService()

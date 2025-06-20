@@ -2,7 +2,7 @@
 Main Streamlit Dashboard for PII Extraction System
 
 This module provides the primary entry point for the comprehensive PII extraction
-dashboard, featuring 7 main sections for complete system interaction and monitoring.
+dashboard, featuring 4 main sections for streamlined system workflow and monitoring.
 """
 
 import streamlit as st
@@ -138,30 +138,12 @@ def main():
                 "LLM API Status",
                 "Phase 0 Dataset Creation",
                 "Phase 1 Performance Validation",
-                "AI Document Processing",
-                "Document Processing (Classic)",
-                "AI Batch Analysis", 
-                "Model Comparison",
-                "Model Analytics",
-                "Error Analysis",
-                "Performance Metrics",
-                "Data Management",
-                "LLM OCR Config",
                 "Configuration"
             ],
             icons=[
                 "cloud-check",
                 "bullseye",
                 "target",
-                "robot",
-                "file-earmark-text",
-                "files", 
-                "diagram-3",
-                "bar-chart",
-                "bug",
-                "graph-up",
-                "database",
-                "cpu",
                 "gear"
             ],
             menu_icon="list",
@@ -203,28 +185,6 @@ def main():
         dataset_creation_phase0.show_page()
     elif selected_page == "Phase 1 Performance Validation":
         phase1_performance_validation.show_page()
-    elif selected_page == "AI Document Processing":
-        document_processing_llm.show_page()
-    elif selected_page == "Document Processing (Classic)":
-        document_processing.show_page()
-    elif selected_page == "AI Batch Analysis":
-        batch_analysis.show_page()
-    elif selected_page == "Model Comparison":
-        model_comparison.show_page()
-    elif selected_page == "Model Analytics":
-        model_analytics.show_page()
-    elif selected_page == "Error Analysis":
-        error_analysis.show_page()
-    elif selected_page == "Performance Metrics":
-        performance_metrics.show_page()
-    elif selected_page == "Data Management":
-        data_management.show_page()
-    elif selected_page == "LLM OCR Config":
-        if llm_ocr_config:
-            llm_ocr_config.show_llm_ocr_config()
-        else:
-            st.error("LLM OCR configuration not available")
-            st.info("Please check the installation and imports.")
     elif selected_page == "Configuration":
         configuration.show_page()
 

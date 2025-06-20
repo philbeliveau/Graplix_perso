@@ -20,6 +20,25 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class BudgetCheckResult:
+    """Result of a budget check operation"""
+    can_afford: bool
+    estimated_cost: float
+    remaining_daily_budget: float
+    remaining_monthly_budget: float
+    daily_usage: float
+    monthly_usage: float
+    daily_limit: float
+    monthly_limit: float
+    warning_messages: List[str]
+    blocking_reason: Optional[str] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for JSON serialization"""
+        return asdict(self)
+
+
+@dataclass
 class UsageRecord:
     """Single usage record for LLM API call"""
     timestamp: datetime
@@ -527,6 +546,234 @@ class CostTracker:
                     for r in recent
                 ]
             }
+    
+    def estimate_cost_before_call(
+        self,
+        provider: str,
+        model: str,
+        estimated_input_tokens: Optional[int] = None,
+        estimated_output_tokens: Optional[int] = None,
+        safety_margin: float = 1.1
+    ) -> float:
+        """
+        Estimate cost for an API call before making it
+        
+        Args:
+            provider: API provider name
+            model: Model name
+            estimated_input_tokens: Estimated input tokens
+            estimated_output_tokens: Estimated output tokens
+            safety_margin: Safety margin multiplier for estimation
+        
+        Returns:
+            Estimated cost in USD
+        """
+        # Default token estimates if not provided
+        if estimated_input_tokens is None:
+            estimated_input_tokens = 800  # Conservative estimate for typical PII extraction prompt
+        if estimated_output_tokens is None:
+            estimated_output_tokens = 500  # Conservative estimate for typical JSON response
+        
+        # Model-specific cost per token (per 1000 tokens)
+        cost_per_1k_tokens = {
+            'openai': {
+                'gpt-4o': {'input': 0.0025, 'output': 0.01},
+                'gpt-4o-mini': {'input': 0.00015, 'output': 0.0006},
+                'gpt-4-turbo': {'input': 0.01, 'output': 0.03},
+                'gpt-4': {'input': 0.03, 'output': 0.06}
+            },
+            'anthropic': {
+                'claude-3-5-sonnet-20241022': {'input': 0.003, 'output': 0.015},
+                'claude-3-5-haiku-20241022': {'input': 0.001, 'output': 0.005},
+                'claude-3-opus-20240229': {'input': 0.015, 'output': 0.075}
+            },
+            'google': {
+                'gemini-1.5-pro': {'input': 0.0025, 'output': 0.0075},
+                'gemini-1.5-flash': {'input': 0.000075, 'output': 0.0003}
+            },
+            'mistral': {
+                'mistral-large': {'input': 0.002, 'output': 0.006},
+                'mistral-medium': {'input': 0.0015, 'output': 0.0045},
+                'mistral-small': {'input': 0.0006, 'output': 0.0018},
+                'mistral-tiny': {'input': 0.00025, 'output': 0.00025}
+            }
+        }
+        
+        # Get cost information
+        provider_costs = cost_per_1k_tokens.get(provider.lower(), {})
+        model_costs = provider_costs.get(model, {'input': 0.001, 'output': 0.003})  # Fallback
+        
+        # Calculate estimated cost
+        input_cost = (estimated_input_tokens / 1000) * model_costs['input']
+        output_cost = (estimated_output_tokens / 1000) * model_costs['output']
+        total_cost = (input_cost + output_cost) * safety_margin
+        
+        logger.debug(f"Estimated cost for {provider}/{model}: ${total_cost:.6f} (input: {estimated_input_tokens}, output: {estimated_output_tokens})")
+        return total_cost
+    
+    def get_remaining_budget(self, provider: str, budget_config: Optional[Any] = None) -> Dict[str, float]:
+        """
+        Get remaining budget for a provider
+        
+        Args:
+            provider: Provider name
+            budget_config: Budget configuration object (optional)
+        
+        Returns:
+            Dictionary with remaining daily and monthly budgets
+        """
+        now = datetime.now()
+        
+        # Get current usage
+        daily_costs = self.get_daily_costs(now)
+        monthly_costs = self.get_monthly_costs(now.year, now.month)
+        
+        # Find provider usage
+        daily_usage = 0.0
+        monthly_usage = 0.0
+        
+        for provider_data in daily_costs.get('by_provider', []):
+            if provider_data.get('provider', '').lower() == provider.lower():
+                daily_usage = provider_data.get('provider_cost', 0)
+                break
+        
+        for provider_data in monthly_costs.get('by_provider', []):
+            if provider_data.get('provider', '').lower() == provider.lower():
+                monthly_usage = provider_data.get('total_cost', 0)
+                break
+        
+        # Get budget limits (use defaults if config not provided)
+        if budget_config:
+            daily_limit = budget_config.get_daily_limit(provider)
+            monthly_limit = budget_config.get_monthly_limit(provider)
+        else:
+            # Default limits
+            daily_limit = 10.0
+            monthly_limit = 100.0
+        
+        return {
+            'daily_usage': daily_usage,
+            'monthly_usage': monthly_usage,
+            'daily_limit': daily_limit,
+            'monthly_limit': monthly_limit,
+            'remaining_daily': max(0, daily_limit - daily_usage),
+            'remaining_monthly': max(0, monthly_limit - monthly_usage)
+        }
+    
+    def can_afford(
+        self,
+        provider: str,
+        estimated_cost: float,
+        budget_config: Optional[Any] = None,
+        enforce_limits: bool = True
+    ) -> BudgetCheckResult:
+        """
+        Check if we can afford an API call before making it
+        
+        Args:
+            provider: Provider name
+            estimated_cost: Estimated cost of the API call
+            budget_config: Budget configuration object
+            enforce_limits: Whether to enforce budget limits
+        
+        Returns:
+            BudgetCheckResult with detailed information
+        """
+        budget_info = self.get_remaining_budget(provider, budget_config)
+        warning_messages = []
+        blocking_reason = None
+        
+        # Check against daily limit
+        remaining_daily = budget_info['remaining_daily']
+        daily_usage = budget_info['daily_usage']
+        daily_limit = budget_info['daily_limit']
+        
+        # Check against monthly limit
+        remaining_monthly = budget_info['remaining_monthly']
+        monthly_usage = budget_info['monthly_usage']
+        monthly_limit = budget_info['monthly_limit']
+        
+        # Determine if we can afford this call
+        can_afford_daily = remaining_daily >= estimated_cost
+        can_afford_monthly = remaining_monthly >= estimated_cost
+        can_afford = can_afford_daily and can_afford_monthly
+        
+        # Generate warnings
+        if budget_config:
+            warning_threshold = getattr(budget_config, 'budget_warning_threshold', 0.8)
+            
+            # Daily warnings
+            daily_percentage = (daily_usage + estimated_cost) / daily_limit if daily_limit > 0 else 0
+            if daily_percentage >= warning_threshold:
+                warning_messages.append(
+                    f"Daily budget warning for {provider}: {daily_percentage:.1%} of limit would be used after this call"
+                )
+            
+            # Monthly warnings
+            monthly_percentage = (monthly_usage + estimated_cost) / monthly_limit if monthly_limit > 0 else 0
+            if monthly_percentage >= warning_threshold:
+                warning_messages.append(
+                    f"Monthly budget warning for {provider}: {monthly_percentage:.1%} of limit would be used after this call"
+                )
+        
+        # Determine blocking reason if applicable
+        if enforce_limits and not can_afford:
+            if not can_afford_daily:
+                blocking_reason = f"Daily budget exceeded: ${estimated_cost:.4f} requested, ${remaining_daily:.4f} remaining"
+            elif not can_afford_monthly:
+                blocking_reason = f"Monthly budget exceeded: ${estimated_cost:.4f} requested, ${remaining_monthly:.4f} remaining"
+        
+        # Override can_afford if enforcement is disabled
+        if not enforce_limits:
+            can_afford = True
+            blocking_reason = None
+        
+        return BudgetCheckResult(
+            can_afford=can_afford,
+            estimated_cost=estimated_cost,
+            remaining_daily_budget=remaining_daily,
+            remaining_monthly_budget=remaining_monthly,
+            daily_usage=daily_usage,
+            monthly_usage=monthly_usage,
+            daily_limit=daily_limit,
+            monthly_limit=monthly_limit,
+            warning_messages=warning_messages,
+            blocking_reason=blocking_reason
+        )
+    
+    def check_emergency_stop(
+        self,
+        provider: str,
+        budget_config: Optional[Any] = None
+    ) -> bool:
+        """
+        Check if emergency stop should be triggered
+        
+        Args:
+            provider: Provider name
+            budget_config: Budget configuration object
+        
+        Returns:
+            True if emergency stop should be triggered
+        """
+        if not budget_config or not getattr(budget_config, 'enable_emergency_stop', False):
+            return False
+        
+        budget_info = self.get_remaining_budget(provider, budget_config)
+        emergency_multiplier = getattr(budget_config, 'emergency_stop_multiplier', 1.2)
+        
+        # Check if usage has exceeded emergency threshold
+        daily_emergency_threshold = budget_info['daily_limit'] * emergency_multiplier
+        monthly_emergency_threshold = budget_info['monthly_limit'] * emergency_multiplier
+        
+        daily_exceeded = budget_info['daily_usage'] >= daily_emergency_threshold
+        monthly_exceeded = budget_info['monthly_usage'] >= monthly_emergency_threshold
+        
+        if daily_exceeded or monthly_exceeded:
+            logger.critical(f"EMERGENCY STOP triggered for {provider}: Usage exceeded emergency threshold")
+            return True
+        
+        return False
 
 
 class TokenUsageMonitor:

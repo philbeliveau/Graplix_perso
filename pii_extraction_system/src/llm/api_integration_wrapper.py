@@ -128,7 +128,8 @@ class MultiLLMIntegrationWrapper:
         env_file_path: Optional[str] = None,
         session_id: Optional[str] = None,
         enable_cost_tracking: bool = True,
-        enable_monitoring: bool = True
+        enable_monitoring: bool = True,
+        budget_config: Optional[Any] = None
     ):
         """
         Initialize the multi-LLM integration wrapper
@@ -138,12 +139,29 @@ class MultiLLMIntegrationWrapper:
             session_id: Unique session identifier for cost tracking
             enable_cost_tracking: Enable cost tracking functionality
             enable_monitoring: Enable real-time monitoring
+            budget_config: Budget configuration object
         """
         # Initialize components
         self.api_key_manager = api_key_manager if not env_file_path else APIKeyManager(env_file_path)
-        self.llm_service = llm_service
         self.cost_tracker = default_cost_tracker if enable_cost_tracking else None
         self.token_monitor = token_monitor if enable_monitoring else None
+        
+        # Budget configuration
+        if budget_config is None:
+            try:
+                from ..core.config import settings
+                self.budget_config = settings.budget
+            except ImportError:
+                self.budget_config = None
+                logger.warning("Budget configuration not available")
+        else:
+            self.budget_config = budget_config
+        
+        # Initialize LLM service with budget support
+        self.llm_service = MultimodalLLMService(
+            cost_tracker=self.cost_tracker,
+            budget_config=self.budget_config
+        )
         
         # Session management
         self.session_id = session_id or f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -155,6 +173,7 @@ class MultiLLMIntegrationWrapper:
         self._refresh_available_models()
         
         logger.info(f"Multi-LLM Integration initialized with {len(self._available_models)} available models")
+        logger.info(f"Budget enforcement: {'enabled' if self.budget_config else 'disabled'}")
     
     def _refresh_available_models(self):
         """Refresh the list of available models based on API keys"""
@@ -247,6 +266,7 @@ class MultiLLMIntegrationWrapper:
         document_type: str = "document",
         user_id: Optional[str] = None,
         document_id: Optional[str] = None,
+        allow_auto_fallback: bool = True,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -258,11 +278,14 @@ class MultiLLMIntegrationWrapper:
             document_type: Type of document
             user_id: User identifier for tracking
             document_id: Document identifier for tracking
+            allow_auto_fallback: Allow automatic fallback to cheaper models
             **kwargs: Additional parameters for the LLM
         
         Returns:
             Extraction results with tracking information
         """
+        original_model = model_key
+        
         # Validate model availability
         if model_key not in self._available_models:
             return {
@@ -282,6 +305,36 @@ class MultiLLMIntegrationWrapper:
                 document_type=document_type,
                 **kwargs
             )
+            
+            # Handle budget constraint with automatic fallback
+            if not result.get("success") and "Budget limit exceeded" in result.get("error", ""):
+                if allow_auto_fallback:
+                    alternative_model = self.suggest_alternative_model(
+                        preferred_model=model_key,
+                        task_requirements={'requires_vision': True, 'requires_json': True}
+                    )
+                    
+                    if alternative_model:
+                        logger.info(f"Falling back to cheaper model {alternative_model} due to budget constraints")
+                        result = self.llm_service.extract_pii_from_image(
+                            image_data=image_data,
+                            model_key=alternative_model,
+                            document_type=document_type,
+                            **kwargs
+                        )
+                        result["fallback_used"] = True
+                        result["original_model"] = original_model
+                        result["fallback_model"] = alternative_model
+                        model_key = alternative_model  # Update for tracking
+                        provider, model_name = model_key.split('/', 1)
+                    else:
+                        # Add budget status to error response
+                        result["budget_status"] = self.get_budget_status()
+                        return result
+                else:
+                    # Add budget status to error response
+                    result["budget_status"] = self.get_budget_status()
+                    return result
             
             # Track usage if cost tracking is enabled
             if self.cost_tracker and result.get("success") and "usage" in result:
@@ -307,6 +360,7 @@ class MultiLLMIntegrationWrapper:
             
             # Add model info to result
             result["model_info"] = self._available_models[model_key].to_dict()
+            result["budget_status_summary"] = self.get_budget_status(provider)
             
             return result
             
@@ -332,7 +386,8 @@ class MultiLLMIntegrationWrapper:
                 "success": False,
                 "error": str(e),
                 "model": model_key,
-                "provider": provider
+                "provider": provider,
+                "budget_status": self.get_budget_status()
             }
     
     def batch_extract_with_fallback(
@@ -485,6 +540,120 @@ class MultiLLMIntegrationWrapper:
         
         return unique_recommendations
     
+    def get_budget_status(self, provider: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Get comprehensive budget status for all or specific provider
+        
+        Args:
+            provider: Specific provider to check, or None for all providers
+        
+        Returns:
+            Budget status information
+        """
+        if not self.cost_tracker or not self.budget_config:
+            return {
+                "error": "Budget tracking not configured",
+                "budget_enforcement": False
+            }
+        
+        providers_to_check = [provider] if provider else ['openai', 'anthropic', 'google', 'mistral']
+        status = {
+            "timestamp": datetime.now().isoformat(),
+            "budget_enforcement": getattr(self.budget_config, 'strict_budget_enforcement', True),
+            "providers": {}
+        }
+        
+        for prov in providers_to_check:
+            budget_info = self.cost_tracker.get_remaining_budget(prov, self.budget_config)
+            emergency_stop = self.cost_tracker.check_emergency_stop(prov, self.budget_config)
+            
+            # Calculate usage percentages
+            daily_percentage = (budget_info['daily_usage'] / budget_info['daily_limit']) * 100 if budget_info['daily_limit'] > 0 else 0
+            monthly_percentage = (budget_info['monthly_usage'] / budget_info['monthly_limit']) * 100 if budget_info['monthly_limit'] > 0 else 0
+            
+            # Determine status
+            if emergency_stop:
+                prov_status = "emergency_stop"
+            elif budget_info['remaining_daily'] <= 0 or budget_info['remaining_monthly'] <= 0:
+                prov_status = "budget_exceeded"
+            elif daily_percentage >= 80 or monthly_percentage >= 80:
+                prov_status = "warning"
+            else:
+                prov_status = "healthy"
+            
+            status["providers"][prov] = {
+                "status": prov_status,
+                "daily": {
+                    "usage": budget_info['daily_usage'],
+                    "limit": budget_info['daily_limit'],
+                    "remaining": budget_info['remaining_daily'],
+                    "percentage_used": daily_percentage
+                },
+                "monthly": {
+                    "usage": budget_info['monthly_usage'],
+                    "limit": budget_info['monthly_limit'],
+                    "remaining": budget_info['remaining_monthly'],
+                    "percentage_used": monthly_percentage
+                },
+                "emergency_stop": emergency_stop
+            }
+        
+        return status
+    
+    def suggest_alternative_model(self, preferred_model: str, task_requirements: Optional[Dict[str, Any]] = None) -> Optional[str]:
+        """
+        Suggest an alternative model when the preferred model exceeds budget
+        
+        Args:
+            preferred_model: The originally requested model
+            task_requirements: Optional task requirements for better suggestions
+        
+        Returns:
+            Alternative model key or None if no suitable alternative
+        """
+        if not self.budget_config or not getattr(self.budget_config, 'auto_switch_to_cheaper_model', False):
+            return None
+        
+        # Parse preferred model
+        try:
+            preferred_provider, preferred_model_name = preferred_model.split('/', 1)
+        except ValueError:
+            return None
+        
+        # Get all available models sorted by cost
+        available_models = []
+        for model_key, model_info in self._available_models.items():
+            provider, model_name = model_key.split('/', 1)
+            
+            # Check if this provider is within budget
+            budget_status = self.get_budget_status(provider)
+            if budget_status.get('providers', {}).get(provider, {}).get('status') in ['healthy', 'warning']:
+                available_models.append((
+                    model_key,
+                    model_info.cost_per_1k_input_tokens + model_info.cost_per_1k_output_tokens,
+                    model_info
+                ))
+        
+        # Sort by cost (cheapest first)
+        available_models.sort(key=lambda x: x[1])
+        
+        # Find the cheapest alternative that meets task requirements
+        for model_key, cost, model_info in available_models:
+            if model_key == preferred_model:
+                continue
+            
+            # Check if this model can handle the task
+            if task_requirements:
+                if task_requirements.get('requires_vision', True) and not model_info.supports_vision:
+                    continue
+                if task_requirements.get('requires_json', True) and not model_info.supports_json:
+                    continue
+            
+            logger.info(f"Suggesting cheaper alternative: {model_key} (cost: {cost:.6f}) instead of {preferred_model}")
+            return model_key
+        
+        return None
+    
     def export_usage_report(self, output_path: str, format: str = 'json') -> bool:
         """
         Export comprehensive usage report
@@ -557,4 +726,10 @@ class MultiLLMIntegrationWrapper:
 
 
 # Global instance for easy access
-llm_integration = MultiLLMIntegrationWrapper()
+try:
+    from ..core.config import settings
+    budget_config = settings.budget
+except ImportError:
+    budget_config = None
+
+llm_integration = MultiLLMIntegrationWrapper(budget_config=budget_config)

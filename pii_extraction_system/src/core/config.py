@@ -59,6 +59,55 @@ class PrivacyConfig(BaseModel):
     data_retention_days: int = Field(default=90, description="Data retention period")
 
 
+class BudgetConfig(BaseModel):
+    """Budget enforcement configuration."""
+    
+    # Global budget enforcement settings
+    strict_budget_enforcement: bool = Field(default=True, description="Prevent API calls when budgets would be exceeded")
+    auto_switch_to_cheaper_model: bool = Field(default=False, description="Automatically switch to cheaper models when budget constraints are hit")
+    budget_warning_threshold: float = Field(default=0.8, description="Warn when usage reaches this percentage of limit (0.8 = 80%)")
+    
+    # Daily budget limits per provider (in USD)
+    daily_budget_openai: float = Field(default=10.0, description="Daily budget limit for OpenAI API")
+    daily_budget_anthropic: float = Field(default=10.0, description="Daily budget limit for Anthropic API")
+    daily_budget_google: float = Field(default=10.0, description="Daily budget limit for Google API")
+    daily_budget_mistral: float = Field(default=10.0, description="Daily budget limit for Mistral API")
+    
+    # Monthly budget limits per provider (in USD)
+    monthly_budget_openai: float = Field(default=100.0, description="Monthly budget limit for OpenAI API")
+    monthly_budget_anthropic: float = Field(default=100.0, description="Monthly budget limit for Anthropic API")
+    monthly_budget_google: float = Field(default=100.0, description="Monthly budget limit for Google API")
+    monthly_budget_mistral: float = Field(default=100.0, description="Monthly budget limit for Mistral API")
+    
+    # Emergency settings
+    enable_emergency_stop: bool = Field(default=True, description="Enable emergency stop when critical budget exceeded")
+    emergency_stop_multiplier: float = Field(default=1.2, description="Emergency stop when usage exceeds budget by this multiplier")
+    
+    # Model cost estimation parameters
+    fallback_token_estimate: int = Field(default=1000, description="Fallback token estimate for pre-flight cost calculation")
+    safety_margin_multiplier: float = Field(default=1.1, description="Safety margin for cost estimation (10% buffer)")
+    
+    def get_daily_limit(self, provider: str) -> float:
+        """Get daily budget limit for a provider."""
+        provider_map = {
+            'openai': self.daily_budget_openai,
+            'anthropic': self.daily_budget_anthropic,
+            'google': self.daily_budget_google,
+            'mistral': self.daily_budget_mistral
+        }
+        return provider_map.get(provider.lower(), 5.0)  # Default $5 for unknown providers
+    
+    def get_monthly_limit(self, provider: str) -> float:
+        """Get monthly budget limit for a provider."""
+        provider_map = {
+            'openai': self.monthly_budget_openai,
+            'anthropic': self.monthly_budget_anthropic,
+            'google': self.monthly_budget_google,
+            'mistral': self.monthly_budget_mistral
+        }
+        return provider_map.get(provider.lower(), 50.0)  # Default $50 for unknown providers
+
+
 class SecurityConfig(BaseModel):
     """Security configuration."""
     
@@ -98,6 +147,7 @@ class Settings(BaseSettings):
     ml_models: MLModelConfig = Field(default_factory=MLModelConfig)
     processing: ProcessingConfig = Field(default_factory=ProcessingConfig)
     privacy: PrivacyConfig = Field(default_factory=PrivacyConfig)
+    budget: BudgetConfig = Field(default_factory=BudgetConfig)
     security: SecurityConfig = Field(default_factory=lambda: SecurityConfig(
         secret_key=os.getenv("SECRET_KEY", "dev-secret-key"),
         encryption_key=os.getenv("ENCRYPTION_KEY", "dev-encryption-key")

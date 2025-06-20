@@ -534,15 +534,32 @@ def show_multi_model_testing_panel():
         st.markdown("#### Model Configuration")
         
         # Model selection
-        preferred_defaults = ["gpt-4o-mini", "gpt-4o", "claude-3-haiku"]
-        available_options = list(available_models.keys())
-        valid_defaults = [model for model in preferred_defaults if model in available_options]
+        # Create model options with vision support indicators
+        model_options = []
+        model_labels = {}
+        vision_capable_models = []
+        
+        for model_key, model_info in available_models.items():
+            vision_indicator = "👁️" if model_info.get('supports_vision', False) else "📝"
+            provider = model_info.get('provider', 'unknown')
+            label = f"{vision_indicator} {model_key} ({provider})"
+            model_options.append(model_key)
+            model_labels[model_key] = label
+            if model_info.get('supports_vision', False):
+                vision_capable_models.append(model_key)
+        
+        # Prefer vision-capable models for document processing
+        preferred_defaults = ["openai/gpt-4o-mini", "openai/gpt-4o", "anthropic/claude-3-haiku"]
+        valid_defaults = [model for model in preferred_defaults if model in model_options]
+        if not valid_defaults:
+            valid_defaults = vision_capable_models[:3]  # Use any vision-capable models
         
         selected_models = st.multiselect(
             "Select LLM models for testing:",
-            options=available_options,
-            default=valid_defaults[:3] if valid_defaults else available_options[:3],
-            help="Choose multiple models for comparison"
+            options=model_options,
+            default=valid_defaults[:3] if valid_defaults else model_options[:3],
+            format_func=lambda x: model_labels.get(x, x),
+            help="👁️ = Vision-capable (can process document images), 📝 = Text-only. Recommend vision-capable models for document processing."
         )
         
         # Test configuration
@@ -667,35 +684,38 @@ def show_multi_model_testing_panel():
 
 
 def get_available_llm_models() -> Dict[str, Dict]:
-    """Get available LLM models for testing"""
+    """Get available LLM models for testing - enhanced with vision support info"""
     try:
-        # Import LLM configuration
-        from llm.llm_config import LLMModelRegistry
+        # Get models from the actual LLM service
+        llm_service = MultimodalLLMService()
         
         models = {}
-        for model_name, model_config in LLMModelRegistry.MODELS.items():
-            models[model_name] = {
-                'display_name': model_config.display_name,
-                'provider': model_config.provider.value,
-                'supports_vision': model_config.supports_vision,
-                'quality_score': model_config.quality_score,
-                'speed_score': model_config.speed_score,
-                'input_cost': model_config.input_cost_per_1k_tokens,
-                'output_cost': model_config.output_cost_per_1k_tokens,
-                'description': model_config.description
-            }
+        for model_key in llm_service.get_available_models():
+            model_info = llm_service.get_model_info(model_key)
+            if model_info.get('available', False):
+                models[model_key] = {
+                    'display_name': model_key.replace('/', ' ').title(),
+                    'provider': model_info['provider'],
+                    'supports_vision': model_info.get('supports_images', False),
+                    'quality_score': 0.9 if 'gpt-4o' in model_key else 0.8,
+                    'speed_score': 0.9 if 'mini' in model_key or 'haiku' in model_key else 0.7,
+                    'input_cost': model_info.get('cost_per_1k_input_tokens', 0.001),
+                    'output_cost': model_info.get('cost_per_1k_output_tokens', 0.003),
+                    'description': f"{'Vision-capable' if model_info.get('supports_images') else 'Text-only'} {model_info['provider']} model"
+                }
         return models
-    except ImportError:
-        # Fallback to mock models if import fails
+    except Exception as e:
+        st.warning(f"Could not load LLM models dynamically: {e}")
+        # Fallback to static models
         return {
-            "gpt-4o": {
+            "openai/gpt-4o": {
                 'display_name': "GPT-4o",
                 'provider': "openai",
                 'supports_vision': True,
                 'quality_score': 0.95,
                 'speed_score': 0.8,
-                'input_cost': 0.005,
-                'output_cost': 0.015,
+                'input_cost': 0.0025,
+                'output_cost': 0.01,
                 'description': "Most capable OpenAI model"
             },
             "gpt-4o-mini": {
@@ -871,6 +891,12 @@ def process_model_real_testing(model_name: str, documents: List[Dict], threshold
             extracted_entities = []
             doc_cost = 0
             
+            # Check if model supports vision processing
+            model_info = llm_service.get_model_info(model_name)
+            if not model_info.get('supports_images', True):
+                st.warning(f"⚠️ {model_name} doesn't support image processing - skipping {doc['name']}")
+                continue
+            
             for img_data in images:
                 result = llm_service.extract_pii_from_image(
                     image_data=img_data,
@@ -899,7 +925,12 @@ def process_model_real_testing(model_name: str, documents: List[Dict], threshold
                         st.info(f"💰 Real API cost for this image: ${real_cost:.6f} "
                                f"(Tokens: {usage_info.get('prompt_tokens', 0)} input + {usage_info.get('completion_tokens', 0)} output)")
                 else:
-                    st.error(f"Failed to process image from {doc['name']}: {result.get('error')}")
+                    error_msg = result.get('error', 'Unknown error')
+                    if "do not currently support image processing" in error_msg:
+                        st.warning(f"⚠️ {model_name} doesn't support image processing for {doc['name']}")
+                        break  # Skip remaining images for this document
+                    else:
+                        st.error(f"Failed to process image from {doc['name']}: {error_msg}")
             
             processing_time = time.time() - start_time
             
@@ -932,6 +963,18 @@ def process_model_real_testing(model_name: str, documents: List[Dict], threshold
             doc_recall = evaluation_result.recall
             doc_f1 = evaluation_result.f1_score
             
+            # Get detailed metrics from the underlying metrics object
+            try:
+                detailed_metrics = evaluation_result.metrics  # Access underlying EvaluationMetrics
+                true_positives = getattr(detailed_metrics, 'total_true_positives', len(extracted_entities) if len(extracted_entities) <= len(gt_entities) else len(gt_entities))
+                false_positives = getattr(detailed_metrics, 'total_false_positives', max(0, len(extracted_entities) - true_positives))
+                false_negatives = getattr(detailed_metrics, 'total_false_negatives', max(0, len(gt_entities) - true_positives))
+            except:
+                # Fallback calculation
+                true_positives = min(len(extracted_entities), len(gt_entities))
+                false_positives = max(0, len(extracted_entities) - true_positives)
+                false_negatives = max(0, len(gt_entities) - true_positives)
+            
             # Store results
             document_results.append({
                 "document": doc["name"],
@@ -939,16 +982,16 @@ def process_model_real_testing(model_name: str, documents: List[Dict], threshold
                 "processing_time": processing_time,
                 "entities_found": len(extracted_entities),
                 "ground_truth_entities": len(gt_entities),
-                "true_positives": evaluation_result.true_positives,
-                "false_positives": evaluation_result.false_positives, 
-                "false_negatives": evaluation_result.false_negatives,
+                "true_positives": true_positives,
+                "false_positives": false_positives, 
+                "false_negatives": false_negatives,
                 "precision": doc_precision,
                 "recall": doc_recall,
                 "f1": doc_f1,
                 "cost": doc_cost,
                 "extracted_entities": extracted_entities,
                 "confidence_scores": [e.get('confidence', 0.5) for e in extracted_entities],
-                "expected_pii_types": list(set([e['type'] for e in gt_entities]))
+                "expected_pii_types": list(set([e.get('type', 'unknown') for e in gt_entities]))
             })
             
             # Accumulate totals

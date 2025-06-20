@@ -57,6 +57,8 @@ from llm.multimodal_llm_service import llm_service
 from utils.document_processor import DocumentProcessor
 from core.ground_truth_validation import ground_truth_validator
 from core.logging_config import get_logger
+from utils.s3_integration import S3DocumentProcessor, process_s3_bucket_to_phase0, convert_document_to_images
+from core.config import settings
 
 # Initialize logger with appropriate level for batch processing
 logger = get_logger(__name__)
@@ -98,8 +100,9 @@ def show_page():
         return
     
     # Main tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📤 File Upload",
+        "🗄️ S3 Batch Processing",
         "🤖 GPT-4o Labeling", 
         "🏷️ Metadata Tagging",
         "⚡ Interactive Labeling",
@@ -110,15 +113,18 @@ def show_page():
         show_file_upload_interface()
     
     with tab2:
-        show_gpt4o_labeling_interface()
+        show_s3_batch_processing_interface()
     
     with tab3:
-        show_metadata_tagging_interface()
+        show_gpt4o_labeling_interface()
     
     with tab4:
-        show_interactive_labeling_interface()
+        show_metadata_tagging_interface()
     
     with tab5:
+        show_interactive_labeling_interface()
+    
+    with tab6:
         show_dataset_export_interface()
 
 def show_file_upload_interface():
@@ -281,218 +287,6 @@ def detect_document_type(filename: str) -> str:
     }
     
     return type_mapping.get(extension, 'Unknown')
-
-def convert_document_to_images(file_content: bytes, file_extension: str, password: Optional[str] = None) -> List[str]:
-    """Convert document to base64-encoded images for vision processing"""
-    images = []
-    
-    # Create temporary file
-    with tempfile.NamedTemporaryFile(suffix=file_extension, delete=False) as temp_file:
-        temp_file.write(file_content)
-        temp_file_path = temp_file.name
-    
-    try:
-        # Handle password-protected files
-        processed_file_path = temp_file_path
-        
-        if password and file_extension.lower() in ['.pdf', '.docx', '.xlsx']:
-            # For password-protected files, try to decrypt first
-            if MSOFFCRYPTO_AVAILABLE and file_extension.lower() in ['.docx', '.xlsx']:
-                try:
-                    with open(temp_file_path, 'rb') as f:
-                        office_file = msoffcrypto.OfficeFile(f)
-                        office_file.load_key(password=password)
-                        
-                        # Create decrypted file
-                        decrypted_path = temp_file_path + '_decrypted' + file_extension
-                        with open(decrypted_path, 'wb') as decrypted_f:
-                            office_file.decrypt(decrypted_f)
-                        
-                        processed_file_path = decrypted_path
-                except Exception as e:
-                    logger.warning(f"Failed to decrypt Office document: {e}")
-        
-        # Convert based on file type
-        if file_extension.lower() == '.pdf':
-            if PDF2IMAGE_AVAILABLE:
-                try:
-                    # For password-protected PDFs, pdf2image can handle them directly
-                    kwargs = {'dpi': 200, 'fmt': 'PNG'}
-                    if password:
-                        kwargs['userpw'] = password
-                    
-                    # Convert PDF pages to images
-                    pdf_images = convert_from_path(
-                        processed_file_path,
-                        **kwargs
-                    )
-                    
-                    for img in pdf_images:
-                        # Convert PIL image to base64
-                        buffer = BytesIO()
-                        img.save(buffer, format='PNG')
-                        img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                        images.append(img_base64)
-                        
-                except Exception as e:
-                    logger.error(f"PDF to image conversion failed: {e}")
-                    # Try without password if it failed
-                    if password:
-                        try:
-                            logger.info("Retrying PDF conversion without password...")
-                            pdf_images = convert_from_path(
-                                processed_file_path,
-                                dpi=200,
-                                fmt='PNG'
-                            )
-                            for img in pdf_images:
-                                buffer = BytesIO()
-                                img.save(buffer, format='PNG')
-                                img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                                images.append(img_base64)
-                        except Exception as e2:
-                            logger.error(f"PDF conversion also failed without password: {e2}")
-            else:
-                logger.error("pdf2image not available for PDF conversion")
-        
-        elif file_extension.lower() in ['.docx', '.doc']:
-            # For Word documents
-            if file_extension.lower() == '.doc':
-                # Old .doc format not directly supported
-                logger.warning(f"Old .doc format detected. Consider converting to .docx for better support.")
-                # Create a placeholder image with instructions
-                text_content = (
-                    f"Document: {os.path.basename(temp_file_path)}\n\n"
-                    "⚠️ Old .doc format is not directly supported\n\n"
-                    "This is a legacy Microsoft Word format that cannot be\n"
-                    "processed directly. Please:\n\n"
-                    "1. Open the document in Microsoft Word\n"
-                    "2. Save it as .docx format (File → Save As → .docx)\n"
-                    "3. Re-upload the .docx version\n\n"
-                    "Alternatively, you can:\n"
-                    "- Export the document as PDF\n"
-                    "- Take screenshots of the document pages"
-                )
-                img = create_text_image(text_content)
-                buffer = BytesIO()
-                img.save(buffer, format='PNG')
-                img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                images.append(img_base64)
-            elif OFFICE_AVAILABLE:
-                try:
-                    doc = Document(processed_file_path)
-                    text_content = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
-                    
-                    # Create a simple text image
-                    img = create_text_image(text_content)
-                    buffer = BytesIO()
-                    img.save(buffer, format='PNG')
-                    img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                    images.append(img_base64)
-                except Exception as e:
-                    logger.error(f"Word document processing failed: {e}")
-        
-        elif file_extension.lower() in ['.xlsx', '.xls']:
-            # For Excel files, create a simple representation
-            if OFFICE_AVAILABLE:
-                try:
-                    workbook = openpyxl.load_workbook(processed_file_path)
-                    text_content = ''
-                    
-                    for sheet in workbook.worksheets:
-                        text_content += f"Sheet: {sheet.title}\n"
-                        for row in sheet.iter_rows(values_only=True):
-                            row_text = '\t'.join([str(cell) if cell is not None else '' for cell in row])
-                            text_content += row_text + '\n'
-                        text_content += '\n'
-                    
-                    # Create a text image
-                    img = create_text_image(text_content)
-                    buffer = BytesIO()
-                    img.save(buffer, format='PNG')
-                    img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                    images.append(img_base64)
-                except Exception as e:
-                    logger.error(f"Excel document processing failed: {e}")
-        
-        elif file_extension.lower() == '.txt':
-            # For text files, create a text image
-            try:
-                with open(processed_file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                    text_content = f.read()
-                
-                img = create_text_image(text_content)
-                buffer = BytesIO()
-                img.save(buffer, format='PNG')
-                img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                images.append(img_base64)
-            except Exception as e:
-                logger.error(f"Text file processing failed: {e}")
-        
-        elif file_extension.lower() in ['.png', '.jpg', '.jpeg', '.tiff', '.bmp']:
-            # Already an image, just convert to base64
-            img_base64 = base64.b64encode(file_content).decode('utf-8')
-            images.append(img_base64)
-    
-    finally:
-        # Clean up temporary files
-        try:
-            os.unlink(temp_file_path)
-            if processed_file_path != temp_file_path:
-                os.unlink(processed_file_path)
-        except OSError:
-            pass
-    
-    return images
-
-def create_text_image(text: str, width: int = 800, font_size: int = 12) -> Image.Image:
-    """Create a PIL image from text content"""
-    from PIL import Image, ImageDraw, ImageFont
-    
-    # Split text into lines and estimate image height
-    lines = text.split('\n')
-    max_chars_per_line = width // (font_size // 2)
-    
-    # Wrap long lines
-    wrapped_lines = []
-    for line in lines:
-        if len(line) <= max_chars_per_line:
-            wrapped_lines.append(line)
-        else:
-            # Simple word wrapping
-            words = line.split(' ')
-            current_line = ''
-            for word in words:
-                if len(current_line + ' ' + word) <= max_chars_per_line:
-                    current_line += (' ' + word) if current_line else word
-                else:
-                    if current_line:
-                        wrapped_lines.append(current_line)
-                    current_line = word
-            if current_line:
-                wrapped_lines.append(current_line)
-    
-    # Calculate image height
-    line_height = font_size + 4
-    height = max(len(wrapped_lines) * line_height + 40, 400)
-    
-    # Create image
-    img = Image.new('RGB', (width, height), color='white')
-    draw = ImageDraw.Draw(img)
-    
-    # Try to use a default font
-    try:
-        font = ImageFont.truetype('/System/Library/Fonts/Arial.ttf', font_size)
-    except:
-        font = ImageFont.load_default()
-    
-    # Draw text
-    y_position = 20
-    for line in wrapped_lines[:100]:  # Limit to first 100 lines
-        draw.text((20, y_position), line, fill='black', font=font)
-        y_position += line_height
-    
-    return img
 
 def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
     """Auto-label document using GPT-4o vision - direct image processing approach"""
@@ -749,6 +543,316 @@ def display_document_queue():
         
         if selected_doc_name != 'None':
             show_document_details(selected_doc_name)
+
+def show_s3_batch_processing_interface():
+    """S3 batch processing interface for automated dataset creation"""
+    import asyncio
+    
+    st.markdown("### 🗄️ S3 Batch Processing")
+    st.markdown("Process documents directly from S3 buckets for automated Phase 0 dataset creation.")
+    
+    if not auth.has_permission('write'):
+        st.warning("S3 batch processing requires write permissions.")
+        return
+    
+    # S3 Configuration Section
+    with st.expander("📋 S3 Configuration", expanded=True):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**Connection Settings**")
+            bucket_name = st.text_input(
+                "S3 Bucket Name",
+                value="", 
+                help="Name of the S3 bucket containing documents"
+            )
+            
+            aws_region = st.selectbox(
+                "AWS Region",
+                ["us-west-2", "us-east-1", "eu-west-1", "ap-southeast-1"],
+                index=0
+            )
+            
+            input_prefix = st.text_input(
+                "Input Prefix",
+                value="documents/",
+                help="S3 prefix where documents are stored (e.g., 'documents/', 'incoming/')"
+            )
+        
+        with col2:
+            st.markdown("**Processing Settings**")
+            password = st.text_input(
+                "Document Password",
+                value="Hubert",
+                type="password",
+                help="Password for encrypted documents"
+            )
+            
+            model_options = ["openai/gpt-4o-mini", "openai/gpt-4o", "deepseek/deepseek-chat"]
+            selected_model = st.selectbox(
+                "Processing Model",
+                model_options,
+                index=0,
+                help="LLM model for PII extraction (gpt-4o-mini recommended for batch)"
+            )
+            
+            max_budget = st.number_input(
+                "Maximum Budget ($)",
+                value=50.0,
+                min_value=1.0,
+                max_value=1000.0,
+                step=5.0,
+                help="Maximum spend for this batch processing session"
+            )
+    
+    # Advanced Settings
+    with st.expander("⚙️ Advanced Settings"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            max_documents = st.slider(
+                "Maximum Documents",
+                min_value=10,
+                max_value=1000,
+                value=100,
+                help="Maximum number of documents to process in this batch"
+            )
+            
+            max_concurrent = st.slider(
+                "Concurrent Processing",
+                min_value=1,
+                max_value=10,
+                value=5,
+                help="Number of documents to process simultaneously"
+            )
+        
+        with col2:
+            skip_processed = st.checkbox(
+                "Skip Already Processed",
+                value=True,
+                help="Skip documents that have been processed before"
+            )
+            
+            export_to_s3 = st.checkbox(
+                "Export Results to S3",
+                value=True,
+                help="Export the labeled dataset back to S3"
+            )
+    
+    # Status and Statistics
+    st.markdown("### 📊 Processing Status")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        if 's3_last_batch_result' in st.session_state:
+            st.metric("Last Batch Processed", st.session_state.s3_last_batch_result.get('documents_processed', 0))
+        else:
+            st.metric("Last Batch Processed", 0)
+    
+    with col2:
+        if 's3_last_batch_result' in st.session_state:
+            success_rate = st.session_state.s3_last_batch_result.get('success_rate', 0)
+            st.metric("Success Rate", f"{success_rate:.1%}")
+        else:
+            st.metric("Success Rate", "0%")
+    
+    with col3:
+        if 's3_last_batch_result' in st.session_state:
+            total_cost = st.session_state.s3_last_batch_result.get('total_cost', 0)
+            st.metric("Last Batch Cost", f"${total_cost:.2f}")
+        else:
+            st.metric("Last Batch Cost", "$0.00")
+    
+    with col4:
+        s3_dataset_count = sum(1 for doc in st.session_state.phase0_dataset if doc.get('metadata', {}).get('source') == 's3')
+        st.metric("S3 Documents in Dataset", s3_dataset_count)
+    
+    # Processing Actions
+    st.markdown("### 🚀 Processing Actions")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if st.button("🔍 Discover Documents", help="Discover available documents in S3 bucket"):
+            if bucket_name:
+                discover_s3_documents(bucket_name, aws_region, input_prefix)
+            else:
+                st.error("Please provide S3 bucket name")
+    
+    with col2:
+        start_processing = st.button(
+            "▶️ Start Batch Processing", 
+            help="Begin automated processing of S3 documents",
+            type="primary"
+        )
+    
+    with col3:
+        if st.button("📥 Import Existing Dataset", help="Import previously processed S3 dataset"):
+            show_s3_dataset_import_interface()
+    
+    # Processing Logic
+    if start_processing:
+        if not bucket_name:
+            st.error("Please provide S3 bucket name")
+        else:
+            try:
+                # Pre-flight budget check
+                from llm.cost_tracker import cost_tracker
+                
+                # Check if we can afford the estimated cost
+                estimated_cost = max_documents * 0.02  # Rough estimate
+                if not cost_tracker.can_afford('openai', estimated_cost):
+                    remaining = cost_tracker.get_remaining_budget('openai')
+                    st.error(f"Insufficient budget. Estimated cost: ${estimated_cost:.2f}, Remaining: ${remaining:.2f}")
+                    return
+                
+                # Start processing
+                with st.spinner("🔄 Starting S3 batch processing..."):
+                    result = asyncio.run(process_s3_bucket_to_phase0(
+                        bucket_name=bucket_name,
+                        prefix=input_prefix,
+                        password=password,
+                        max_documents=max_documents,
+                        max_budget=max_budget
+                    ))
+                
+                # Store results
+                st.session_state.s3_last_batch_result = result
+                
+                if result.get('success'):
+                    st.success(f"✅ Batch processing completed!")
+                    
+                    # Show detailed results
+                    with st.expander("📊 Processing Results", expanded=True):
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.metric("Documents Found", result.get('documents_found', 0))
+                            st.metric("Documents Processed", result.get('documents_processed', 0))
+                            st.metric("Success Rate", f"{result.get('success_rate', 0):.1%}")
+                        
+                        with col2:
+                            st.metric("Total Cost", f"${result.get('total_cost', 0):.2f}")
+                            if result.get('dataset_s3_key'):
+                                st.text_area("Dataset S3 Key", result['dataset_s3_key'], height=80)
+                    
+                    # Import into current session
+                    if st.button("📥 Import Results to Current Dataset"):
+                        import_s3_results_to_session(result)
+                        st.success("S3 processing results imported to current Phase 0 dataset!")
+                        st.rerun()
+                
+                else:
+                    st.error(f"❌ Batch processing failed: {result.get('error', 'Unknown error')}")
+                    
+            except Exception as e:
+                st.error(f"Processing error: {str(e)}")
+                logger.error(f"S3 batch processing error: {e}")
+    
+    # Recent Processing History
+    if 's3_processing_history' in st.session_state and st.session_state.s3_processing_history:
+        st.markdown("### 📜 Recent Processing History")
+        
+        history_df = pd.DataFrame(st.session_state.s3_processing_history)
+        st.dataframe(
+            history_df,
+            use_container_width=True,
+            column_config={
+                "timestamp": st.column_config.DatetimeColumn("Timestamp"),
+                "documents_processed": st.column_config.NumberColumn("Documents"),
+                "success_rate": st.column_config.ProgressColumn("Success Rate", min_value=0, max_value=1),
+                "total_cost": st.column_config.NumberColumn("Cost ($)", format="%.2f")
+            }
+        )
+
+def discover_s3_documents(bucket_name: str, aws_region: str, input_prefix: str):
+    """Discover and preview S3 documents"""
+    try:
+        # Initialize S3 processor
+        processor = S3DocumentProcessor(
+            bucket_name=bucket_name,
+            aws_region=aws_region
+        )
+        
+        with st.spinner("🔍 Discovering S3 documents..."):
+            documents = processor.discover_documents(
+                prefix=input_prefix,
+                max_documents=50,  # Limit for preview
+                skip_processed=True
+            )
+        
+        if documents:
+            st.success(f"✅ Found {len(documents)} documents in S3")
+            
+            # Show preview
+            with st.expander("📋 Document Preview", expanded=True):
+                preview_data = []
+                for doc in documents[:20]:  # Show first 20
+                    preview_data.append({
+                        "Filename": doc.filename,
+                        "Size (KB)": f"{doc.size / 1024:.1f}",
+                        "Type": doc.extension,
+                        "Last Modified": doc.last_modified.strftime('%Y-%m-%d %H:%M')
+                    })
+                
+                st.dataframe(pd.DataFrame(preview_data), use_container_width=True)
+                
+                if len(documents) > 20:
+                    st.info(f"Showing first 20 documents. Total found: {len(documents)}")
+        else:
+            st.warning("No unprocessed documents found in the specified S3 location")
+            
+    except Exception as e:
+        st.error(f"Failed to discover S3 documents: {str(e)}")
+        logger.error(f"S3 discovery error: {e}")
+
+def show_s3_dataset_import_interface():
+    """Interface for importing existing S3 datasets"""
+    with st.expander("📥 Import S3 Dataset", expanded=True):
+        dataset_s3_key = st.text_input(
+            "Dataset S3 Key",
+            placeholder="labeled-datasets/phase0_dataset_20241220_143022.json",
+            help="S3 key of the previously exported labeled dataset"
+        )
+        
+        if st.button("Import Dataset") and dataset_s3_key:
+            try:
+                import_s3_dataset_by_key(dataset_s3_key)
+                st.success("Dataset imported successfully!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Import failed: {str(e)}")
+
+def import_s3_results_to_session(result: Dict[str, Any]):
+    """Import S3 processing results into current session"""
+    # This would need to fetch the actual dataset from S3
+    # For now, we'll create placeholder entries
+    
+    if result.get('dataset_s3_key'):
+        # Add processing history
+        if 's3_processing_history' not in st.session_state:
+            st.session_state.s3_processing_history = []
+        
+        history_entry = {
+            'timestamp': datetime.now(),
+            'documents_processed': result.get('documents_processed', 0),
+            'success_rate': result.get('success_rate', 0),
+            'total_cost': result.get('total_cost', 0),
+            'dataset_s3_key': result.get('dataset_s3_key')
+        }
+        
+        st.session_state.s3_processing_history.append(history_entry)
+        
+        # Keep only last 10 entries
+        if len(st.session_state.s3_processing_history) > 10:
+            st.session_state.s3_processing_history = st.session_state.s3_processing_history[-10:]
+
+def import_s3_dataset_by_key(dataset_s3_key: str):
+    """Import a specific S3 dataset by its key"""
+    # Implementation would fetch and parse the S3 dataset
+    # For now, this is a placeholder
+    st.info("S3 dataset import functionality will be implemented based on the S3 integration setup")
 
 def show_document_details(doc_name: str):
     """Show detailed view of selected document"""

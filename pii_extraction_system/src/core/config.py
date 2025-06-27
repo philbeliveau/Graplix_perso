@@ -42,8 +42,8 @@ class ProcessingConfig(BaseModel):
     
     # LLM OCR settings
     enable_llm_ocr: bool = Field(default=True, description="Enable LLM-based OCR for enhanced accuracy")
-    llm_ocr_model: str = Field(default="gpt-4o-mini", description="Default LLM model for OCR")
-    llm_ocr_fallback_model: str = Field(default="gpt-3.5-turbo", description="Fallback LLM model for OCR")
+    llm_ocr_model: str = Field(default="claude-3-5-sonnet-20241022", description="Default LLM model for OCR")
+    llm_ocr_fallback_model: str = Field(default="claude-3-5-haiku-20241022", description="Fallback LLM model for OCR")
     max_llm_cost_per_document: float = Field(default=0.10, description="Maximum cost per document for LLM OCR")
     llm_confidence_threshold: float = Field(default=0.8, description="Minimum confidence to use LLM result")
 

@@ -44,8 +44,8 @@ class LLMOCRConfig(BaseModel):
     """Configuration for LLM-based OCR."""
     
     enabled_models: List[str] = Field(default_factory=list)
-    default_model: str = Field(default="gpt-4o-mini")
-    fallback_model: str = Field(default="gpt-4o-mini")
+    default_model: str = Field(default="claude-3-5-sonnet-20241022")
+    fallback_model: str = Field(default="claude-3-5-haiku-20241022")
     
     # Task-specific model mapping
     task_model_mapping: Dict[OCRTaskType, str] = Field(default_factory=dict)
@@ -121,6 +121,30 @@ class LLMModelRegistry:
             quality_score=0.92,
             speed_score=0.8,
             description="Balanced performance and cost for complex OCR"
+        ),
+        "claude-3-5-sonnet-20241022": LLMModel(
+            provider=LLMProvider.ANTHROPIC,
+            model_name="claude-3-5-sonnet-20241022",
+            display_name="Claude 3.5 Sonnet",
+            input_cost_per_1k_tokens=0.003,
+            output_cost_per_1k_tokens=0.015,
+            max_tokens=8192,
+            supports_vision=True,
+            quality_score=0.95,
+            speed_score=0.85,
+            description="Latest Claude model with excellent vision capabilities"
+        ),
+        "claude-3-5-haiku-20241022": LLMModel(
+            provider=LLMProvider.ANTHROPIC,
+            model_name="claude-3-5-haiku-20241022",
+            display_name="Claude 3.5 Haiku",
+            input_cost_per_1k_tokens=0.001,
+            output_cost_per_1k_tokens=0.005,
+            max_tokens=8192,
+            supports_vision=True,
+            quality_score=0.88,
+            speed_score=0.95,
+            description="Fast and cost-effective Claude model with vision"
         ),
         
         # Google Models

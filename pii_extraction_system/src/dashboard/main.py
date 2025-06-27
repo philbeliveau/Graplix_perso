@@ -16,7 +16,26 @@ warnings.filterwarnings("ignore", message=".*torch.classes.*")
 warnings.filterwarnings("ignore", message=".*no running event loop.*")
 warnings.filterwarnings("ignore", message=".*__path__._path.*")
 warnings.filterwarnings("ignore", message=".*does not exist.*")
+warnings.filterwarnings("ignore", message=".*torch._C._get_custom_class_python_wrapper.*")
 warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+# Additional torch error suppression
+import os
+os.environ['PYTORCH_DISABLE_WARNINGS'] = '1'
+
+# Suppress torch module inspection errors
+try:
+    import torch
+    # Patch the problematic __getattr__ method
+    original_getattr = torch.classes.__class__.__getattr__
+    def safe_getattr(self, name):
+        try:
+            return original_getattr(self, name)
+        except RuntimeError:
+            return None
+    torch.classes.__class__.__getattr__ = safe_getattr
+except ImportError:
+    pass  # torch not installed
 
 # Add the src directory to Python path for imports
 src_path = Path(__file__).parent.parent

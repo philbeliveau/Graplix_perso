@@ -34,6 +34,13 @@ from llm.api_key_manager import api_key_manager
 from llm.llm_config import LLMModelRegistry
 from extractors.evaluation import PIIEvaluator
 
+# Import the new contextual PII pipeline
+try:
+    from extractors.contextual_pii_pipeline import ContextualPIIPipeline, DocumentDomain, ConfidenceLevel
+    CONTEXTUAL_PII_AVAILABLE = True
+except ImportError as e:
+    CONTEXTUAL_PII_AVAILABLE = False
+
 # Initialize logger
 logger = get_logger(__name__)
 
@@ -82,8 +89,9 @@ def show_page():
     initialize_phase1_session_state()
     
     # Main analytics tabs
-    main_tab1, main_tab2, main_tab3, main_tab4 = st.tabs([
+    main_tab1, main_tab2, main_tab3, main_tab4, main_tab5 = st.tabs([
         "🔬 Model Validation",
+        "🎯 Contextual PII Validation",
         "📈 Model Comparison", 
         "📊 Performance Analytics",
         "📋 Metrics Dashboard"
@@ -93,12 +101,15 @@ def show_page():
         show_model_validation_interface()
     
     with main_tab2:
-        show_model_comparison_interface()
+        show_contextual_pii_validation_interface()
     
     with main_tab3:
-        show_performance_analytics_interface()
+        show_model_comparison_interface()
     
     with main_tab4:
+        show_performance_analytics_interface()
+    
+    with main_tab5:
         show_metrics_dashboard_interface()
 
 
@@ -179,8 +190,8 @@ def import_from_phase0():
     for doc in labeled_docs:
         # Extract PII types from ground truth labels
         pii_types = []
-        if doc.get('gpt4o_labels', {}).get('entities'):
-            pii_types = list(set([entity['type'] for entity in doc['gpt4o_labels']['entities']]))
+        if doc.get('claude_labels', {}).get('entities'):
+            pii_types = list(set([entity['type'] for entity in doc['claude_labels']['entities']]))
         
         phase1_doc = {
             'category': doc['metadata'].get('domain', 'General'),
@@ -192,11 +203,11 @@ def import_from_phase0():
                 'complexity': doc['metadata'].get('difficulty_level', 'medium'),
                 'expected_pii_types': pii_types,
                 'language': 'English',  # Could be enhanced from metadata
-                'ground_truth_labels': doc.get('gpt4o_labels', {}),
+                'ground_truth_labels': doc.get('claude_labels', {}),
                 'document_id': doc['id'],
-                'confidence_score': doc.get('gpt4o_labels', {}).get('confidence_score', 0),
-                'processing_time': doc.get('gpt4o_labels', {}).get('processing_time', 0),
-                'cost': doc.get('gpt4o_labels', {}).get('cost', 0),
+                'confidence_score': doc.get('claude_labels', {}).get('confidence_score', 0),
+                'processing_time': doc.get('claude_labels', {}).get('processing_time', 0),
+                'cost': doc.get('claude_labels', {}).get('cost', 0),
                 'file_extension': PathlibPath(doc['name']).suffix
             }
         }
@@ -3641,3 +3652,315 @@ def show_alerts_dashboard(alerts: List[Dict]):
         for alert in successes:
             st.success(f"**{alert['category']}**: {alert['message']}")
             st.caption(f"💡 {alert['recommendation']}")
+
+
+def show_contextual_pii_validation_interface():
+    """
+    Contextual PII Validation Interface for Phase 1
+    Tests the 3-step pipeline across multiple documents and models
+    """
+    st.markdown("### 🎯 Contextual PII Performance Validation")
+    
+    # Explanation
+    st.info("""
+    **🧩 Validation Objective:** Test the 3-step contextual PII pipeline across diverse documents and models to ensure:
+    - **Accurate role classification** (data subject vs professional)
+    - **Consistent performance** across different domains (health, legal, HR, etc.)
+    - **Model comparison** for contextual understanding capabilities
+    - **Quality metrics** for production deployment
+    """)
+    
+    if not CONTEXTUAL_PII_AVAILABLE:
+        st.error("❌ Contextual PII Pipeline not available. Please check the installation.")
+        return
+        
+    if not auth.has_permission('write'):
+        st.warning("Contextual PII validation requires write permissions.")
+        return
+    
+    # Initialize contextual pipeline
+    if 'contextual_pipeline' not in st.session_state:
+        st.session_state.contextual_pipeline = ContextualPIIPipeline()
+    
+    # Get documents from Phase 0
+    phase0_docs = st.session_state.get('phase0_dataset', [])
+    if not phase0_docs:
+        st.warning("No documents available. Please upload documents in Phase 0 first.")
+        return
+    
+    st.markdown("#### 📋 Test Setup")
+    
+    # Document selection for validation
+    col1, col2 = st.columns(2)
+    with col1:
+        # Select multiple documents
+        doc_options = {}
+        for doc in phase0_docs:
+            doc_name = doc.get('name', 'Unknown')
+            domain = doc.get('metadata', {}).get('domain', 'Unknown')
+            doc_options[f"{doc_name} ({domain})"] = doc
+        
+        selected_doc_keys = st.multiselect(
+            "Select documents for validation:",
+            options=list(doc_options.keys()),
+            help="Choose 3-10 documents from different domains"
+        )
+        
+        if len(selected_doc_keys) < 3:
+            st.warning("Please select at least 3 documents for meaningful validation.")
+        elif len(selected_doc_keys) > 10:
+            st.warning("Maximum 10 documents recommended for validation.")
+    
+    with col2:
+        # Model selection for comparison
+        available_models = ["gpt-4o", "gpt-4o-mini", "claude-3.5-sonnet"]
+        selected_models = st.multiselect(
+            "Select models to compare:",
+            options=available_models,
+            default=["gpt-4o", "gpt-4o-mini"],
+            help="Choose 2-3 models for comparison"
+        )
+        
+        if len(selected_models) < 2:
+            st.warning("Please select at least 2 models for comparison.")
+    
+    # Validation parameters
+    st.markdown("#### ⚙️ Validation Parameters")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        confidence_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.75)
+    with col2:
+        max_cost_per_doc = st.number_input("Max Cost per Document ($)", 0.01, 1.0, 0.10, 0.01)
+    with col3:
+        variance_target = st.slider("Target Variance (%)", 1, 20, 10)
+    
+    # Run validation
+    if st.button("🚀 Run Contextual PII Validation", type="primary", disabled=len(selected_doc_keys) < 3 or len(selected_models) < 2):
+        
+        selected_docs = [doc_options[key] for key in selected_doc_keys]
+        
+        # Initialize results tracking
+        validation_results = []
+        total_cost = 0.0
+        
+        # Progress tracking
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+        total_operations = len(selected_docs) * len(selected_models)
+        current_operation = 0
+        
+        # Results containers
+        results_container = st.container()
+        
+        for doc_idx, doc in enumerate(selected_docs):
+            for model_idx, model in enumerate(selected_models):
+                current_operation += 1
+                progress = current_operation / total_operations
+                progress_bar.progress(progress)
+                status_text.text(f"Processing {doc.get('name', 'Unknown')} with {model}...")
+                
+                try:
+                    # Get document image data
+                    if 'images' in doc and doc['images']:
+                        image_data = doc['images'][0]
+                        
+                        # Process with contextual pipeline
+                        result = st.session_state.contextual_pipeline.process_document(
+                            image_data=image_data,
+                            document_id=f"{doc.get('id')}_{model}"
+                        )
+                        
+                        # Calculate metrics
+                        quality = st.session_state.contextual_pipeline.validate_extraction_quality(result)
+                        
+                        validation_results.append({
+                            'document_name': doc.get('name', 'Unknown'),
+                            'document_domain': doc.get('metadata', {}).get('domain', 'Unknown'),
+                            'model': model,
+                            'classification_domain': result.classification.domain.value,
+                            'classification_confidence': result.classification.confidence,
+                            'total_entities': len(result.all_entities),
+                            'data_subject_entities': len(result.data_subject_entities),
+                            'professional_entities': len(result.professional_entities),
+                            'unknown_entities': len([e for e in result.all_entities if e.role == "unknown"]),
+                            'quality_score': quality['quality_score'],
+                            'quality_grade': quality['grade'],
+                            'requires_review': quality['requires_review'],
+                            'cost': result.processing_metadata.get('cost', 0.0),
+                            'processing_time': result.processing_metadata.get('processing_time', 0),
+                            'confidence_flags': len(result.confidence_flags)
+                        })
+                        
+                        total_cost += result.processing_metadata.get('cost', 0.0)
+                        
+                except Exception as e:
+                    st.error(f"❌ Failed to process {doc.get('name')} with {model}: {str(e)}")
+                    validation_results.append({
+                        'document_name': doc.get('name', 'Unknown'),
+                        'document_domain': doc.get('metadata', {}).get('domain', 'Unknown'),
+                        'model': model,
+                        'classification_domain': 'ERROR',
+                        'classification_confidence': 0.0,
+                        'total_entities': 0,
+                        'data_subject_entities': 0,
+                        'professional_entities': 0,
+                        'unknown_entities': 0,
+                        'quality_score': 0.0,
+                        'quality_grade': 'F',
+                        'requires_review': True,
+                        'cost': 0.0,
+                        'processing_time': 0,
+                        'confidence_flags': 999,
+                        'error': str(e)
+                    })
+        
+        progress_bar.progress(1.0)
+        status_text.text("✅ Validation complete!")
+        
+        # Store results in session state
+        st.session_state.contextual_validation_results = validation_results
+        st.session_state.contextual_validation_cost = total_cost
+        
+        # Display results
+        with results_container:
+            st.markdown("---")
+            st.markdown("### 📊 Validation Results")
+            
+            # Summary metrics
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Documents Processed", len(selected_docs))
+            with col2:
+                st.metric("Models Tested", len(selected_models))
+            with col3:
+                st.metric("Total Cost", f"${total_cost:.4f}")
+            with col4:
+                avg_quality = np.mean([r['quality_score'] for r in validation_results if 'error' not in r])
+                st.metric("Avg Quality Score", f"{avg_quality:.3f}")
+            
+            # Results DataFrame
+            results_df = pd.DataFrame(validation_results)
+            
+            # Model Performance Comparison
+            st.markdown("#### 📈 Model Performance Comparison")
+            
+            if not results_df.empty:
+                # Performance by model
+                model_performance = results_df.groupby('model').agg({
+                    'quality_score': ['mean', 'std'],
+                    'classification_confidence': ['mean', 'std'],
+                    'data_subject_entities': 'mean',
+                    'professional_entities': 'mean',
+                    'cost': 'mean',
+                    'processing_time': 'mean'
+                }).round(3)
+                
+                # Flatten column names
+                model_performance.columns = ['_'.join(col).strip() for col in model_performance.columns]
+                
+                st.dataframe(model_performance, use_container_width=True)
+                
+                # Visualizations
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    # Quality Score by Model
+                    fig_quality = px.box(results_df, x='model', y='quality_score', 
+                                       title="Quality Score Distribution by Model")
+                    st.plotly_chart(fig_quality, use_container_width=True)
+                
+                with col2:
+                    # Data Subject vs Professional Entities
+                    fig_entities = px.scatter(results_df, x='data_subject_entities', y='professional_entities',
+                                            color='model', size='quality_score',
+                                            title="Data Subject vs Professional Entities")
+                    st.plotly_chart(fig_entities, use_container_width=True)
+                
+                # Domain Performance Analysis
+                st.markdown("#### 🎯 Domain Performance Analysis")
+                
+                domain_performance = results_df.groupby(['document_domain', 'model']).agg({
+                    'quality_score': 'mean',
+                    'classification_confidence': 'mean',
+                    'data_subject_entities': 'mean',
+                    'professional_entities': 'mean'
+                }).round(3).reset_index()
+                
+                fig_domain = px.bar(domain_performance, x='document_domain', y='quality_score',
+                                  color='model', barmode='group',
+                                  title="Quality Score by Domain and Model")
+                st.plotly_chart(fig_domain, use_container_width=True)
+                
+                # Variance Analysis
+                st.markdown("#### 📊 Variance Analysis")
+                
+                variance_analysis = {}
+                for metric in ['quality_score', 'classification_confidence', 'data_subject_entities']:
+                    model_variance = results_df.groupby('model')[metric].std()
+                    variance_analysis[metric] = model_variance.to_dict()
+                
+                variance_df = pd.DataFrame(variance_analysis).T
+                variance_df.columns = [f"{col}_variance" for col in variance_df.columns]
+                
+                st.dataframe(variance_df, use_container_width=True)
+                
+                # Check variance targets
+                avg_variance = variance_df.mean().mean()
+                if avg_variance <= variance_target/100:
+                    st.success(f"✅ Variance target met! Average variance: {avg_variance:.1%} (Target: {variance_target}%)")
+                else:
+                    st.warning(f"⚠️ Variance target not met. Average variance: {avg_variance:.1%} (Target: {variance_target}%)")
+                
+                # Detailed Results Table
+                st.markdown("#### 📋 Detailed Results")
+                st.dataframe(results_df, use_container_width=True)
+                
+                # Recommendations
+                st.markdown("#### 💡 Recommendations")
+                
+                # Calculate recommendations based on results
+                recommendations = []
+                
+                # Quality recommendations
+                low_quality_models = results_df.groupby('model')['quality_score'].mean()
+                worst_model = low_quality_models.idxmin()
+                best_model = low_quality_models.idxmax()
+                
+                recommendations.append(f"🏆 **Best performing model**: {best_model} (Quality: {low_quality_models[best_model]:.3f})")
+                recommendations.append(f"⚠️ **Needs improvement**: {worst_model} (Quality: {low_quality_models[worst_model]:.3f})")
+                
+                # Cost recommendations
+                cost_efficiency = results_df.groupby('model').apply(lambda x: x['quality_score'].mean() / x['cost'].mean() if x['cost'].mean() > 0 else 0)
+                most_efficient = cost_efficiency.idxmax()
+                recommendations.append(f"💰 **Most cost-efficient**: {most_efficient}")
+                
+                # Domain-specific recommendations
+                domain_issues = results_df[results_df['quality_score'] < 0.7]['document_domain'].value_counts()
+                if not domain_issues.empty:
+                    problematic_domain = domain_issues.index[0]
+                    recommendations.append(f"🎯 **Domain needing attention**: {problematic_domain} (Low quality scores)")
+                
+                for rec in recommendations:
+                    st.write(rec)
+            
+            else:
+                st.error("No valid results to display. Please check for processing errors.")
+    
+    # Show previous results if available
+    if 'contextual_validation_results' in st.session_state:
+        st.markdown("#### 📋 Previous Validation Results")
+        prev_results = st.session_state.contextual_validation_results
+        prev_cost = st.session_state.get('contextual_validation_cost', 0.0)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Previous Tests", len(prev_results))
+        with col2:
+            st.metric("Previous Cost", f"${prev_cost:.4f}")
+        with col3:
+            avg_quality = np.mean([r['quality_score'] for r in prev_results if 'error' not in r])
+            st.metric("Previous Avg Quality", f"{avg_quality:.3f}")
+        
+        if st.button("📊 Show Previous Results Details"):
+            st.dataframe(pd.DataFrame(prev_results), use_container_width=True)

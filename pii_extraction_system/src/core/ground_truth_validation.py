@@ -53,7 +53,7 @@ class GroundTruthValidator:
             'needs_human_review': False
         }
         
-        if not document.get('gpt4o_labels'):
+        if not document.get('claude_labels'):
             validation_result['issues_detected'].append({
                 'type': 'missing_labels',
                 'severity': 'high',
@@ -61,7 +61,7 @@ class GroundTruthValidator:
             })
             return validation_result
         
-        labels = document['gpt4o_labels']
+        labels = document['claude_labels']
         entities = labels.get('entities', [])
         
         if validation_method == "confidence_based":

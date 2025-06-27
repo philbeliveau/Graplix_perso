@@ -58,6 +58,14 @@ from utils.document_processor import DocumentProcessor
 from core.ground_truth_validation import ground_truth_validator
 from core.logging_config import get_logger
 from utils.s3_integration import S3DocumentProcessor, process_s3_bucket_to_phase0, convert_document_to_images
+
+# Import the new contextual PII pipeline
+try:
+    from extractors.contextual_pii_pipeline import ContextualPIIPipeline, DocumentDomain, ConfidenceLevel
+    CONTEXTUAL_PII_AVAILABLE = True
+except ImportError as e:
+    st.error(f"Contextual PII Pipeline not available: {e}")
+    CONTEXTUAL_PII_AVAILABLE = False
 from core.config import settings
 
 # Initialize logger with appropriate level for batch processing
@@ -79,31 +87,37 @@ class SuppressVerboseLogs:
         self.suppressed = False
 
 # Dataset creation state management
-if 'phase0_dataset' not in st.session_state:
-    st.session_state.phase0_dataset = []
+def initialize_session_state():
+    """Initialize session state variables for phase 0 dataset creation"""
+    if 'phase0_dataset' not in st.session_state:
+        st.session_state.phase0_dataset = []
 
-if 'phase0_current_document' not in st.session_state:
-    st.session_state.phase0_current_document = None
+    if 'phase0_current_document' not in st.session_state:
+        st.session_state.phase0_current_document = None
 
-if 'phase0_labeling_queue' not in st.session_state:
-    st.session_state.phase0_labeling_queue = []
+    if 'phase0_labeling_queue' not in st.session_state:
+        st.session_state.phase0_labeling_queue = []
 
 def show_page():
     """Main Phase 0 dataset creation page"""
+    # Initialize session state first
+    initialize_session_state()
+    
     st.markdown('<div class="section-header">🎯 Phase 0 Dataset Creation</div>', 
                 unsafe_allow_html=True)
-    st.markdown("Create high-quality ground truth datasets with GPT-4o assistance and metadata tagging.")
+    st.markdown("Create high-quality ground truth datasets with Claude assistance and metadata tagging.")
     
     # Check permissions
     if not auth.has_permission('read'):
         st.error("Access denied. Insufficient permissions.")
         return
     
-    # Main tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    # Main tabs  
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📤 File Upload",
-        "🗄️ S3 Batch Processing",
-        "🤖 GPT-4o Labeling", 
+        "🗄️ S3 Batch Processing", 
+        "🤖 Claude Labeling",
+        "🎯 3-Step Contextual PII",
         "🏷️ Metadata Tagging",
         "⚡ Interactive Labeling",
         "📊 Dataset Export"
@@ -116,19 +130,25 @@ def show_page():
         show_s3_batch_processing_interface()
     
     with tab3:
-        show_gpt4o_labeling_interface()
+        show_claude_labeling_interface()
     
     with tab4:
+        show_contextual_pii_interface()
+        
+    with tab5:
         show_metadata_tagging_interface()
     
-    with tab5:
+    with tab6:
         show_interactive_labeling_interface()
     
-    with tab6:
+    with tab7:
         show_dataset_export_interface()
 
 def show_file_upload_interface():
     """Show file upload interface with validation"""
+    # Ensure session state is initialized
+    initialize_session_state()
+    
     st.markdown("### 📤 Document Upload & Ingestion")
     
     if not auth.has_permission('write'):
@@ -247,7 +267,7 @@ def process_uploaded_files(uploaded_files, auto_label: bool, batch_size: int, pr
                 'domain': 'Unknown'
             },
             'ground_truth_labels': [],
-            'gpt4o_labels': None,
+            'claude_labels': None,
             'validation_status': 'Pending'
         }
         
@@ -257,8 +277,8 @@ def process_uploaded_files(uploaded_files, auto_label: bool, batch_size: int, pr
         # Auto-label if requested
         if auto_label:
             try:
-                gpt4o_labels = auto_label_document(doc_id, password)
-                document['gpt4o_labels'] = gpt4o_labels
+                claude_labels = auto_label_document(doc_id, password)
+                document['claude_labels'] = claude_labels
                 document['labeled'] = True
                 document['validation_status'] = 'Auto-labeled'
             except Exception as e:
@@ -288,8 +308,8 @@ def detect_document_type(filename: str) -> str:
     
     return type_mapping.get(extension, 'Unknown')
 
-def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
-    """Auto-label document using GPT-4o vision - direct image processing approach"""
+def auto_label_document(doc_id: str, password: str = "", model: str = "anthropic/claude-3-5-sonnet-20241022") -> Dict[str, Any]:
+    """Auto-label document using Claude vision - direct image processing approach"""
     document = next((doc for doc in st.session_state.phase0_dataset if doc['id'] == doc_id), None)
     
     if not document:
@@ -332,7 +352,7 @@ def auto_label_document(doc_id: str, password: str = "") -> Dict[str, Any]:
             # Extract PII using vision
             result = llm_service.extract_pii_from_image(
                 image_data,
-                'openai/gpt-4o',
+                model,
                 document_type=document['metadata']['document_type']
             )
             
@@ -469,7 +489,7 @@ def display_document_queue():
     for doc in st.session_state.phase0_dataset:
         # Determine status with more granular information
         if doc['labeled']:
-            labels = doc.get('gpt4o_labels', {})
+            labels = doc.get('claude_labels', {})
             if labels.get('method') == 'unsupported_format':
                 status = '⚠️ Unsupported Format'
             elif labels.get('method') == 'no_text_content':
@@ -1102,7 +1122,7 @@ def show_document_details(doc_name: str):
             
             # Enhanced status display
             if document['labeled']:
-                labels = document.get('gpt4o_labels', {})
+                labels = document.get('claude_labels', {})
                 if labels.get('method') == 'unsupported_format':
                     st.error(f"⚠️ Unsupported Format: {labels.get('error', '')}")
                     if labels.get('suggestion'):
@@ -1131,7 +1151,7 @@ def show_document_details(doc_name: str):
             
             # Processing details
             if document['labeled']:
-                labels = document.get('gpt4o_labels', {})
+                labels = document.get('claude_labels', {})
                 if labels.get('method'):
                     st.write(f"Processing Method: {labels['method']}")
                 if labels.get('processing_time'):
@@ -1140,9 +1160,9 @@ def show_document_details(doc_name: str):
                     st.write(f"Processing Cost: ${labels['cost']:.4f}")
         
         # Show labels if available
-        if document.get('gpt4o_labels'):
+        if document.get('claude_labels'):
             st.markdown("**GPT-4o Labels**")
-            labels = document['gpt4o_labels']
+            labels = document['claude_labels']
             
             col1, col2, col3 = st.columns(3)
             with col1:
@@ -1156,12 +1176,12 @@ def show_document_details(doc_name: str):
                 entities_df = pd.DataFrame(labels['entities'])
                 st.dataframe(entities_df, use_container_width=True)
 
-def show_gpt4o_labeling_interface():
-    """Show GPT-4o labeling interface"""
-    st.markdown("### 🤖 GPT-4o Ground Truth Labeling")
+def show_claude_labeling_interface():
+    """Show Claude labeling interface"""
+    st.markdown("### 🤖 Claude Ground Truth Labeling")
     
     if not auth.has_permission('write'):
-        st.warning("GPT-4o labeling requires write permissions.")
+        st.warning("Claude labeling requires write permissions.")
         return
     
     # Add troubleshooting tips for password-protected documents
@@ -1181,12 +1201,12 @@ def show_gpt4o_labeling_interface():
         - Ensure sufficient processing time for large documents
         """)
     
-    # GPT-4o availability check
+    # Claude availability check
     available_models = llm_service.get_available_models()
-    gpt4o_models = [model for model in available_models if 'gpt-4o' in model]
+    claude_models = [model for model in available_models if 'claude' in model.lower()]
     
-    if not gpt4o_models:
-        st.error("GPT-4o models are not available. Please check your OpenAI API configuration.")
+    if not claude_models:
+        st.error("Claude models are not available. Please check your Anthropic API configuration.")
         return
     
     # Model selection and configuration
@@ -1194,9 +1214,9 @@ def show_gpt4o_labeling_interface():
     
     with col1:
         selected_model = st.selectbox(
-            "Select GPT-4o Model",
-            gpt4o_models,
-            help="Choose the GPT-4o model for labeling"
+            "Select Claude Model",
+            claude_models,
+            help="Choose the Claude model for labeling"
         )
     
     with col2:
@@ -1355,8 +1375,8 @@ def label_document_batch(documents: List[Dict], model_key: str, password: str = 
             
             try:
                 # Suppress individual document logs during batch processing
-                labels = auto_label_document(document['id'], password)
-                document['gpt4o_labels'] = labels
+                labels = auto_label_document(document['id'], password, model_key)
+                document['claude_labels'] = labels
                 document['labeled'] = True
                 document['validation_status'] = 'Auto-labeled'
                 
@@ -1429,7 +1449,7 @@ def show_labeling_history():
     labeled_docs.sort(key=lambda x: x['uploaded_at'], reverse=True)
     
     for doc in labeled_docs[:5]:  # Show last 5
-        labels = doc.get('gpt4o_labels', {})
+        labels = doc.get('claude_labels', {})
         
         col1, col2, col3, col4 = st.columns(4)
         
@@ -1698,8 +1718,8 @@ def auto_suggest_tags(document: Dict):
     suggestions = {}
     
     # Suggest difficulty based on entity count and types
-    if document.get('gpt4o_labels'):
-        entities = document['gpt4o_labels'].get('entities', [])
+    if document.get('claude_labels'):
+        entities = document['claude_labels'].get('entities', [])
         entity_count = len(entities)
         
         if entity_count > 10:
@@ -1790,8 +1810,8 @@ def export_current_dataset():
         }
         
         # Only include labels if they exist
-        if doc.get('gpt4o_labels'):
-            export_doc['labels'] = doc['gpt4o_labels']
+        if doc.get('claude_labels'):
+            export_doc['labels'] = doc['claude_labels']
         
         export_documents.append(export_doc)
     
@@ -2021,8 +2041,8 @@ def show_document_validation_interface(doc_name: str, review_queue: List[Dict]):
                 st.rerun()
         
         with col2:
-            if st.button("Reprocess with GPT-4o"):
-                reprocess_document_with_gpt4o(document['id'])
+            if st.button("Reprocess with Claude"):
+                reprocess_document_with_claude(document['id'])
         
         with col3:
             if st.button("Mark as Reviewed"):
@@ -2060,15 +2080,15 @@ def save_manual_validation(
         else:
             document['validation_status'] = 'Under Review'
 
-def reprocess_document_with_gpt4o(doc_id: str):
-    """Reprocess document with GPT-4o"""
+def reprocess_document_with_claude(doc_id: str):
+    """Reprocess document with Claude"""
     try:
         # Use default password "Hubert" for reprocessing
         labels = auto_label_document(doc_id, "Hubert")
         document = next((doc for doc in st.session_state.phase0_dataset if doc['id'] == doc_id), None)
         
         if document:
-            document['gpt4o_labels'] = labels
+            document['claude_labels'] = labels
             document['labeled'] = True
             document['validation_status'] = 'Reprocessed'
             st.success("Document reprocessed successfully!")
@@ -2160,8 +2180,8 @@ def show_dataset_export_interface():
     total_entities = 0
     
     for doc in st.session_state.phase0_dataset:
-        if doc.get('gpt4o_labels'):
-            total_entities += len(doc['gpt4o_labels'].get('entities', []))
+        if doc.get('claude_labels'):
+            total_entities += len(doc['claude_labels'].get('entities', []))
     
     col1, col2, col3, col4 = st.columns(4)
     
@@ -2226,9 +2246,9 @@ def show_dataset_export_interface():
         
         difficulty_entities = {}
         for doc in st.session_state.phase0_dataset:
-            if doc['labeled'] and doc.get('gpt4o_labels'):
+            if doc['labeled'] and doc.get('claude_labels'):
                 difficulty = doc['metadata']['difficulty_level']
-                entities_count = len(doc['gpt4o_labels'].get('entities', []))
+                entities_count = len(doc['claude_labels'].get('entities', []))
                 
                 if difficulty not in difficulty_entities:
                     difficulty_entities[difficulty] = []
@@ -2306,7 +2326,7 @@ def show_export_preview(export_format: str, export_filter: str):
                     'id': example_doc['id'],
                     'name': example_doc['name'],
                     'metadata': example_doc['metadata'],
-                    'labels': example_doc.get('gpt4o_labels', {}).get('entities', [])
+                    'labels': example_doc.get('claude_labels', {}).get('entities', [])
                 }
                 st.json(preview_data)
             
@@ -2318,7 +2338,7 @@ def show_export_preview(export_format: str, export_filter: str):
                     'document_type': example_doc['metadata']['document_type'],
                     'difficulty_level': example_doc['metadata']['difficulty_level'],
                     'domain': example_doc['metadata']['domain'],
-                    'entity_count': len(example_doc.get('gpt4o_labels', {}).get('entities', [])),
+                    'entity_count': len(example_doc.get('claude_labels', {}).get('entities', [])),
                     'labeled': example_doc['labeled']
                 }])
                 st.dataframe(csv_preview)
@@ -2332,7 +2352,7 @@ def filter_documents_for_export(documents: List[Dict], export_filter: str) -> Li
     elif export_filter == 'High confidence only':
         return [
             doc for doc in documents 
-            if doc.get('gpt4o_labels', {}).get('confidence_score', 0) > 0.8
+            if doc.get('claude_labels', {}).get('confidence_score', 0) > 0.8
         ]
     else:
         return documents
@@ -2383,8 +2403,8 @@ def prepare_json_export(documents: List[Dict], include_content: bool, include_me
         if include_content:
             export_doc['content'] = doc['content']
         
-        if doc.get('gpt4o_labels'):
-            export_doc['labels'] = doc['gpt4o_labels']
+        if doc.get('claude_labels'):
+            export_doc['labels'] = doc['claude_labels']
         
         export_docs.append(export_doc)
     
@@ -2403,7 +2423,7 @@ def prepare_csv_export(documents: List[Dict], include_metadata: bool) -> str:
     rows = []
     
     for doc in documents:
-        labels = doc.get('gpt4o_labels', {})
+        labels = doc.get('claude_labels', {})
         entities = labels.get('entities', [])
         
         base_row = {
@@ -2493,10 +2513,10 @@ def calculate_dataset_statistics() -> Dict[str, Any]:
         stats['domain_distribution'][domain] = stats['domain_distribution'].get(domain, 0) + 1
         
         # Entity statistics
-        if doc.get('gpt4o_labels'):
-            entities = doc['gpt4o_labels'].get('entities', [])
+        if doc.get('claude_labels'):
+            entities = doc['claude_labels'].get('entities', [])
             stats['total_entities'] += len(entities)
-            stats['total_labeling_cost'] += doc['gpt4o_labels'].get('cost', 0)
+            stats['total_labeling_cost'] += doc['claude_labels'].get('cost', 0)
             
             for entity in entities:
                 entity_type = entity.get('type', 'UNKNOWN')
@@ -2543,8 +2563,8 @@ def generate_quality_report() -> Dict[str, Any]:
     # Analyze confidence distribution
     all_confidences = []
     for doc in st.session_state.phase0_dataset:
-        if doc.get('gpt4o_labels'):
-            entities = doc['gpt4o_labels'].get('entities', [])
+        if doc.get('claude_labels'):
+            entities = doc['claude_labels'].get('entities', [])
             for entity in entities:
                 all_confidences.append(entity.get('confidence', 0))
     
@@ -2581,3 +2601,318 @@ def generate_quality_report() -> Dict[str, Any]:
         report['recommendations'].append("Review and improve labels with low confidence scores")
     
     return report
+
+
+def show_contextual_pii_interface():
+    """
+    3-Step Contextual PII Processing Interface
+    Solves the core problem: Extract data subject PII while ignoring professional PII
+    """
+    # Ensure session state is initialized
+    initialize_session_state()
+    
+    st.markdown("### 🎯 3-Step Contextual PII Pipeline")
+    
+    # Problem explanation
+    st.info("""
+    **🧩 The Real Problem:** Extract PII of the data subject (person whose consent is needed) while ignoring PII of professionals (doctors, lawyers, staff).
+    
+    **🎯 3-Step Solution:**
+    1. **Document Classification** - Identify domain (health, legal, HR, etc.)
+    2. **Prompt Routing** - Use domain-specific prompts for better accuracy  
+    3. **Role-Based Extraction** - Distinguish data subject vs professional PII
+    """)
+    
+    if not CONTEXTUAL_PII_AVAILABLE:
+        st.error("❌ Contextual PII Pipeline not available. Please check the installation.")
+        return
+        
+    if not auth.has_permission('write'):
+        st.warning("Contextual PII processing requires write permissions.")
+        return
+    
+    # Initialize pipeline
+    if 'contextual_pipeline' not in st.session_state:
+        st.session_state.contextual_pipeline = ContextualPIIPipeline()
+    
+    # Document selection
+    st.markdown("#### 📄 Select Document to Process")
+    
+    if not st.session_state.phase0_dataset:
+        st.warning("No documents uploaded. Please upload documents in the 'File Upload' tab first.")
+        return
+    
+    # Create document selection dropdown
+    doc_options = {}
+    for doc in st.session_state.phase0_dataset:
+        doc_name = doc.get('name', 'Unknown')
+        doc_id = doc.get('id', 'unknown')
+        doc_options[f"{doc_name} (ID: {doc_id[:8]})"] = doc
+    
+    selected_doc_key = st.selectbox(
+        "Choose a document to process:",
+        options=list(doc_options.keys()),
+        help="Select a document for contextual PII extraction"
+    )
+    
+    if not selected_doc_key:
+        return
+        
+    selected_doc = doc_options[selected_doc_key]
+    
+    # Display document info
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Document", selected_doc.get('name', 'Unknown'))
+    with col2:
+        st.metric("Size", f"{selected_doc.get('size', 0)/1024:.1f} KB")
+    with col3:
+        domain = selected_doc.get('metadata', {}).get('domain', 'Unknown')
+        st.metric("Current Domain", domain)
+    
+    # Processing options
+    st.markdown("#### ⚙️ Processing Options")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        confidence_threshold = st.slider(
+            "Confidence Threshold", 
+            min_value=0.0, 
+            max_value=1.0, 
+            value=0.75,
+            help="Minimum confidence for auto-classification"
+        )
+    with col2:
+        model_choice = st.selectbox(
+            "LLM Model",
+            ["anthropic/claude-3-5-sonnet-20241022", "anthropic/claude-3-5-haiku-20241022", "openai/gpt-4o", "openai/gpt-4o-mini", "🧪 TEST MODE (No API)"],
+            help="Choose the model for processing. Test mode works without API calls."
+        )
+    
+    # Quota warning
+    st.warning("""
+    ⚠️ **API Quota Notice**: If you see "quota exceeded" errors:
+    - **Anthropic**: Check your usage at https://console.anthropic.com/
+    - **OpenAI**: Check your billing at https://platform.openai.com/account/billing
+    - **Alternative**: Try different model providers or use TEST MODE for demonstration
+    - **Free Alternative**: Consider using local models (if available)
+    """)
+    
+    # Process button
+    if st.button("🚀 Run 3-Step Contextual PII Extraction", type="primary"):
+        
+        # Convert document to image data
+        try:
+            # Convert document content to images for processing
+            file_content = base64.b64decode(selected_doc['content'])
+            file_extension = os.path.splitext(selected_doc['name'])[1]
+            
+            # Convert document to images
+            images = convert_document_to_images(file_content, file_extension, "")
+            
+            if not images:
+                st.error("❌ Could not convert document to images for processing. Please check if the document format is supported.")
+                return
+                
+            # Use the first image for processing
+            image_data = images[0]
+            
+            with st.spinner("Processing through 3-step pipeline..."):
+                
+                # Create progress indicators for the 3 steps
+                progress_col1, progress_col2, progress_col3 = st.columns(3)
+                
+                with progress_col1:
+                    st.markdown("**Step 1: Classification**")
+                    step1_placeholder = st.empty()
+                    step1_placeholder.info("🔄 Processing...")
+                
+                with progress_col2:
+                    st.markdown("**Step 2: Prompt Routing**")
+                    step2_placeholder = st.empty()
+                    step2_placeholder.info("⏳ Waiting...")
+                    
+                with progress_col3:
+                    st.markdown("**Step 3: PII Extraction**")
+                    step3_placeholder = st.empty()
+                    step3_placeholder.info("⏳ Waiting...")
+                
+                # Run the pipeline - use test mode if selected
+                if model_choice == "🧪 TEST MODE (No API)":
+                    result = st.session_state.contextual_pipeline.process_document_test_mode(
+                        document_id=selected_doc.get('id')
+                    )
+                else:
+                    result = st.session_state.contextual_pipeline.process_document(
+                        image_data=image_data,
+                        document_id=selected_doc.get('id')
+                    )
+                
+                # Update step indicators
+                step1_placeholder.success(f"✅ {result.classification.domain.value.title()} ({result.classification.confidence:.2f})")
+                
+                strategy = "Domain-specific" if result.classification.confidence >= 0.85 else "General"
+                step2_placeholder.success(f"✅ {strategy} prompt")
+                
+                step3_placeholder.success(f"✅ {len(result.data_subject_entities)} subject, {len(result.professional_entities)} professional")
+                
+                # Show test mode notice
+                if model_choice == "🧪 TEST MODE (No API)":
+                    st.info("🧪 **Test Mode Results**: These are demonstration results. No actual document processing occurred.")
+                
+                # Display detailed results
+                st.markdown("---")
+                st.markdown("### 📊 Processing Results")
+                
+                # Classification results
+                st.markdown("#### Step 1: Document Classification")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Domain", result.classification.domain.value.title())
+                with col2:
+                    st.metric("Confidence", f"{result.classification.confidence:.3f}")
+                with col3:
+                    confidence_level = "High" if result.classification.confidence >= 0.85 else "Medium" if result.classification.confidence >= 0.65 else "Low"
+                    color = "🟢" if confidence_level == "High" else "🟡" if confidence_level == "Medium" else "🔴"
+                    st.metric("Level", f"{color} {confidence_level}")
+                
+                st.text_area("Classification Reasoning", result.classification.reasoning, height=100)
+                
+                # PII Extraction Results
+                st.markdown("#### Step 3: Contextual PII Extraction Results")
+                
+                # Summary metrics
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("📋 Total Entities", len(result.all_entities))
+                with col2:
+                    st.metric("👤 Data Subject PII", len(result.data_subject_entities), 
+                            help="PII requiring consent")
+                with col3:
+                    st.metric("🏥 Professional PII", len(result.professional_entities),
+                            help="PII to ignore (doctors, lawyers, etc.)")
+                with col4:
+                    unknown_entities = len([e for e in result.all_entities if e.role == "unknown"])
+                    st.metric("❓ Unknown Role", unknown_entities,
+                            help="Entities needing manual review")
+                    
+                # Data Subject PII (Most Important)
+                if result.data_subject_entities:
+                    st.markdown("##### 🎯 Data Subject PII (Requires Consent)")
+                    ds_df = pd.DataFrame([
+                        {
+                            "Type": entity.type,
+                            "Value": entity.value,
+                            "Confidence": f"{entity.confidence:.3f}",
+                            "Context": entity.context[:50] + "..." if len(entity.context) > 50 else entity.context,
+                            "Flags": ", ".join(entity.flags) if entity.flags else "None"
+                        }
+                        for entity in result.data_subject_entities
+                    ])
+                    st.dataframe(ds_df, use_container_width=True)
+                else:
+                    st.warning("⚠️ No data subject PII identified. This may indicate a processing issue.")
+                    
+                # Professional PII (Excluded)
+                if result.professional_entities:
+                    st.markdown("##### 🏥 Professional PII (Excluded from Consent)")
+                    prof_df = pd.DataFrame([
+                        {
+                            "Type": entity.type,
+                            "Value": entity.value,
+                            "Role Context": entity.context[:50] + "..." if len(entity.context) > 50 else entity.context
+                        }
+                        for entity in result.professional_entities
+                    ])
+                    st.dataframe(prof_df, use_container_width=True)
+                    
+                # Quality Assessment
+                quality = st.session_state.contextual_pipeline.validate_extraction_quality(result)
+                
+                st.markdown("#### 🎯 Quality Assessment")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    color = "🟢" if quality['grade'] in ['A', 'B'] else "🟡" if quality['grade'] == 'C' else "🔴"
+                    st.metric("Quality Grade", f"{color} {quality['grade']}")
+                with col2:
+                    st.metric("Quality Score", f"{quality['quality_score']:.2f}")
+                with col3:
+                    review_needed = "Yes" if quality['requires_review'] else "No"
+                    color = "🔴" if quality['requires_review'] else "🟢"
+                    st.metric("Review Needed", f"{color} {review_needed}")
+                
+                if quality['recommendations']:
+                    st.markdown("**Recommendations:**")
+                    for rec in quality['recommendations']:
+                        st.write(f"• {rec}")
+                    
+                # Confidence Flags
+                if result.confidence_flags:
+                    st.markdown("#### ⚠️ Processing Flags")
+                    for flag in result.confidence_flags:
+                        flag_color = "🔴" if "failed" in flag else "🟡"
+                        st.write(f"{flag_color} {flag.replace('_', ' ').title()}")
+                
+                # Save results option
+                st.markdown("#### 💾 Save Results")
+                if st.button("Save Contextual PII Results"):
+                    # Add contextual results to document metadata
+                    selected_doc['contextual_pii_results'] = {
+                        'classification': {
+                            'domain': result.classification.domain.value,
+                            'confidence': result.classification.confidence,
+                            'reasoning': result.classification.reasoning
+                        },
+                        'data_subject_entities': [
+                            {
+                                'type': e.type,
+                                'value': e.value,
+                                'confidence': e.confidence,
+                                'context': e.context
+                            }
+                            for e in result.data_subject_entities
+                        ],
+                        'professional_entities': [
+                            {
+                                'type': e.type,
+                                'value': e.value,
+                                'context': e.context
+                            }
+                            for e in result.professional_entities
+                        ],
+                        'quality_assessment': quality,
+                        'processing_metadata': result.processing_metadata
+                    }
+                    st.success("✅ Contextual PII results saved to document!")
+                        
+        except Exception as e:
+            error_message = str(e)
+            if "quota" in error_message.lower() or "429" in error_message:
+                st.error("🚨 **API Quota Exceeded**")
+                st.info("""
+                **How to fix this:**
+                1. **OpenAI**: Add credits at https://platform.openai.com/account/billing
+                2. **Try Claude**: The system will automatically try Anthropic's Claude models
+                3. **Wait**: Quotas may reset hourly/daily depending on your plan
+                4. **Use fewer documents**: Process documents one at a time to conserve quota
+                """)
+                st.warning(f"Technical details: {error_message}")
+            else:
+                st.error(f"❌ Processing failed: {error_message}")
+            logger.error(f"Contextual PII processing failed: {e}")
+    
+    # Show existing contextual results if available
+    if selected_doc.get('contextual_pii_results'):
+        st.markdown("#### 📋 Previous Contextual PII Results")
+        prev_results = selected_doc['contextual_pii_results']
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Previous Domain", prev_results['classification']['domain'].title())
+        with col2:
+            st.metric("Data Subject Entities", len(prev_results['data_subject_entities']))
+        with col3:
+            st.metric("Professional Entities", len(prev_results['professional_entities']))
+        
+        if st.button("🔄 Show Previous Results Details"):
+            st.json(prev_results)

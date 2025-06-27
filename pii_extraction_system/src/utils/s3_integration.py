@@ -317,7 +317,7 @@ class DocumentProcessingResult:
                 'source': 's3',
                 's3_bucket': self.s3_key.split('/')[0] if '/' in self.s3_key else ''
             },
-            'gpt4o_labels': {
+            'claude_labels': {
                 'method': 'gpt4o_vision_s3' if self.success else 'failed',
                 'entities': self.entities or [],
                 'cost': self.cost,
@@ -679,7 +679,7 @@ class S3DocumentProcessor:
             'created_at': datetime.now().isoformat(),
             'total_documents': len(processing_results),
             'successful_documents': len(phase0_dataset),
-            'total_entities': sum(len(doc['gpt4o_labels']['entities']) for doc in phase0_dataset),
+            'total_entities': sum(len(doc['claude_labels']['entities']) for doc in phase0_dataset),
             'total_cost': sum(result.cost for result in processing_results),
             'source': 's3_batch_processing',
             'bucket': self.bucket_name

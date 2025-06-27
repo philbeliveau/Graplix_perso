@@ -142,6 +142,16 @@ class Settings(BaseSettings):
     aws_secret_access_key: Optional[str] = Field(default=None, description="AWS secret key")
     aws_region: str = Field(default="us-west-2", description="AWS region")
     
+    # API Keys
+    openai_api_key: Optional[str] = Field(default=None, description="OpenAI API key")
+    anthropic_api_key: Optional[str] = Field(default=None, description="Anthropic API key")
+    deepseek_api: Optional[str] = Field(default=None, description="DeepSeek API key")
+    huggingface_api_key: Optional[str] = Field(default=None, description="HuggingFace API key")
+    nvidia_key: Optional[str] = Field(default=None, description="NVIDIA API key")
+    github_personal_access_token: Optional[str] = Field(default=None, description="GitHub personal access token")
+    space_sparc: Optional[str] = Field(default=None, description="Space SPARC token")
+    jwt_secret_key: Optional[str] = Field(default=None, description="JWT secret key")
+    
     # Configuration objects
     data_source: DataSourceConfig = Field(default_factory=DataSourceConfig)
     ml_models: MLModelConfig = Field(default_factory=MLModelConfig)

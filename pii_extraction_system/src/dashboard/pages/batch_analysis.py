@@ -31,6 +31,7 @@ if env_loader_path.exists():
 from dashboard.utils import session_state, ui_components, auth, run_history
 from llm.multimodal_llm_service import llm_service
 from utils.document_processor import DocumentProcessor
+from core import get_pipeline
 
 def format_model_display(model_key: str) -> str:
     """Format model display name"""
@@ -303,6 +304,7 @@ def process_batch_real(batch_job: Dict, files: List, model: str, threshold: floa
             
             try:
                 # Process with PII pipeline
+                PIIExtractionPipeline = get_pipeline()
                 pipeline = PIIExtractionPipeline(models=enabled_models)
                 extraction_result = pipeline.extract_from_file(tmp_file_path)
                 

@@ -31,7 +31,7 @@ if env_loader_path.exists():
         pass
 
 from dashboard.utils import session_state, ui_components, auth
-from core.pipeline import PIIExtractionPipeline
+from core import get_pipeline
 from utils.document_processor import DocumentProcessor
 
 def show_page():
@@ -304,6 +304,7 @@ def process_document(file_id: str):
             enabled_models = model_mapping.get(processing_model, ["rule_based", "ner", "layout_aware"])
             
             # Use actual PII pipeline with selected models
+            PIIExtractionPipeline = get_pipeline()
             pipeline = PIIExtractionPipeline(models=enabled_models)
             extraction_result = pipeline.extract_from_file(tmp_file_path)
             

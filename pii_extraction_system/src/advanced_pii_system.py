@@ -18,7 +18,7 @@ except ImportError:
     SAGEMAKER_AVAILABLE = False
 from .models.version_control import ModelRegistry, ABTestingFramework, ExperimentConfig
 from .extractors.base import PIIExtractorBase, PIIExtractionResult
-from .core.pipeline import PIIExtractionPipeline
+from .core import get_pipeline
 
 logger = logging.getLogger(__name__)
 

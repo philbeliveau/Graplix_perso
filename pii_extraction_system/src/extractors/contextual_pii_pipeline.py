@@ -269,10 +269,15 @@ class ContextualPIIPipeline:
             
             for model in models_to_try:
                 try:
-                    response = self.llm_service.process_image_with_text(
-                        image_base64=image_base64,
-                        prompt=classification_prompt,
-                        model=model
+                    # Get the normalized model key and provider
+                    normalized_key = self.llm_service.normalize_model_key(model)
+                    if normalized_key not in self.llm_service.providers:
+                        continue
+                    
+                    provider = self.llm_service.providers[normalized_key]
+                    response = provider.extract_pii(
+                        image_data=image_base64,
+                        prompt=classification_prompt
                     )
                     logger.info(f"Successfully used {model} for classification")
                     break
@@ -425,10 +430,15 @@ class ContextualPIIPipeline:
             
             for model in models_to_try:
                 try:
-                    response = self.llm_service.process_image_with_text(
-                        image_base64=image_base64,
-                        prompt=prompt,
-                        model=model
+                    # Get the normalized model key and provider
+                    normalized_key = self.llm_service.normalize_model_key(model)
+                    if normalized_key not in self.llm_service.providers:
+                        continue
+                    
+                    provider = self.llm_service.providers[normalized_key]
+                    response = provider.extract_pii(
+                        image_data=image_base64,
+                        prompt=prompt
                     )
                     logger.info(f"Successfully used {model} for PII extraction")
                     break

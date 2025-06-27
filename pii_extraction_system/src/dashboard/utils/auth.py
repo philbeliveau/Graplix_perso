@@ -82,6 +82,14 @@ def show_login_page():
     </div>
     """, unsafe_allow_html=True)
     
+    # Show available credentials for development
+    st.info("""
+    **Available Login Credentials:**
+    - **Admin**: `admin` / `admin` (Full access)
+    - **Analyst**: `analyst` / `hello` (Read/Write access)  
+    - **Viewer**: `viewer` / `viewer` (Read-only access)
+    """)
+    
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:

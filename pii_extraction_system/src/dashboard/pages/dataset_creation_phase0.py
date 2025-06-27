@@ -178,6 +178,7 @@ def show_file_upload_interface():
     
     # File upload interface
     st.markdown("#### Upload Documents")
+    st.info("💡 **Quick Upload**: Files can be uploaded without any LLM processing. Enable 'Auto-label with Claude' in Upload Options only if you want immediate labeling.")
     
     col1, col2 = st.columns([2, 1])
     
@@ -192,7 +193,11 @@ def show_file_upload_interface():
     with col2:
         upload_options = st.expander("Upload Options")
         with upload_options:
-            auto_label = st.checkbox("Auto-label with GPT-4o", value=True)
+            auto_label = st.checkbox(
+                "Auto-label with Claude (Optional)", 
+                value=False,
+                help="Enable to automatically run Claude labeling on upload. You can always label documents later in the Claude Labeling tab."
+            )
             batch_size = st.slider("Batch Size", 1, 10, 5)
             priority = st.selectbox("Priority", ["High", "Medium", "Low"], index=1)
             
@@ -224,13 +229,15 @@ def show_file_upload_interface():
         
         with col1:
             if st.button("Label All Unlabeled"):
-                st.info("💡 Using default password 'Hubert' for bulk operations. Use GPT-4o Labeling tab for custom passwords.")
+                st.info("💡 Using default password 'Hubert' for bulk operations. Use Claude Labeling tab for custom passwords.")
                 label_all_unlabeled_documents()
         
         with col2:
             if st.button("Clear All Documents"):
-                if st.confirm("Are you sure you want to clear all documents?"):
+                st.warning("⚠️ This will permanently delete all uploaded documents!")
+                if st.button("🗑️ Yes, Clear All Documents", type="secondary"):
                     st.session_state.phase0_dataset = []
+                    st.success("All documents cleared!")
                     st.rerun()
         
         with col3:
@@ -317,7 +324,13 @@ def auto_label_document(doc_id: str, password: str = "", model: str = "anthropic
     
     try:
         # Decode the base64 content
-        file_content = base64.b64decode(document['content'])
+        content_str = document['content']
+        if isinstance(content_str, str):
+            # content_str is already a base64 string, decode it directly
+            file_content = base64.b64decode(content_str)
+        else:
+            # content_str is bytes, decode to string first then base64 decode
+            file_content = base64.b64decode(content_str.decode('utf-8'))
         file_extension = os.path.splitext(document['name'])[1]
         
         # Convert document to images for vision processing
@@ -1296,7 +1309,9 @@ def show_claude_labeling_interface():
     
     with col2:
         if st.button("Label All Filtered", disabled=len(filtered_docs) == 0):
-            if st.confirm(f"Label all {len(filtered_docs)} documents? Estimated cost: ${estimate_labeling_cost(filtered_docs, selected_model):.3f}"):
+            estimated_cost = estimate_labeling_cost(filtered_docs, selected_model)
+            st.warning(f"⚠️ This will label {len(filtered_docs)} documents with estimated cost: ${estimated_cost:.3f}")
+            if st.button("🚀 Confirm Label All", type="primary"):
                 label_document_batch(filtered_docs, selected_model, batch_password)
     
     with col3:
@@ -1787,7 +1802,8 @@ def label_all_unlabeled_documents():
     selected_model = gpt4o_models[0]
     estimated_cost = estimate_labeling_cost(unlabeled_docs, selected_model)
     
-    if st.confirm(f"Label {len(unlabeled_docs)} documents with {selected_model}? Estimated cost: ${estimated_cost:.3f}"):
+    st.warning(f"⚠️ This will label {len(unlabeled_docs)} documents with {selected_model}. Estimated cost: ${estimated_cost:.3f}")
+    if st.button("🚀 Confirm Label All Unlabeled", type="primary"):
         # Use default password "Hubert" for bulk operations
         label_document_batch(unlabeled_docs, selected_model, "Hubert")
 
@@ -2689,13 +2705,19 @@ def show_contextual_pii_interface():
             help="Choose the model for processing. Test mode works without API calls."
         )
     
-    # Quota warning
+    # API and Processing Info
+    st.info("""
+    💡 **Processing Options:**
+    - **Claude/OpenAI Models**: Use real API calls for actual document processing
+    - **🧪 TEST MODE**: Try the pipeline without API calls (demonstration only)
+    - **Troubleshooting**: If you get errors, TEST MODE can help verify the interface works
+    """)
+    
     st.warning("""
     ⚠️ **API Quota Notice**: If you see "quota exceeded" errors:
     - **Anthropic**: Check your usage at https://console.anthropic.com/
     - **OpenAI**: Check your billing at https://platform.openai.com/account/billing
     - **Alternative**: Try different model providers or use TEST MODE for demonstration
-    - **Free Alternative**: Consider using local models (if available)
     """)
     
     # Process button
@@ -2704,7 +2726,15 @@ def show_contextual_pii_interface():
         # Convert document to image data
         try:
             # Convert document content to images for processing
-            file_content = base64.b64decode(selected_doc['content'])
+            content_str = selected_doc['content']
+            
+            if isinstance(content_str, str):
+                # content_str is already a base64 string, decode it directly
+                file_content = base64.b64decode(content_str)
+            else:
+                # content_str is bytes, decode to string first then base64 decode
+                file_content = base64.b64decode(content_str.decode('utf-8'))
+            
             file_extension = os.path.splitext(selected_doc['name'])[1]
             
             # Convert document to images
@@ -2715,7 +2745,11 @@ def show_contextual_pii_interface():
                 return
                 
             # Use the first image for processing
-            image_data = images[0]
+            image_base64 = images[0]  # This is a base64 string from convert_document_to_images
+            
+            # Convert base64 string back to bytes for the contextual PII pipeline
+            # (The pipeline expects bytes, but convert_document_to_images returns base64 strings)
+            image_data = base64.b64decode(image_base64)
             
             with st.spinner("Processing through 3-step pipeline..."):
                 
@@ -2887,19 +2921,36 @@ def show_contextual_pii_interface():
                         
         except Exception as e:
             error_message = str(e)
+            logger.error(f"Contextual PII processing failed: {e}", exc_info=True)
+            
             if "quota" in error_message.lower() or "429" in error_message:
                 st.error("🚨 **API Quota Exceeded**")
                 st.info("""
                 **How to fix this:**
-                1. **OpenAI**: Add credits at https://platform.openai.com/account/billing
-                2. **Try Claude**: The system will automatically try Anthropic's Claude models
-                3. **Wait**: Quotas may reset hourly/daily depending on your plan
-                4. **Use fewer documents**: Process documents one at a time to conserve quota
+                1. **Anthropic**: Check your usage at https://console.anthropic.com/
+                2. **OpenAI**: Add credits at https://platform.openai.com/account/billing
+                3. **Try different model**: Switch between Claude and OpenAI models
+                4. **Wait**: Quotas may reset hourly/daily depending on your plan
+                5. **Use TEST MODE**: Try the test mode for demonstration
+                """)
+                st.warning(f"Technical details: {error_message}")
+            elif "bytes-like object" in error_message:
+                st.error("🔧 **Document Processing Error**")
+                st.info("""
+                **This appears to be a data format issue. Try:**
+                1. **Re-upload the document**: Sometimes re-uploading fixes format issues
+                2. **Different file format**: Try converting to PDF if using other formats
+                3. **Use TEST MODE**: Test the pipeline functionality without processing your document
+                4. **Check file integrity**: Ensure the document isn't corrupted
                 """)
                 st.warning(f"Technical details: {error_message}")
             else:
                 st.error(f"❌ Processing failed: {error_message}")
-            logger.error(f"Contextual PII processing failed: {e}")
+                st.info("💡 **Troubleshooting suggestions:**")
+                st.write("1. Try **TEST MODE** to verify the pipeline works")
+                st.write("2. Check if the document is supported (PDF, DOCX, images)")
+                st.write("3. Try a different model from the dropdown")
+                st.write("4. Re-upload the document if needed")
     
     # Show existing contextual results if available
     if selected_doc.get('contextual_pii_results'):
